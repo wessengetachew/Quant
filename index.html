@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -910,6 +910,7 @@
                 </div>
                 <div class="export-row">
                     <button class="export-btn csv" onclick="exportTableCSV('stepByStep')">Export Table CSV</button>
+                    <button class="export-btn png" onclick="exportStepByStepTablePNG()">Export Table PNG</button>
                 </div>
             </div>
         </div>
@@ -1017,106 +1018,6 @@
     
     <canvas id="compositeCanvas" style="display: none;"></canvas>
     
-    <div class="controls-container">
-        <div class="control-panel">
-            <h3>Comprehensive Screenshot Generator</h3>
-            <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 16px;">Generate a publication-ready composite image with selected charts, titles, and Ramanujan-style mathematical commentary</p>
-            
-            <div class="control-grid">
-                <div class="control-group">
-                    <label style="margin-bottom: 8px;">Main Title</label>
-                    <input type="text" id="screenshotTitle" value="Gap-Class Decomposition of ζ(2) = π²/6" style="width: 100%;">
-                </div>
-                
-                <div class="control-group">
-                    <label style="margin-bottom: 8px;">Subtitle</label>
-                    <input type="text" id="screenshotSubtitle" value="Analytical Framework for Prime Gap Contributions" style="width: 100%;">
-                </div>
-            </div>
-            
-            <div style="margin: 20px 0;">
-                <label style="display: block; color: #aaa; font-size: 0.9rem; margin-bottom: 12px; font-weight: 600;">Select Charts to Include:</label>
-                
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px;">
-                    <div class="toggle-wrapper">
-                        <label class="toggle">
-                            <input type="checkbox" id="includeConvergence" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span>Progressive Convergence</span>
-                    </div>
-                    
-                    <div class="toggle-wrapper">
-                        <label class="toggle">
-                            <input type="checkbox" id="includeGapContrib" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span>Gap Family Products</span>
-                    </div>
-                    
-                    <div class="toggle-wrapper">
-                        <label class="toggle">
-                            <input type="checkbox" id="includeGapDist" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span>Prime Distribution</span>
-                    </div>
-                    
-                    <div class="toggle-wrapper">
-                        <label class="toggle">
-                            <input type="checkbox" id="includePercentage" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span>Percentage Contributions</span>
-                    </div>
-                    
-                    <div class="toggle-wrapper">
-                        <label class="toggle">
-                            <input type="checkbox" id="includeError" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span>Error Analysis</span>
-                    </div>
-                    
-                    <div class="toggle-wrapper">
-                        <label class="toggle">
-                            <input type="checkbox" id="includeLogScale" checked>
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <span>Log-Scale Products</span>
-                    </div>
-                </div>
-            </div>
-            
-            <div style="margin: 20px 0;">
-                <label style="display: block; color: #aaa; font-size: 0.9rem; margin-bottom: 8px; font-weight: 600;">Commentary Style:</label>
-                <select id="commentaryStyle" style="width: 100%;">
-                    <option value="ramanujan">Ramanujan to Hardy - Intimate Mathematical Discovery</option>
-                    <option value="euler">Euler - Classical Elegance</option>
-                    <option value="gauss">Gauss - Profound Simplicity</option>
-                    <option value="riemann">Riemann - Analytical Depth</option>
-                </select>
-            </div>
-            
-            <div style="margin: 20px 0;">
-                <label style="display: block; color: #aaa; font-size: 0.9rem; margin-bottom: 8px; font-weight: 600;">Layout:</label>
-                <select id="screenshotLayout" style="width: 100%;">
-                    <option value="grid">Grid Layout (2 columns)</option>
-                    <option value="vertical">Vertical Stack</option>
-                    <option value="compact">Compact (3 columns)</option>
-                </select>
-            </div>
-            
-            <div class="button-row" style="margin-top: 20px;">
-                <button class="btn" onclick="generateScreenshot()">Generate Screenshot</button>
-                <button class="btn btn-secondary" onclick="generateScreenshot(true)">Generate (8K Resolution)</button>
-            </div>
-            
-            <div id="screenshotStatus" class="status-bar" style="display: none; margin-top: 16px;">
-                Generating screenshot...
-            </div>
-        </div>
-    </div>
     
     <canvas id="compositeCanvas" style="display: none;"></canvas>
     
@@ -3002,228 +2903,146 @@
             return csv;
         }
         
-        // Screenshot generation
-        function generateScreenshot(isHighRes = false) {
+        function exportStepByStepTablePNG() {
             if (!analysisResults) {
                 alert('Please run analysis first');
                 return;
             }
             
-            const statusBar = document.getElementById('screenshotStatus');
-            statusBar.style.display = 'block';
-            statusBar.className = 'status-bar computing';
-            statusBar.textContent = 'Generating comprehensive screenshot...';
+            const precision = parseInt(document.getElementById('stepByStepPrecision').value);
+            const gaps = analysisResults.evenGaps.slice(0, 15); // Top 15 rows
             
-            setTimeout(() => {
-                try {
-                    const canvas = document.getElementById('compositeCanvas');
-                    const ctx = canvas.getContext('2d');
-                    
-                    // Determine which charts to include
-                    const includeCharts = {
-                        convergence: document.getElementById('includeConvergence').checked,
-                        gapContrib: document.getElementById('includeGapContrib').checked,
-                        gapDist: document.getElementById('includeGapDist').checked,
-                        percentage: document.getElementById('includePercentage').checked,
-                        error: document.getElementById('includeError').checked,
-                        logScale: document.getElementById('includeLogScale').checked
-                    };
-                    
-                    const selectedCharts = Object.entries(includeCharts)
-                        .filter(([_, include]) => include)
-                        .map(([name, _]) => name);
-                    
-                    if (selectedCharts.length === 0) {
-                        statusBar.className = 'status-bar';
-                        statusBar.style.color = '#ff6464';
-                        statusBar.textContent = 'Please select at least one chart';
-                        return;
-                    }
-                    
-                    const layout = document.getElementById('screenshotLayout').value;
-                    const resolution = isHighRes ? 2 : 1;
-                    
-                    // Calculate layout
-                    let cols, rows;
-                    switch(layout) {
-                        case 'grid':
-                            cols = 2;
-                            rows = Math.ceil(selectedCharts.length / 2);
-                            break;
-                        case 'vertical':
-                            cols = 1;
-                            rows = selectedCharts.length;
-                            break;
-                        case 'compact':
-                            cols = 3;
-                            rows = Math.ceil(selectedCharts.length / 3);
-                            break;
-                    }
-                    
-                    const chartWidth = 1920 * resolution;
-                    const chartHeight = 1080 * resolution;
-                    const headerHeight = 300 * resolution;
-                    const footerHeight = 600 * resolution;
-                    const padding = 40 * resolution;
-                    
-                    const canvasWidth = cols * chartWidth + (cols + 1) * padding;
-                    const canvasHeight = headerHeight + rows * chartHeight + (rows + 1) * padding + footerHeight;
-                    
-                    canvas.width = canvasWidth;
-                    canvas.height = canvasHeight;
-                    
-                    // Background
-                    ctx.fillStyle = '#0a0a0f';
-                    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
-                    
-                    // Header
-                    const title = document.getElementById('screenshotTitle').value;
-                    const subtitle = document.getElementById('screenshotSubtitle').value;
-                    
-                    ctx.fillStyle = '#ffd700';
-                    ctx.font = `bold ${80 * resolution}px sans-serif`;
-                    ctx.textAlign = 'center';
-                    ctx.fillText(title, canvasWidth / 2, 100 * resolution);
-                    
-                    ctx.fillStyle = '#aaa';
-                    ctx.font = `${40 * resolution}px sans-serif`;
-                    ctx.fillText(subtitle, canvasWidth / 2, 170 * resolution);
-                    
-                    // Stats summary
-                    const statsText = `Analysis: ${analysisResults.totalPrimes.toLocaleString()} primes up to ${analysisResults.maxPrime.toLocaleString()} | ${analysisResults.evenGaps.length} gap families | Error: ${(analysisResults.finalRelativeError * 100).toFixed(6)}%`;
-                    ctx.fillStyle = '#888';
-                    ctx.font = `${32 * resolution}px monospace`;
-                    ctx.fillText(statsText, canvasWidth / 2, 240 * resolution);
-                    
-                    // Draw charts
-                    const chartMap = {
-                        convergence: 'convergenceChart',
-                        gapContrib: 'gapContribChart',
-                        gapDist: 'gapDistChart',
-                        percentage: 'percentageChart',
-                        error: 'errorChart',
-                        logScale: 'logScaleChart'
-                    };
-                    
-                    selectedCharts.forEach((chartName, idx) => {
-                        const row = Math.floor(idx / cols);
-                        const col = idx % cols;
-                        
-                        const x = col * chartWidth + (col + 1) * padding;
-                        const y = headerHeight + row * chartHeight + (row + 1) * padding;
-                        
-                        const sourceCanvas = document.getElementById(chartMap[chartName]);
-                        ctx.drawImage(sourceCanvas, x, y, chartWidth, chartHeight);
-                    });
-                    
-                    // Footer commentary
-                    const commentaryY = headerHeight + rows * chartHeight + (rows + 1) * padding + 60 * resolution;
-                    const commentary = generateCommentary();
-                    
-                    ctx.fillStyle = '#1a1a2a';
-                    ctx.fillRect(padding, commentaryY - 40 * resolution, canvasWidth - 2 * padding, footerHeight - 80 * resolution);
-                    
-                    ctx.strokeStyle = '#ffd700';
-                    ctx.lineWidth = 3 * resolution;
-                    ctx.strokeRect(padding, commentaryY - 40 * resolution, canvasWidth - 2 * padding, footerHeight - 80 * resolution);
-                    
-                    ctx.fillStyle = '#ffd700';
-                    ctx.font = `bold ${36 * resolution}px serif`;
-                    ctx.textAlign = 'left';
-                    ctx.fillText('Mathematical Observations:', padding + 40 * resolution, commentaryY);
-                    
-                    // Wrap commentary text
-                    ctx.fillStyle = '#e0e0e0';
-                    ctx.font = `${28 * resolution}px serif`;
-                    const maxWidth = canvasWidth - 2 * padding - 80 * resolution;
-                    const lineHeight = 42 * resolution;
-                    let currentY = commentaryY + 60 * resolution;
-                    
-                    const paragraphs = commentary.split('\n\n');
-                    paragraphs.forEach(para => {
-                        const words = para.split(' ');
-                        let line = '';
-                        
-                        words.forEach(word => {
-                            const testLine = line + word + ' ';
-                            const metrics = ctx.measureText(testLine);
-                            
-                            if (metrics.width > maxWidth && line !== '') {
-                                ctx.fillText(line, padding + 40 * resolution, currentY);
-                                currentY += lineHeight;
-                                line = word + ' ';
-                            } else {
-                                line = testLine;
-                            }
-                        });
-                        
-                        if (line !== '') {
-                            ctx.fillText(line, padding + 40 * resolution, currentY);
-                            currentY += lineHeight;
-                        }
-                        currentY += lineHeight * 0.5;
-                    });
-                    
-                    // Date stamp
-                    ctx.fillStyle = '#666';
-                    ctx.font = `${24 * resolution}px monospace`;
-                    ctx.textAlign = 'right';
-                    ctx.fillText(new Date().toISOString().slice(0, 10), canvasWidth - padding - 40 * resolution, canvasHeight - 40 * resolution);
-                    
-                    // Export
-                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-                    const link = document.createElement('a');
-                    link.download = `gap_decomposition_comprehensive_${analysisResults.maxPrime}_${isHighRes ? '8K' : '4K'}_${timestamp}.png`;
-                    link.href = canvas.toDataURL('image/png');
-                    link.click();
-                    
-                    statusBar.className = 'status-bar complete';
-                    statusBar.textContent = `Screenshot generated successfully (${isHighRes ? '8K' : '4K'} resolution, ${selectedCharts.length} charts)`;
-                    
-                } catch (error) {
-                    statusBar.className = 'status-bar';
-                    statusBar.style.color = '#ff6464';
-                    statusBar.textContent = `Error: ${error.message}`;
-                    console.error(error);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+            
+            // Calculate dimensions
+            const headerH = 200;
+            const tableHeaderH = 80;
+            const rowH = 60;
+            const footerH = 100;
+            const padding = 40;
+            
+            const canvasW = 3840;
+            const canvasH = headerH + tableHeaderH + (gaps.length + 1) * rowH + footerH;
+            
+            canvas.width = canvasW;
+            canvas.height = canvasH;
+            
+            // Background
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, canvasW, canvasH);
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 64px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Step-by-Step Gap Accumulation: ζ(2) = P₀ × P₂ × P₄ × ...', canvasW / 2, 80);
+            
+            ctx.fillStyle = '#888';
+            ctx.font = '32px monospace';
+            ctx.fillText(`Analysis: ${analysisResults.totalPrimes.toLocaleString()} primes up to ${analysisResults.maxPrime.toLocaleString()}`, canvasW / 2, 140);
+            
+            // Table headers
+            const tableY = headerH + padding;
+            const headers = ['Step', 'Gap', 'P_g', 'Cumulative Product', 'Distance to π²/6', '% Complete'];
+            const colWidths = [0.08, 0.08, 0.18, 0.24, 0.22, 0.20];
+            
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(padding, tableY, canvasW - 2 * padding, tableHeaderH);
+            
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(padding, tableY, canvasW - 2 * padding, tableHeaderH);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 36px sans-serif';
+            ctx.textAlign = 'center';
+            
+            let xPos = padding;
+            headers.forEach((header, idx) => {
+                const w = (canvasW - 2 * padding) * colWidths[idx];
+                ctx.fillText(header, xPos + w / 2, tableY + 50);
+                xPos += w;
+            });
+            
+            // Table rows
+            ctx.font = '32px monospace';
+            gaps.forEach((gap, rowIdx) => {
+                const y = tableY + tableHeaderH + rowIdx * rowH;
+                const data = analysisResults.gapProducts[gap];
+                const cumulative = analysisResults.progressiveProducts[rowIdx].value;
+                const distance = analysisResults.targetZeta2 - cumulative;
+                const percentComplete = (cumulative / analysisResults.targetZeta2) * 100;
+                
+                // Alternating row background
+                if (rowIdx % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                    ctx.fillRect(padding, y, canvasW - 2 * padding, rowH);
                 }
-            }, 100);
-        }
-        
-        function generateCommentary() {
-            const style = document.getElementById('commentaryStyle').value;
-            const res = analysisResults;
-            
-            // Extract key insights
-            const dominantGap = res.evenGaps[0];
-            const dominantProduct = res.gapProducts[dominantGap].product;
-            const dominantContribution = (dominantProduct / res.targetZeta2) * 100;
-            
-            const twinPrimeCount = res.gapProducts[2] ? res.gapProducts[2].count : 0;
-            const twinContribution = res.percentageContributions[2] || 0;
-            
-            const finalError = res.finalRelativeError;
-            const gapFamilies = res.evenGaps.length;
-            
-            // Calculate convergence rate
-            const midPoint = Math.floor(res.progressiveProducts.length / 2);
-            const midError = res.progressiveProducts[midPoint].relativeError;
-            
-            switch(style) {
-                case 'ramanujan':
-                    return `My dear Hardy,\n\nI have been examining the most curious decomposition of ζ(2). When one partitions the Euler product by prime gap classes, the structure reveals itself with remarkable clarity. The twin primes alone—those ${twinPrimeCount} noble pairs separated by the minimal even gap—contribute approximately ${twinContribution.toFixed(2)}% to the logarithmic measure, a proportion that strikes me as deeply significant.\n\nWhat arrests my attention most profoundly is the precipitous convergence: after incorporating merely ${gapFamilies} gap families, we achieve agreement with π²/6 to within ${(finalError * 100).toExponential(2)}%. The dominant gap class (gap=${dominantGap}) alone accounts for ${dominantContribution.toFixed(2)}% of the final value—surely this concentration of contribution must encode some deeper principle about the distribution of primes.\n\nI venture to suggest that if we could determine the exact asymptotic for each P_g, we might illuminate the very nature of prime constellations. The logarithmic products appear to follow a pattern that may yield to analysis, though I confess the precise form eludes me still.`;
                 
-                case 'euler':
-                    return `Concerning the remarkable decomposition of the series Σ 1/n² = π²/6:\n\nBy partitioning the infinite product over primes according to their forward gaps, we observe that the contributions admit a natural hierarchical ordering. The gap class of magnitude ${dominantGap} dominates, contributing ${dominantContribution.toFixed(2)}% of the total value. The twin primes, numbering ${twinPrimeCount} among the first ${res.maxPrime.toLocaleString()} primes, provide ${twinContribution.toFixed(2)}% to the logarithmic sum.\n\nThe convergence proceeds with geometric rapidity—a mere ${gapFamilies} terms suffice to approximate π²/6 with relative error ${(finalError * 100).toExponential(2)}%. This elegant factorization suggests that the mysterious constant π emerges not merely from circular geometry, but from the very arithmetic structure of prime gaps.`;
+                ctx.fillStyle = '#e0e0e0';
+                const rowData = [
+                    (rowIdx + 1).toString(),
+                    gap.toString(),
+                    data.product.toFixed(precision),
+                    cumulative.toFixed(precision),
+                    distance.toFixed(precision),
+                    percentComplete.toFixed(precision) + '%'
+                ];
                 
-                case 'gauss':
-                    return `Observations on the gap-class partition of ζ(2):\n\nThe decomposition ζ(2) = ∏P_g exhibits striking regularity. Among ${res.totalPrimes.toLocaleString()} primes analyzed, the distribution across ${gapFamilies} gap families reveals a clear hierarchy. Gap ${dominantGap} contains the plurality, accounting for ${dominantContribution.toFixed(2)}% of the product value.\n\nThe twin prime family (gap=2), comprising ${twinPrimeCount} instances, contributes ${twinContribution.toFixed(2)}% to log(ζ(2)). The rapid convergence (error = ${(finalError * 100).toExponential(2)}% after ${gapFamilies} terms) suggests an underlying simplicity worthy of deeper investigation. One suspects a connection to the prime number theorem, though the precise relationship remains to be established.`;
-                
-                case 'riemann':
-                    return `Analysis of the gap-class decomposition in the critical strip:\n\nThe partition ζ(2) = ∏_{g even} P_g where P_g = ∏_{p: gap(p)=g} p²/(p²-1) reveals analytic structure relevant to the distribution of zeros. Examining ${res.totalPrimes.toLocaleString()} primes up to ${res.maxPrime.toLocaleString()}, we observe ${gapFamilies} significant gap families.\n\nThe logarithmic contributions exhibit monotonic decay: gap ${dominantGap} provides ${dominantContribution.toFixed(2)}% of the total, while twin primes (${twinPrimeCount} instances) contribute ${twinContribution.toFixed(2)}%. The exceptional convergence rate—relative error ${(finalError * 100).toExponential(2)}% with finite truncation—suggests that the gap structure encodes information about the analytic continuation of ζ(s) into the critical strip. This decomposition may offer a discrete approach to understanding the continuous properties of the zeta function.`;
-                
-                default:
-                    return generateCommentary(); // Default to Ramanujan
-            }
+                xPos = padding;
+                rowData.forEach((cell, colIdx) => {
+                    const w = (canvasW - 2 * padding) * colWidths[colIdx];
+                    ctx.fillText(cell, xPos + w / 2, y + 42);
+                    xPos += w;
+                });
+            });
+            
+            // Target row
+            const targetY = tableY + tableHeaderH + gaps.length * rowH;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(padding, targetY, canvasW - 2 * padding, rowH);
+            
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(padding, targetY, canvasW - 2 * padding, rowH);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 36px monospace';
+            
+            const targetData = [
+                'Target',
+                '∞',
+                '1.0',
+                analysisResults.targetZeta2.toFixed(precision),
+                '0.' + '0'.repeat(precision),
+                '100.' + '0'.repeat(precision) + '%'
+            ];
+            
+            xPos = padding;
+            targetData.forEach((cell, colIdx) => {
+                const w = (canvasW - 2 * padding) * colWidths[colIdx];
+                ctx.fillText(cell, xPos + w / 2, targetY + 42);
+                xPos += w;
+            });
+            
+            // Footer
+            ctx.fillStyle = '#666';
+            ctx.font = '28px monospace';
+            ctx.textAlign = 'right';
+            const dateStr = new Date().toLocaleDateString('en-GB', { 
+                day: '2-digit', 
+                month: 'long', 
+                year: 'numeric' 
+            });
+            ctx.fillText(dateStr, canvasW - padding, canvasH - 40);
+            
+            // Export
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            const link = document.createElement('a');
+            link.download = `step_by_step_table_${analysisResults.maxPrime}_${timestamp}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
         }
         
         // Composite screenshot generation
@@ -3299,7 +3118,8 @@
                     const chartW = 1920 * scale;
                     const chartH = 1080 * scale;
                     const headerH = 250 * scale;
-                    const footerH = 800 * scale;
+                    // Adjust footer based on number of charts - less space for single chart
+                    const footerH = selectedCharts.length === 1 ? 400 * scale : 600 * scale;
                     const padding = 40 * scale;
                     const statsH = 100 * scale;
                     
@@ -3379,10 +3199,12 @@
                     // Generate and render narrative
                     const narrative = generateRamanujanNarrative();
                     ctx.fillStyle = '#e0e0e0';
-                    ctx.font = `${26 * scale}px Georgia, serif`;
+                    // Smaller font for single chart to fit better
+                    const fontSize = selectedCharts.length === 1 ? 22 : 26;
+                    ctx.font = `${fontSize * scale}px Georgia, serif`;
                     
                     const maxLineWidth = canvasW - 2 * padding - 60 * scale;
-                    const lineHeight = 38 * scale;
+                    const lineHeight = (fontSize + 12) * scale;
                     let currentY = footerY + 100 * scale;
                     
                     const paragraphs = narrative.split('\n\n');
@@ -3446,7 +3268,6 @@
             
             // Extract key numerical insights
             const twinCount = r.gapProducts[2] ? r.gapProducts[2].count : 0;
-            const twinProduct = r.gapProducts[2] ? r.gapProducts[2].product : 1;
             const twinPct = r.percentageContributions[2] ? r.percentageContributions[2].toFixed(3) : 0;
             
             const gap4Count = r.gapProducts[4] ? r.gapProducts[4].count : 0;
@@ -3458,23 +3279,22 @@
             const errorExp = Math.floor(Math.log10(r.finalRelativeError));
             const errorMantissa = (r.finalRelativeError / Math.pow(10, errorExp)).toFixed(2);
             
-            // Calculate what portion of product comes from first few gaps
-            const firstThreeGaps = r.progressiveProducts.length >= 3 ? r.progressiveProducts[2].value : 0;
-            const firstThreePct = ((firstThreeGaps / r.targetZeta2) * 100).toFixed(2);
+            // Random variation selector - always Euler style
+            const variation = Math.floor(Math.random() * 5);
             
-            const narrative = `My dear Hardy,
-
-I write to you with great excitement concerning a most remarkable partition of Euler's celebrated identity ζ(2) = π²/6. By decomposing the infinite product according to prime gap classes, the structure reveals itself with extraordinary clarity.
-
-Consider: among the ${r.totalPrimes.toLocaleString()} primes examined up to ${r.maxPrime.toLocaleString()}, we find ${twinCount} twin prime pairs (gap 2), ${gap4Count} cousin pairs (gap 4), and ${gap6Count} sexy prime pairs (gap 6). The twin primes alone contribute ${twinPct}% to the logarithmic measure of ζ(2), while gaps 4 and 6 provide ${gap4Pct}% and ${gap6Pct}% respectively. What strikes me most profoundly is that merely the first three gap families—accounting for but a fraction of all primes—already capture ${firstThreePct}% of the final value.
-
-The convergence proceeds with geometric swiftness: after partitioning across ${r.evenGaps.length} gap families, our finite product differs from π²/6 by merely ${errorMantissa} × 10^${errorExp} in relative terms. This precipitous approach to the transcendental limit suggests to me that each gap class P_g must admit an asymptotic formula, perhaps expressible in terms of π itself.
-
-I venture to propose that the logarithmic products log(P_g) follow a pattern inversely proportional to some power of g, though the precise exponent eludes me still. If we could establish the exact form, we might illuminate not merely the structure of ζ(2), but the very distribution of prime constellations throughout the integers. The twin prime conjecture itself may be encoded in the behavior of P_2 as we extend to infinity.
-
-The beauty of this decomposition lies in its reduction of the continuous (π²/6) to the discrete (prime gaps), bridging analysis and arithmetic in a manner reminiscent of your own work on partitions.`;
-
-            return narrative;
+            const eulerVariations = [
+                `Concerning the partition of ζ(2) by prime gaps: among ${r.totalPrimes.toLocaleString()} primes, the ${twinCount} twin pairs contribute ${twinPct}% logarithmically. With ${r.evenGaps.length} gap families, we achieve ${errorMantissa} × 10^${errorExp} precision relative to π²/6. The geometric rapidity of convergence suggests π emerges from prime gap arithmetic itself.`,
+                
+                `The decomposition ∏P_g reveals that ${twinCount} twin primes provide ${twinPct}% of log(ζ(2)). Partitioning ${r.totalPrimes.toLocaleString()} primes across ${r.evenGaps.length} gap classes yields error ${errorMantissa} × 10^${errorExp}. This elegant structure connects circular geometry to prime distribution.`,
+                
+                `By gap-class partition, ζ(2) = ∏P_g exhibits rapid convergence. The ${twinCount} twins contribute ${twinPct}%, while ${r.evenGaps.length} families suffice for ${errorMantissa} × 10^${errorExp} precision. A remarkable bridge between discrete gaps and π²/6.`,
+                
+                `The ${r.evenGaps.length} gap families demonstrate hierarchical contribution: twins (${twinCount} pairs) at ${twinPct}%, cousins (${gap4Count} pairs) at ${gap4Pct}%, sexy primes (${gap6Count} pairs) at ${gap6Pct}%. Convergence to π²/6 proceeds with error ${errorMantissa} × 10^${errorExp}, revealing π's arithmetic foundation.`,
+                
+                `Among ${r.totalPrimes.toLocaleString()} primes examined, the gap decomposition yields ${r.evenGaps.length} distinct families. Twin primes alone account for ${twinPct}% of the logarithmic sum. The finite product approximates π²/6 with merely ${errorMantissa} × 10^${errorExp} relative deviation, a testament to the profound regularity underlying prime distribution.`
+            ];
+            
+            return eulerVariations[variation];
         }
         
         // Initialize
