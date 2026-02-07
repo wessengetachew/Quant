@@ -3,125 +3,3482 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The Deterministic Structure of Finite Coprime Lattices</title>
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+    <title>Gap-Class Decomposition of ζ(2) = π²/6 | Mathematical Research Tool</title>
     <style>
-        body { font-family: "Times New Roman", Times, serif; line-height: 1.6; color: #1a1a1a; max-width: 900px; margin: 0 auto; padding: 60px; background-color: #ffffff; }
-        .paper-header { text-align: center; margin-bottom: 50px; border-bottom: 2px solid #000; padding-bottom: 20px; }
-        h1 { font-size: 2.2em; margin-bottom: 10px; text-transform: uppercase; letter-spacing: 1px; }
-        h2 { font-size: 1.5em; border-bottom: 1px solid #ccc; padding-bottom: 5px; margin-top: 40px; }
-        h3 { font-size: 1.2em; margin-top: 25px; }
-        .author { font-variant: small-caps; font-size: 1.3em; margin-bottom: 5px; }
-        .affiliation { font-style: italic; color: #444; margin-bottom: 5px; }
-        .abstract { margin: 30px 60px; text-align: justify; font-size: 0.95em; }
-        .abstract-title { font-weight: bold; text-align: center; display: block; margin-bottom: 10px; }
-        .formula-block { background: #fdfdfd; border: 1px solid #efefef; padding: 20px; margin: 20px 0; text-align: center; box-shadow: inset 0 0 5px rgba(0,0,0,0.02); }
-        .identity-table { width: 100%; border-collapse: collapse; margin: 25px 0; font-size: 0.9em; }
-        .identity-table th, .identity-table td { border: 1px solid #000; padding: 10px; text-align: left; }
-        .identity-table th { background-color: #f0f0f0; }
-        .citation { color: #2980b9; text-decoration: none; font-size: 0.9em; }
-        .footer { margin-top: 60px; padding-top: 20px; border-top: 1px solid #000; font-size: 0.8em; text-align: center; }
-        p { text-align: justify; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { 
+            font-family: 'Segoe UI', system-ui, sans-serif; 
+            background: #0a0a0f; 
+            color: #e0e0e0;
+            line-height: 1.6;
+        }
+        
+        .header { 
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%); 
+            padding: 40px;
+            border-bottom: 2px solid #2a2a4a;
+        }
+        .header h1 { 
+            font-size: 2.2rem; 
+            color: #ffd700; 
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+        .header .subtitle { 
+            color: #aaa; 
+            font-size: 1.1rem; 
+            margin-bottom: 8px;
+        }
+        .header .author { 
+            color: #888; 
+            font-size: 0.95rem;
+        }
+        
+        .introduction {
+            max-width: 1400px;
+            margin: 40px auto;
+            padding: 0 40px;
+        }
+        
+        .intro-section {
+            background: #12121a;
+            border-radius: 8px;
+            border: 1px solid #2a2a4a;
+            padding: 32px;
+            margin-bottom: 24px;
+        }
+        
+        .intro-section h2 {
+            color: #ffd700;
+            font-size: 1.6rem;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #2a2a4a;
+            padding-bottom: 10px;
+        }
+        
+        .intro-section h3 {
+            color: #ffd700;
+            font-size: 1.2rem;
+            margin: 24px 0 12px 0;
+        }
+        
+        .intro-section p {
+            margin-bottom: 16px;
+            color: #ccc;
+            font-size: 1rem;
+        }
+        
+        .intro-section ul {
+            margin-left: 24px;
+            margin-bottom: 16px;
+            color: #ccc;
+        }
+        
+        .intro-section li {
+            margin-bottom: 10px;
+        }
+        
+        .formula-box {
+            background: #1a1a2a;
+            padding: 20px;
+            border-radius: 6px;
+            font-family: 'Times New Roman', serif;
+            font-size: 1.3rem;
+            text-align: center;
+            color: #ffd700;
+            margin: 20px 0;
+            border-left: 4px solid #ffd700;
+        }
+        
+        .research-question {
+            background: linear-gradient(135deg, #1a1a2a 0%, #2a1a1a 100%);
+            padding: 24px;
+            border-radius: 6px;
+            border-left: 4px solid #ff6464;
+            margin: 20px 0;
+        }
+        
+        .research-question h3 {
+            color: #ff6464;
+            margin-bottom: 12px;
+        }
+        
+        .controls-container {
+            max-width: 1400px;
+            margin: 0 auto 30px auto;
+            padding: 0 40px;
+        }
+        
+        .control-panel {
+            background: #12121a;
+            border-radius: 8px;
+            border: 1px solid #2a2a4a;
+            padding: 24px;
+            margin-bottom: 20px;
+        }
+        
+        .control-panel h3 {
+            color: #ffd700;
+            font-size: 1.1rem;
+            margin-bottom: 16px;
+            padding-bottom: 8px;
+            border-bottom: 1px solid #2a2a4a;
+        }
+        
+        .control-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .control-group label {
+            font-size: 0.85rem;
+            color: #aaa;
+            margin-bottom: 6px;
+            display: flex;
+            justify-content: space-between;
+        }
+        
+        .control-value {
+            color: #ffd700;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        input[type="number"], select {
+            width: 100%;
+            padding: 10px;
+            background: #1a1a2a;
+            border: 1px solid #3a3a5a;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 0.9rem;
+        }
+        
+        input[type="number"]:focus, select:focus {
+            outline: none;
+            border-color: #ffd700;
+        }
+        
+        .btn {
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            border: none;
+            border-radius: 4px;
+            color: #000;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(255, 215, 0, 0.3);
+        }
+        
+        .btn:active {
+            transform: translateY(0);
+        }
+        
+        .btn-secondary {
+            background: #2a2a4a;
+            color: #e0e0e0;
+        }
+        
+        .btn-secondary:hover {
+            background: #3a3a5a;
+            box-shadow: none;
+        }
+        
+        .button-row {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        
+        .charts-container {
+            max-width: 3840px;
+            margin: 0 auto;
+            padding: 0 40px 40px 40px;
+        }
+        
+        .chart-wrapper {
+            background: #12121a;
+            border-radius: 8px;
+            border: 1px solid #2a2a4a;
+            padding: 20px;
+            margin-bottom: 24px;
+        }
+        
+        .chart-title {
+            color: #ffd700;
+            font-size: 1.2rem;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+        
+        canvas {
+            display: block;
+            width: 100%;
+            height: auto;
+            background: #0a0a10;
+            border-radius: 4px;
+        }
+        
+        .status-bar {
+            background: #1a1a2a;
+            padding: 12px 20px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .status-bar.computing {
+            color: #ffd700;
+            border-left: 4px solid #ffd700;
+        }
+        
+        .status-bar.complete {
+            color: #64ff64;
+            border-left: 4px solid #64ff64;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 16px;
+            margin-bottom: 20px;
+        }
+        
+        .stat-card {
+            background: #1a1a2a;
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 3px solid #ffd700;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #888;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 6px;
+        }
+        
+        .stat-value {
+            font-size: 1.4rem;
+            color: #ffd700;
+            font-family: monospace;
+        }
+        
+        .toggle-wrapper {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 12px;
+        }
+        
+        .toggle {
+            position: relative;
+            width: 50px;
+            height: 26px;
+        }
+        
+        .toggle input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            inset: 0;
+            background: #2a2a4a;
+            border-radius: 13px;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+        
+        .toggle-slider:before {
+            content: '';
+            position: absolute;
+            width: 20px;
+            height: 20px;
+            left: 3px;
+            top: 3px;
+            background: #666;
+            border-radius: 50%;
+            transition: 0.3s;
+        }
+        
+        .toggle input:checked + .toggle-slider {
+            background: #ffd700;
+        }
+        
+        .toggle input:checked + .toggle-slider:before {
+            transform: translateX(24px);
+            background: #000;
+        }
+        
+        .animation-controls {
+            background: #1a1a2a;
+            padding: 16px;
+            border-radius: 6px;
+            margin-top: 16px;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #2a2a4a;
+            border-radius: 4px;
+            overflow: hidden;
+            margin-top: 12px;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #ffd700, #ffaa00);
+            width: 0%;
+            transition: width 0.3s;
+        }
+        
+        .stats-table-wrapper {
+            background: #1a1a2a;
+            border-radius: 6px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        
+        .stats-table-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #3a3a5a;
+        }
+        
+        .stats-table-title {
+            color: #ffd700;
+            font-size: 1rem;
+            font-weight: 600;
+        }
+        
+        .precision-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .precision-control label {
+            color: #aaa;
+            font-size: 0.85rem;
+        }
+        
+        .precision-control select {
+            width: 80px;
+            padding: 6px;
+            background: #12121a;
+            border: 1px solid #3a3a5a;
+            border-radius: 4px;
+            color: #e0e0e0;
+            font-size: 0.85rem;
+        }
+        
+        .show-all-toggle {
+            background: #2a2a4a;
+            color: #e0e0e0;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background 0.2s;
+        }
+        
+        .show-all-toggle:hover {
+            background: #3a3a5a;
+        }
+        
+        .stats-table-container {
+            max-height: 300px;
+            overflow-y: auto;
+            border-radius: 4px;
+        }
+        
+        .stats-table-container.expanded {
+            max-height: 800px;
+        }
+        
+        .stats-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-family: monospace;
+            font-size: 0.9rem;
+        }
+        
+        .stats-table thead {
+            position: sticky;
+            top: 0;
+            background: #12121a;
+            z-index: 10;
+        }
+        
+        .stats-table th {
+            padding: 12px;
+            text-align: left;
+            color: #ffd700;
+            font-weight: 600;
+            border-bottom: 2px solid #3a3a5a;
+        }
+        
+        .stats-table th:first-child {
+            text-align: center;
+        }
+        
+        .stats-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #2a2a4a;
+            color: #ccc;
+        }
+        
+        .stats-table td:first-child {
+            text-align: center;
+            color: #ffd700;
+            font-weight: 600;
+        }
+        
+        .stats-table tr:hover {
+            background: #1a1a2a;
+        }
+        
+        .stats-table tr:nth-child(even) {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        
+        .prime-list {
+            max-width: 400px;
+            color: #888;
+            font-size: 0.85rem;
+        }
+        
+        .stats-table-container::-webkit-scrollbar {
+            width: 10px;
+        }
+        
+        .stats-table-container::-webkit-scrollbar-track {
+            background: #12121a;
+            border-radius: 4px;
+        }
+        
+        .stats-table-container::-webkit-scrollbar-thumb {
+            background: #3a3a5a;
+            border-radius: 4px;
+        }
+        
+        .stats-table-container::-webkit-scrollbar-thumb:hover {
+            background: #4a4a6a;
+        }
+        
+        .export-row {
+            display: flex;
+            gap: 8px;
+            margin-top: 12px;
+            padding-top: 12px;
+            border-top: 1px solid #3a3a5a;
+        }
+        
+        .export-btn {
+            flex: 1;
+            padding: 8px 12px;
+            background: #2a2a4a;
+            color: #e0e0e0;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: all 0.2s;
+        }
+        
+        .export-btn:hover {
+            background: #3a3a5a;
+            transform: translateY(-1px);
+        }
+        
+        .export-btn.csv {
+            background: linear-gradient(135deg, #64ff64 0%, #32aa32 100%);
+            color: #000;
+        }
+        
+        .export-btn.csv:hover {
+            box-shadow: 0 2px 8px rgba(100, 255, 100, 0.3);
+        }
+        
+        .export-btn.png {
+            background: linear-gradient(135deg, #64ffff 0%, #32aaaa 100%);
+            color: #000;
+        }
+        
+        .export-btn.png:hover {
+            box-shadow: 0 2px 8px rgba(100, 255, 255, 0.3);
+        }
+        
+        .section-divider {
+            height: 1px;
+            background: #3a3a5a;
+            margin: 24px 0;
+        }
     </style>
 </head>
 <body>
+    <header class="header">
+        <h1>Gap-Class Decomposition of ζ(2) = π²/6</h1>
+        <div class="subtitle">Analytical Framework for Prime Gap Contributions to the Riemann Zeta Function</div>
+        <div class="author">Mathematical Research Tool | 2025</div>
+    </header>
+    
+    <div class="introduction">
+        <div class="intro-section">
+            <h2>Theoretical Foundation</h2>
+            
+            <p>Leonhard Euler established in 1734 that the Riemann zeta function at s=2 admits the following representation:</p>
+            
+            <div class="formula-box">
+                ζ(2) = Σ<sub>n=1</sub><sup>∞</sup> 1/n² = ∏<sub>p prime</sub> p²/(p²-1) = π²/6 ≈ 1.644934066848...
+            </div>
+            
+            <p>The Euler product expresses ζ(2) as an infinite product over all prime numbers, where each prime p contributes the multiplicative factor p²/(p²-1).</p>
+            
+            <h3>Gap-Class Partition</h3>
+            
+            <p>This framework introduces a partition of the Euler product based on prime gap classes. Define gap(p) as the forward difference p<sub>n+1</sub> - p<sub>n</sub> for consecutive primes. The Euler product may then be reorganized as:</p>
+            
+            <div class="formula-box">
+                ζ(2) = ∏<sub>g∈{0,2,4,6,...}</sub> P<sub>g</sub>
+            </div>
+            
+            <p>where each gap family product is:</p>
+            
+            <div class="formula-box">
+                P<sub>g</sub> = ∏<sub>p: gap(p)=g</sub> p²/(p²-1)
+            </div>
+            
+            <h3>Gap Classification</h3>
+            
+            <p>Prime gaps partition into the following classes:</p>
+            
+            <ul>
+                <li><strong>Gap 0:</strong> {2} (special case)</li>
+                <li><strong>Gap 2 (Twin Primes):</strong> {3, 5, 11, 13, 17, 19, 29, 31, 41, 43, ...}</li>
+                <li><strong>Gap 4 (Cousin Primes):</strong> {7, 13, 19, 37, 43, 67, 79, ...}</li>
+                <li><strong>Gap 6 (Sexy Primes):</strong> {5, 7, 11, 13, 17, 23, 31, 37, ...}</li>
+            </ul>
+            
+            <h3>Research Objectives</h3>
+            
+            <p>This computational framework enables investigation of the following questions:</p>
+            
+            <ol>
+                <li><strong>Quantitative Contributions:</strong> Determine the absolute and relative contribution of each gap class to ζ(2)</li>
+                <li><strong>Convergence Analysis:</strong> Characterize whether individual P<sub>g</sub> admit closed-form expressions involving π or other fundamental constants</li>
+                <li><strong>Asymptotic Behavior:</strong> Analyze how P<sub>g</sub> scales as g → ∞</li>
+                <li><strong>Gap Distribution:</strong> Examine relationships between gap class populations and analytic properties of ζ(s)</li>
+                <li><strong>Generalization:</strong> Test whether this decomposition extends to ζ(2n) for all positive integers n</li>
+                <li><strong>Conjecture Constraints:</strong> Investigate whether gap contribution patterns impose necessary conditions on unproven conjectures</li>
+            </ol>
+            
+            <h3>Analytical Methods</h3>
+            
+            <p>The tool employs the Sieve of Eratosthenes for prime generation, computes exact products P<sub>g</sub> for each gap class, tracks progressive convergence to π²/6, and provides high-precision numerical analysis with configurable decimal representation.</p>
+        </div>
+    </div>
+    
+    <div class="controls-container">
+        <div class="control-panel">
+            <h3>Computation Parameters</h3>
+            
+            <div class="control-grid">
+                <div class="control-group">
+                    <label>
+                        Maximum Prime
+                        <span class="control-value" id="maxPrimeDisplay">100000</span>
+                    </label>
+                    <input type="number" id="maxPrime" value="100000" min="1000" max="10000000" step="1000">
+                </div>
+                
+                <div class="control-group">
+                    <label>
+                        Maximum Gap to Analyze
+                        <span class="control-value" id="maxGapDisplay">50</span>
+                    </label>
+                    <input type="number" id="maxGap" value="50" min="10" max="200" step="2">
+                </div>
+                
+                <div class="control-group">
+                    <label>
+                        Animation Range Start
+                        <span class="control-value" id="animStartDisplay">1000</span>
+                    </label>
+                    <input type="number" id="animStart" value="1000" min="100" max="1000000" step="100">
+                </div>
+                
+                <div class="control-group">
+                    <label>
+                        Animation Range End
+                        <span class="control-value" id="animEndDisplay">100000</span>
+                    </label>
+                    <input type="number" id="animEnd" value="100000" min="1000" max="10000000" step="1000">
+                </div>
+            </div>
+            
+            <div class="button-row">
+                <button class="btn" onclick="runAnalysis()">Run Analysis</button>
+                <button class="btn btn-secondary" onclick="startAnimation()">Start Animation</button>
+                <button class="btn btn-secondary" onclick="stopAnimation()">Stop Animation</button>
+                <button class="btn btn-secondary" onclick="exportAllData()">Export All Data (CSV)</button>
+                <button class="btn btn-secondary" onclick="exportAllCharts()">Export All Charts (PNG)</button>
+            </div>
+            
+            <div id="statusBar" class="status-bar" style="display: none;">
+                Ready to compute...
+            </div>
+            
+            <div id="progressContainer" style="display: none;">
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="control-panel">
+            <h3>Chart Options</h3>
+            
+            <div class="toggle-wrapper">
+                <label class="toggle">
+                    <input type="checkbox" id="showGapContributions" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>Show Gap Contributions Chart</span>
+            </div>
+            
+            <div class="toggle-wrapper">
+                <label class="toggle">
+                    <input type="checkbox" id="showConvergence" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>Show Progressive Convergence</span>
+            </div>
+            
+            <div class="toggle-wrapper">
+                <label class="toggle">
+                    <input type="checkbox" id="showGapDistribution" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>Show Gap Distribution</span>
+            </div>
+            
+            <div class="toggle-wrapper">
+                <label class="toggle">
+                    <input type="checkbox" id="showPercentageContrib" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>Show Percentage Contributions</span>
+            </div>
+            
+            <div class="toggle-wrapper">
+                <label class="toggle">
+                    <input type="checkbox" id="showErrorAnalysis" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>Show Error Analysis</span>
+            </div>
+            
+            <div class="toggle-wrapper">
+                <label class="toggle">
+                    <input type="checkbox" id="showLogScale" checked>
+                    <span class="toggle-slider"></span>
+                </label>
+                <span>Show Log-Scale Product Analysis</span>
+            </div>
+        </div>
+        
+        <div id="statsPanel" class="control-panel" style="display: none;">
+            <h3>Analysis Statistics</h3>
+            <div class="stats-grid" id="statsGrid"></div>
+        </div>
+    </div>
+    
+    <div class="charts-container">
+        <div class="chart-wrapper" id="convergenceWrapper">
+            <div class="chart-title">Progressive Convergence to ζ(2) = π²/6</div>
+            <canvas id="convergenceChart" width="3840" height="2160"></canvas>
+            <div class="stats-table-wrapper">
+                <div class="stats-table-header">
+                    <div class="stats-table-title">Progressive Convergence Data</div>
+                    <div class="precision-control">
+                        <label>Decimals:</label>
+                        <select id="convergencePrecision" onchange="updateStatsTables()">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8" selected>8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                        </select>
+                        <button class="show-all-toggle" onclick="toggleTable('convergenceTable')">Show All</button>
+                    </div>
+                </div>
+                <div class="stats-table-container" id="convergenceTable">
+                    <table class="stats-table" id="convergenceTableContent"></table>
+                </div>
+                <div class="export-row">
+                    <button class="export-btn csv" onclick="exportTableCSV('convergence')">Export Table CSV</button>
+                    <button class="export-btn png" onclick="exportChartPNG('convergenceChart', 'convergence')">Export Chart PNG</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-wrapper" id="gapContribWrapper">
+            <div class="chart-title">Individual Gap Family Products P<sub>g</sub></div>
+            <canvas id="gapContribChart" width="3840" height="2160"></canvas>
+            <div class="stats-table-wrapper">
+                <div class="stats-table-header">
+                    <div class="stats-table-title">Gap Family Product Values</div>
+                    <div class="precision-control">
+                        <label>Decimals:</label>
+                        <select id="gapContribPrecision" onchange="updateStatsTables()">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8" selected>8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                        </select>
+                        <button class="show-all-toggle" onclick="toggleTable('gapContribTable')">Show All</button>
+                    </div>
+                </div>
+                <div class="stats-table-container" id="gapContribTable">
+                    <table class="stats-table" id="gapContribTableContent"></table>
+                </div>
+                <div class="export-row">
+                    <button class="export-btn csv" onclick="exportTableCSV('gapContrib')">Export Table CSV</button>
+                    <button class="export-btn png" onclick="exportChartPNG('gapContribChart', 'gap_contributions')">Export Chart PNG</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-wrapper" id="gapDistWrapper">
+            <div class="chart-title">Prime Distribution by Gap Class</div>
+            <canvas id="gapDistChart" width="3840" height="2160"></canvas>
+            <div class="stats-table-wrapper">
+                <div class="stats-table-header">
+                    <div class="stats-table-title">Prime Count and Distribution</div>
+                    <div class="precision-control">
+                        <label>Decimals:</label>
+                        <select id="gapDistPrecision" onchange="updateStatsTables()">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8" selected>8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                        </select>
+                        <button class="show-all-toggle" onclick="toggleTable('gapDistTable')">Show All</button>
+                    </div>
+                </div>
+                <div class="stats-table-container" id="gapDistTable">
+                    <table class="stats-table" id="gapDistTableContent"></table>
+                </div>
+                <div class="export-row">
+                    <button class="export-btn csv" onclick="exportTableCSV('gapDist')">Export Table CSV</button>
+                    <button class="export-btn png" onclick="exportChartPNG('gapDistChart', 'gap_distribution')">Export Chart PNG</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-wrapper" id="percentageWrapper">
+            <div class="chart-title">Percentage Contribution to ζ(2) by Gap Family</div>
+            <canvas id="percentageChart" width="3840" height="2160"></canvas>
+            <div class="stats-table-wrapper">
+                <div class="stats-table-header">
+                    <div class="stats-table-title">Contribution Percentages</div>
+                    <div class="precision-control">
+                        <label>Decimals:</label>
+                        <select id="percentagePrecision" onchange="updateStatsTables()">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8" selected>8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                        </select>
+                        <button class="show-all-toggle" onclick="toggleTable('percentageTable')">Show All</button>
+                    </div>
+                </div>
+                <div class="stats-table-container" id="percentageTable">
+                    <table class="stats-table" id="percentageTableContent"></table>
+                </div>
+                <div class="export-row">
+                    <button class="export-btn csv" onclick="exportTableCSV('percentage')">Export Table CSV</button>
+                    <button class="export-btn png" onclick="exportChartPNG('percentageChart', 'percentage_contributions')">Export Chart PNG</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-wrapper" id="errorWrapper">
+            <div class="chart-title">Convergence Error Analysis</div>
+            <canvas id="errorChart" width="3840" height="2160"></canvas>
+            <div class="stats-table-wrapper">
+                <div class="stats-table-header">
+                    <div class="stats-table-title">Error Metrics by Gap</div>
+                    <div class="precision-control">
+                        <label>Decimals:</label>
+                        <select id="errorPrecision" onchange="updateStatsTables()">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8" selected>8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                        </select>
+                        <button class="show-all-toggle" onclick="toggleTable('errorTable')">Show All</button>
+                    </div>
+                </div>
+                <div class="stats-table-container" id="errorTable">
+                    <table class="stats-table" id="errorTableContent"></table>
+                </div>
+                <div class="export-row">
+                    <button class="export-btn csv" onclick="exportTableCSV('error')">Export Table CSV</button>
+                    <button class="export-btn png" onclick="exportChartPNG('errorChart', 'error_analysis')">Export Chart PNG</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-wrapper" id="logScaleWrapper">
+            <div class="chart-title">Log-Scale Product Growth P<sub>g</sub></div>
+            <canvas id="logScaleChart" width="3840" height="2160"></canvas>
+            <div class="stats-table-wrapper">
+                <div class="stats-table-header">
+                    <div class="stats-table-title">Logarithmic Product Analysis</div>
+                    <div class="precision-control">
+                        <label>Decimals:</label>
+                        <select id="logScalePrecision" onchange="updateStatsTables()">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8" selected>8</option>
+                            <option value="10">10</option>
+                            <option value="12">12</option>
+                        </select>
+                        <button class="show-all-toggle" onclick="toggleTable('logScaleTable')">Show All</button>
+                    </div>
+                </div>
+                <div class="stats-table-container" id="logScaleTable">
+                    <table class="stats-table" id="logScaleTableContent"></table>
+                </div>
+                <div class="export-row">
+                    <button class="export-btn csv" onclick="exportTableCSV('logScale')">Export Table CSV</button>
+                    <button class="export-btn png" onclick="exportChartPNG('logScaleChart', 'log_scale_products')">Export Chart PNG</button>
+                </div>
+            </div>
+        </div>
+        
+        <div class="chart-wrapper" id="stepByStepWrapper">
+            <div class="chart-title">Step-by-Step Gap Accumulation: ζ(2) = P<sub>0</sub> × P<sub>2</sub> × P<sub>4</sub> × ...</div>
+            <div class="stats-table-wrapper">
+                <div class="stats-table-header">
+                    <div class="stats-table-title">Progressive Product Construction</div>
+                    <div class="precision-control">
+                        <label>Decimals:</label>
+                        <select id="stepByStepPrecision" onchange="updateStatsTables()">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12" selected>12</option>
+                            <option value="15">15</option>
+                        </select>
+                        <button class="show-all-toggle" onclick="toggleTable('stepByStepTable')">Show All</button>
+                    </div>
+                </div>
+                <div class="stats-table-container expanded" id="stepByStepTable">
+                    <table class="stats-table" id="stepByStepTableContent"></table>
+                </div>
+                <div class="export-row">
+                    <button class="export-btn csv" onclick="exportTableCSV('stepByStep')">Export Table CSV</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="controls-container">
+        <div class="control-panel">
+            <h3>Composite Screenshot Export</h3>
+            <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 20px;">
+                Generate a comprehensive image combining selected charts with analysis summary and mathematical narrative
+            </p>
+            
+            <div class="control-grid" style="grid-template-columns: repeat(3, 1fr);">
+                <div class="toggle-wrapper">
+                    <label class="toggle">
+                        <input type="checkbox" id="screenshotConvergence" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Progressive Convergence</span>
+                </div>
+                
+                <div class="toggle-wrapper">
+                    <label class="toggle">
+                        <input type="checkbox" id="screenshotGapContrib" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Gap Products</span>
+                </div>
+                
+                <div class="toggle-wrapper">
+                    <label class="toggle">
+                        <input type="checkbox" id="screenshotGapDist" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Gap Distribution</span>
+                </div>
+                
+                <div class="toggle-wrapper">
+                    <label class="toggle">
+                        <input type="checkbox" id="screenshotPercentage">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Percentage Contributions</span>
+                </div>
+                
+                <div class="toggle-wrapper">
+                    <label class="toggle">
+                        <input type="checkbox" id="screenshotError">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Error Analysis</span>
+                </div>
+                
+                <div class="toggle-wrapper">
+                    <label class="toggle">
+                        <input type="checkbox" id="screenshotLogScale">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Log-Scale Products</span>
+                </div>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <div class="control-group">
+                <label>Main Title</label>
+                <input type="text" id="screenshotTitle" value="Gap-Class Decomposition of ζ(2) = π²/6">
+            </div>
+            
+            <div class="control-group">
+                <label>Subtitle</label>
+                <input type="text" id="screenshotSubtitle" value="Analytical Partition of the Euler Product">
+            </div>
+            
+            <div class="control-group">
+                <label>Layout</label>
+                <select id="screenshotLayout">
+                    <option value="grid">Grid (2×3)</option>
+                    <option value="vertical">Vertical Stack</option>
+                    <option value="horizontal">Horizontal (2 rows)</option>
+                </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Resolution</label>
+                <select id="screenshotResolution">
+                    <option value="1920">HD (1920×1080)</option>
+                    <option value="2560">QHD (2560×1440)</option>
+                    <option value="3840" selected>4K (3840×2160)</option>
+                    <option value="7680">8K (7680×4320)</option>
+                </select>
+            </div>
+            
+            <div class="section-divider"></div>
+            
+            <button class="btn" onclick="generateCompositeScreenshot()" style="width: 100%; margin-bottom: 12px;">
+                Generate Composite Screenshot
+            </button>
+            
+            <div id="screenshotStatus" class="status-bar" style="display: none; margin-top: 12px;">
+                Generating screenshot...
+            </div>
+        </div>
+    </div>
+    
+    <canvas id="compositeCanvas" style="display: none;"></canvas>
+    
+    <div class="controls-container">
+        <div class="control-panel">
+            <h3>Comprehensive Screenshot Generator</h3>
+            <p style="color: #aaa; font-size: 0.9rem; margin-bottom: 16px;">Generate a publication-ready composite image with selected charts, titles, and Ramanujan-style mathematical commentary</p>
+            
+            <div class="control-grid">
+                <div class="control-group">
+                    <label style="margin-bottom: 8px;">Main Title</label>
+                    <input type="text" id="screenshotTitle" value="Gap-Class Decomposition of ζ(2) = π²/6" style="width: 100%;">
+                </div>
+                
+                <div class="control-group">
+                    <label style="margin-bottom: 8px;">Subtitle</label>
+                    <input type="text" id="screenshotSubtitle" value="Analytical Framework for Prime Gap Contributions" style="width: 100%;">
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <label style="display: block; color: #aaa; font-size: 0.9rem; margin-bottom: 12px; font-weight: 600;">Select Charts to Include:</label>
+                
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 12px;">
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="includeConvergence" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Progressive Convergence</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="includeGapContrib" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Gap Family Products</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="includeGapDist" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Prime Distribution</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="includePercentage" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Percentage Contributions</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="includeError" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Error Analysis</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="includeLogScale" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Log-Scale Products</span>
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <label style="display: block; color: #aaa; font-size: 0.9rem; margin-bottom: 8px; font-weight: 600;">Commentary Style:</label>
+                <select id="commentaryStyle" style="width: 100%;">
+                    <option value="ramanujan">Ramanujan to Hardy - Intimate Mathematical Discovery</option>
+                    <option value="euler">Euler - Classical Elegance</option>
+                    <option value="gauss">Gauss - Profound Simplicity</option>
+                    <option value="riemann">Riemann - Analytical Depth</option>
+                </select>
+            </div>
+            
+            <div style="margin: 20px 0;">
+                <label style="display: block; color: #aaa; font-size: 0.9rem; margin-bottom: 8px; font-weight: 600;">Layout:</label>
+                <select id="screenshotLayout" style="width: 100%;">
+                    <option value="grid">Grid Layout (2 columns)</option>
+                    <option value="vertical">Vertical Stack</option>
+                    <option value="compact">Compact (3 columns)</option>
+                </select>
+            </div>
+            
+            <div class="button-row" style="margin-top: 20px;">
+                <button class="btn" onclick="generateScreenshot()">Generate Screenshot</button>
+                <button class="btn btn-secondary" onclick="generateScreenshot(true)">Generate (8K Resolution)</button>
+            </div>
+            
+            <div id="screenshotStatus" class="status-bar" style="display: none; margin-top: 16px;">
+                Generating screenshot...
+            </div>
+        </div>
+    </div>
+    
+    <canvas id="compositeCanvas" style="display: none;"></canvas>
+    
+    <script>
+        // Global variables
+        let analysisResults = null;
+        let animationId = null;
+        let isAnimating = false;
+        
+        // Sieve of Eratosthenes
+        function sievePrimes(max) {
+            const sieve = new Array(max + 1).fill(true);
+            sieve[0] = sieve[1] = false;
+            
+            for (let i = 2; i * i <= max; i++) {
+                if (sieve[i]) {
+                    for (let j = i * i; j <= max; j += i) {
+                        sieve[j] = false;
+                    }
+                }
+            }
+            
+            const primes = [];
+            for (let i = 2; i <= max; i++) {
+                if (sieve[i]) primes.push(i);
+            }
+            return primes;
+        }
+        
+        // Core analysis function
+        function computeGapDecomposition(maxPrime, maxGap) {
+            const primes = sievePrimes(maxPrime);
+            const targetZeta2 = Math.PI * Math.PI / 6;
+            
+            // Calculate gaps and classify primes
+            const gapFamilies = { 0: [2] }; // Gap 0 is special case for prime 2
+            const gaps = [];
+            
+            for (let i = 0; i < primes.length - 1; i++) {
+                const gap = primes[i + 1] - primes[i];
+                gaps.push(gap);
+                
+                if (!gapFamilies[gap]) {
+                    gapFamilies[gap] = [];
+                }
+                gapFamilies[gap].push(primes[i]);
+            }
+            
+            // Calculate products for each gap family
+            const gapProducts = {};
+            const evenGaps = [0];
+            
+            for (let g = 2; g <= maxGap; g += 2) {
+                if (gapFamilies[g] && gapFamilies[g].length > 0) {
+                    evenGaps.push(g);
+                }
+            }
+            
+            evenGaps.forEach(gap => {
+                if (gapFamilies[gap] && gapFamilies[gap].length > 0) {
+                    let product = 1;
+                    let logProduct = 0;
+                    
+                    gapFamilies[gap].forEach(p => {
+                        const factor = (p * p) / (p * p - 1);
+                        product *= factor;
+                        logProduct += Math.log(factor);
+                    });
+                    
+                    gapProducts[gap] = {
+                        product: product,
+                        logProduct: logProduct,
+                        count: gapFamilies[gap].length,
+                        primes: gapFamilies[gap].slice(0, 100) // Store first 100
+                    };
+                }
+            });
+            
+            // Calculate progressive convergence
+            const progressiveProducts = [];
+            let cumulative = 1;
+            let cumulativeLog = 0;
+            
+            evenGaps.forEach(gap => {
+                if (gapProducts[gap]) {
+                    cumulative *= gapProducts[gap].product;
+                    cumulativeLog += gapProducts[gap].logProduct;
+                    
+                    progressiveProducts.push({
+                        gap: gap,
+                        value: cumulative,
+                        logValue: cumulativeLog,
+                        error: Math.abs(cumulative - targetZeta2),
+                        relativeError: Math.abs(cumulative - targetZeta2) / targetZeta2
+                    });
+                }
+            });
+            
+            // Calculate percentage contributions
+            const percentageContributions = {};
+            evenGaps.forEach(gap => {
+                if (gapProducts[gap]) {
+                    const contribution = Math.log(gapProducts[gap].product) / Math.log(targetZeta2);
+                    percentageContributions[gap] = contribution * 100;
+                }
+            });
+            
+            return {
+                primes: primes,
+                totalPrimes: primes.length,
+                maxPrime: maxPrime,
+                targetZeta2: targetZeta2,
+                gapFamilies: gapFamilies,
+                gapProducts: gapProducts,
+                evenGaps: evenGaps,
+                progressiveProducts: progressiveProducts,
+                percentageContributions: percentageContributions,
+                finalProduct: cumulative,
+                finalError: Math.abs(cumulative - targetZeta2),
+                finalRelativeError: Math.abs(cumulative - targetZeta2) / targetZeta2
+            };
+        }
+        
+        // Update displays
+        function updateDisplays() {
+            document.getElementById('maxPrimeDisplay').textContent = 
+                parseInt(document.getElementById('maxPrime').value).toLocaleString();
+            document.getElementById('maxGapDisplay').textContent = 
+                document.getElementById('maxGap').value;
+            document.getElementById('animStartDisplay').textContent = 
+                parseInt(document.getElementById('animStart').value).toLocaleString();
+            document.getElementById('animEndDisplay').textContent = 
+                parseInt(document.getElementById('animEnd').value).toLocaleString();
+        }
+        
+        // Run analysis
+        function runAnalysis() {
+            const maxPrime = parseInt(document.getElementById('maxPrime').value);
+            const maxGap = parseInt(document.getElementById('maxGap').value);
+            
+            const statusBar = document.getElementById('statusBar');
+            statusBar.style.display = 'block';
+            statusBar.className = 'status-bar computing';
+            statusBar.textContent = `Computing gap decomposition for primes up to ${maxPrime.toLocaleString()}...`;
+            
+            // Use setTimeout to allow UI update
+            setTimeout(() => {
+                try {
+                    analysisResults = computeGapDecomposition(maxPrime, maxGap);
+                    
+                    statusBar.className = 'status-bar complete';
+                    statusBar.textContent = `Analysis complete: ${analysisResults.totalPrimes} primes, ${analysisResults.evenGaps.length} gap families, error = ${(analysisResults.finalRelativeError * 100).toFixed(6)}%`;
+                    
+                    updateStatistics();
+                    renderAllCharts();
+                } catch (error) {
+                    statusBar.className = 'status-bar';
+                    statusBar.style.color = '#ff6464';
+                    statusBar.textContent = `Error: ${error.message}`;
+                    console.error(error);
+                }
+            }, 50);
+        }
+        
+        // Update statistics panel
+        function updateStatistics() {
+            if (!analysisResults) return;
+            
+            const statsPanel = document.getElementById('statsPanel');
+            const statsGrid = document.getElementById('statsGrid');
+            statsPanel.style.display = 'block';
+            
+            const stats = [
+                { label: 'Total Primes', value: analysisResults.totalPrimes.toLocaleString() },
+                { label: 'Maximum Prime', value: analysisResults.maxPrime.toLocaleString() },
+                { label: 'Gap Families', value: analysisResults.evenGaps.length },
+                { label: 'Target ζ(2)', value: analysisResults.targetZeta2.toFixed(10) },
+                { label: 'Computed Product', value: analysisResults.finalProduct.toFixed(10) },
+                { label: 'Absolute Error', value: analysisResults.finalError.toExponential(4) },
+                { label: 'Relative Error', value: (analysisResults.finalRelativeError * 100).toFixed(8) + '%' },
+                { label: 'Largest Gap', value: Math.max(...analysisResults.evenGaps) }
+            ];
+            
+            statsGrid.innerHTML = stats.map(stat => `
+                <div class="stat-card">
+                    <div class="stat-label">${stat.label}</div>
+                    <div class="stat-value">${stat.value}</div>
+                </div>
+            `).join('');
+        }
+        
+        // Render all charts
+        function renderAllCharts() {
+            if (!analysisResults) return;
+            
+            if (document.getElementById('showConvergence').checked) {
+                renderConvergenceChart();
+            }
+            if (document.getElementById('showGapContributions').checked) {
+                renderGapContributionsChart();
+            }
+            if (document.getElementById('showGapDistribution').checked) {
+                renderGapDistributionChart();
+            }
+            if (document.getElementById('showPercentageContrib').checked) {
+                renderPercentageChart();
+            }
+            if (document.getElementById('showErrorAnalysis').checked) {
+                renderErrorChart();
+            }
+            if (document.getElementById('showLogScale').checked) {
+                renderLogScaleChart();
+            }
+            
+            // Update statistical tables
+            updateStatsTables();
+        }
+        
+        // Chart rendering functions
+        function renderConvergenceChart() {
+            const canvas = document.getElementById('convergenceChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            // Clear
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const data = analysisResults.progressiveProducts;
+            const target = analysisResults.targetZeta2;
+            
+            // Margins
+            const margin = { left: 200, right: 100, top: 100, bottom: 150 };
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            // Scales
+            const maxY = Math.max(target * 1.1, ...data.map(d => d.value));
+            const minY = Math.min(0.8, ...data.map(d => d.value));
+            const xScale = chartW / (data.length - 1);
+            const yScale = chartH / (maxY - minY);
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a4a';
+            ctx.lineWidth = 2;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin.top + (chartH / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(w - margin.right, y);
+                ctx.stroke();
+                
+                const value = maxY - (maxY - minY) * (i / 10);
+                ctx.fillStyle = '#888';
+                ctx.font = 'bold 32px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(value.toFixed(4), margin.left - 20, y + 12);
+            }
+            
+            // Target line
+            const targetY = margin.top + chartH - (target - minY) * yScale;
+            ctx.strokeStyle = '#ff6464';
+            ctx.lineWidth = 4;
+            ctx.setLineDash([20, 20]);
+            ctx.beginPath();
+            ctx.moveTo(margin.left, targetY);
+            ctx.lineTo(w - margin.right, targetY);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            ctx.fillStyle = '#ff6464';
+            ctx.font = 'bold 40px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText(`ζ(2) = π²/6 = ${target.toFixed(8)}`, margin.left + 40, targetY - 30);
+            
+            // Convergence line
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            data.forEach((point, i) => {
+                const x = margin.left + i * xScale;
+                const y = margin.top + chartH - (point.value - minY) * yScale;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            
+            // Points
+            ctx.fillStyle = '#ffd700';
+            data.forEach((point, i) => {
+                const x = margin.left + i * xScale;
+                const y = margin.top + chartH - (point.value - minY) * yScale;
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            // X-axis labels
+            ctx.fillStyle = '#aaa';
+            ctx.font = 'bold 28px monospace';
+            ctx.textAlign = 'center';
+            data.forEach((point, i) => {
+                if (i % Math.max(1, Math.floor(data.length / 15)) === 0) {
+                    const x = margin.left + i * xScale;
+                    ctx.fillText(`Gap ${point.gap}`, x, h - margin.bottom + 60);
+                }
+            });
+            
+            // Axis labels
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Progressive Product Convergence to ζ(2)', w / 2, margin.top - 30);
+            
+            ctx.save();
+            ctx.translate(60, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Product Value', 0, 0);
+            ctx.restore();
+            
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Gap Family', w / 2, h - 40);
+        }
+        
+        function renderGapContributionsChart() {
+            const canvas = document.getElementById('gapContribChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const gaps = analysisResults.evenGaps;
+            const products = gaps.map(g => analysisResults.gapProducts[g]);
+            
+            const margin = { left: 200, right: 100, top: 100, bottom: 150 };
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            const barWidth = chartW / gaps.length;
+            const maxProduct = Math.max(...products.map(p => p.product));
+            const yScale = chartH / maxProduct;
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a4a';
+            ctx.lineWidth = 2;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin.top + (chartH / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(w - margin.right, y);
+                ctx.stroke();
+                
+                const value = maxProduct - (maxProduct * (i / 10));
+                ctx.fillStyle = '#888';
+                ctx.font = 'bold 32px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(value.toFixed(6), margin.left - 20, y + 12);
+            }
+            
+            // Bars
+            products.forEach((prod, i) => {
+                const x = margin.left + i * barWidth;
+                const barH = prod.product * yScale;
+                const y = margin.top + chartH - barH;
+                
+                const gradient = ctx.createLinearGradient(x, y, x, y + barH);
+                gradient.addColorStop(0, '#ffd700');
+                gradient.addColorStop(1, '#ffaa00');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
+                
+                ctx.strokeStyle = '#ffaa00';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
+            });
+            
+            // Labels
+            ctx.fillStyle = '#aaa';
+            ctx.font = 'bold 24px monospace';
+            ctx.textAlign = 'center';
+            gaps.forEach((gap, i) => {
+                const x = margin.left + i * barWidth + barWidth / 2;
+                ctx.fillText(`${gap}`, x, h - margin.bottom + 50);
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Individual Gap Family Products P_g', w / 2, margin.top - 30);
+            
+            ctx.save();
+            ctx.translate(60, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Product P_g', 0, 0);
+            ctx.restore();
+            
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Gap Size', w / 2, h - 40);
+        }
+        
+        function renderGapDistributionChart() {
+            const canvas = document.getElementById('gapDistChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const gaps = analysisResults.evenGaps;
+            const counts = gaps.map(g => analysisResults.gapProducts[g].count);
+            
+            const margin = { left: 200, right: 100, top: 100, bottom: 150 };
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            const barWidth = chartW / gaps.length;
+            const maxCount = Math.max(...counts);
+            const yScale = chartH / maxCount;
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a4a';
+            ctx.lineWidth = 2;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin.top + (chartH / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(w - margin.right, y);
+                ctx.stroke();
+                
+                const value = maxCount - (maxCount * (i / 10));
+                ctx.fillStyle = '#888';
+                ctx.font = 'bold 32px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(Math.round(value).toLocaleString(), margin.left - 20, y + 12);
+            }
+            
+            // Bars
+            counts.forEach((count, i) => {
+                const x = margin.left + i * barWidth;
+                const barH = count * yScale;
+                const y = margin.top + chartH - barH;
+                
+                const gradient = ctx.createLinearGradient(x, y, x, y + barH);
+                gradient.addColorStop(0, '#64ff64');
+                gradient.addColorStop(1, '#32aa32');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
+                
+                ctx.strokeStyle = '#32aa32';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
+            });
+            
+            // Labels
+            ctx.fillStyle = '#aaa';
+            ctx.font = 'bold 24px monospace';
+            ctx.textAlign = 'center';
+            gaps.forEach((gap, i) => {
+                const x = margin.left + i * barWidth + barWidth / 2;
+                ctx.fillText(`${gap}`, x, h - margin.bottom + 50);
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Number of Primes per Gap Family', w / 2, margin.top - 30);
+            
+            ctx.save();
+            ctx.translate(60, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Prime Count', 0, 0);
+            ctx.restore();
+            
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Gap Size', w / 2, h - 40);
+        }
+        
+        function renderPercentageChart() {
+            const canvas = document.getElementById('percentageChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const gaps = analysisResults.evenGaps;
+            const percentages = gaps.map(g => analysisResults.percentageContributions[g]);
+            
+            const margin = { left: 200, right: 100, top: 100, bottom: 150 };
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            const barWidth = chartW / gaps.length;
+            const maxPct = Math.max(...percentages);
+            const yScale = chartH / maxPct;
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a4a';
+            ctx.lineWidth = 2;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin.top + (chartH / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(w - margin.right, y);
+                ctx.stroke();
+                
+                const value = maxPct - (maxPct * (i / 10));
+                ctx.fillStyle = '#888';
+                ctx.font = 'bold 32px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(value.toFixed(2) + '%', margin.left - 20, y + 12);
+            }
+            
+            // Bars
+            percentages.forEach((pct, i) => {
+                const x = margin.left + i * barWidth;
+                const barH = pct * yScale;
+                const y = margin.top + chartH - barH;
+                
+                const gradient = ctx.createLinearGradient(x, y, x, y + barH);
+                gradient.addColorStop(0, '#ff6464');
+                gradient.addColorStop(1, '#aa3232');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
+                
+                ctx.strokeStyle = '#aa3232';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
+            });
+            
+            // Labels
+            ctx.fillStyle = '#aaa';
+            ctx.font = 'bold 24px monospace';
+            ctx.textAlign = 'center';
+            gaps.forEach((gap, i) => {
+                const x = margin.left + i * barWidth + barWidth / 2;
+                ctx.fillText(`${gap}`, x, h - margin.bottom + 50);
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Percentage Contribution to log(ζ(2))', w / 2, margin.top - 30);
+            
+            ctx.save();
+            ctx.translate(60, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Contribution %', 0, 0);
+            ctx.restore();
+            
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Gap Size', w / 2, h - 40);
+        }
+        
+        function renderErrorChart() {
+            const canvas = document.getElementById('errorChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const data = analysisResults.progressiveProducts;
+            
+            const margin = { left: 200, right: 100, top: 100, bottom: 150 };
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            const xScale = chartW / (data.length - 1);
+            const errors = data.map(d => d.relativeError);
+            const maxError = Math.max(...errors);
+            const minError = Math.min(...errors);
+            const yScale = chartH / (maxError - minError);
+            
+            // Grid (log scale for y-axis)
+            ctx.strokeStyle = '#2a2a4a';
+            ctx.lineWidth = 2;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin.top + (chartH / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(w - margin.right, y);
+                ctx.stroke();
+                
+                const logValue = Math.log10(maxError) - (Math.log10(maxError) - Math.log10(minError)) * (i / 10);
+                const value = Math.pow(10, logValue);
+                ctx.fillStyle = '#888';
+                ctx.font = 'bold 32px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText((value * 100).toExponential(2) + '%', margin.left - 20, y + 12);
+            }
+            
+            // Error line
+            ctx.strokeStyle = '#64ffff';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            data.forEach((point, i) => {
+                const x = margin.left + i * xScale;
+                const logError = Math.log10(point.relativeError);
+                const normalizedLog = (logError - Math.log10(minError)) / (Math.log10(maxError) - Math.log10(minError));
+                const y = margin.top + chartH * (1 - normalizedLog);
+                
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            
+            // Points
+            ctx.fillStyle = '#64ffff';
+            data.forEach((point, i) => {
+                const x = margin.left + i * xScale;
+                const logError = Math.log10(point.relativeError);
+                const normalizedLog = (logError - Math.log10(minError)) / (Math.log10(maxError) - Math.log10(minError));
+                const y = margin.top + chartH * (1 - normalizedLog);
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 10, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            // Labels
+            ctx.fillStyle = '#aaa';
+            ctx.font = 'bold 28px monospace';
+            ctx.textAlign = 'center';
+            data.forEach((point, i) => {
+                if (i % Math.max(1, Math.floor(data.length / 15)) === 0) {
+                    const x = margin.left + i * xScale;
+                    ctx.fillText(`Gap ${point.gap}`, x, h - margin.bottom + 60);
+                }
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Relative Error vs Target (Log Scale)', w / 2, margin.top - 30);
+            
+            ctx.save();
+            ctx.translate(60, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Relative Error', 0, 0);
+            ctx.restore();
+            
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Gap Family', w / 2, h - 40);
+        }
+        
+        function renderLogScaleChart() {
+            const canvas = document.getElementById('logScaleChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const gaps = analysisResults.evenGaps;
+            const logProducts = gaps.map(g => analysisResults.gapProducts[g].logProduct);
+            
+            const margin = { left: 200, right: 100, top: 100, bottom: 150 };
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            const barWidth = chartW / gaps.length;
+            const maxLog = Math.max(...logProducts);
+            const minLog = Math.min(0, ...logProducts);
+            const yScale = chartH / (maxLog - minLog);
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a4a';
+            ctx.lineWidth = 2;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin.top + (chartH / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(w - margin.right, y);
+                ctx.stroke();
+                
+                const value = maxLog - (maxLog - minLog) * (i / 10);
+                ctx.fillStyle = '#888';
+                ctx.font = 'bold 32px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(value.toFixed(4), margin.left - 20, y + 12);
+            }
+            
+            // Bars
+            logProducts.forEach((logProd, i) => {
+                const x = margin.left + i * barWidth;
+                const barH = (logProd - minLog) * yScale;
+                const y = margin.top + chartH - barH;
+                
+                const gradient = ctx.createLinearGradient(x, y, x, y + barH);
+                gradient.addColorStop(0, '#aa64ff');
+                gradient.addColorStop(1, '#6432aa');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
+                
+                ctx.strokeStyle = '#6432aa';
+                ctx.lineWidth = 3;
+                ctx.strokeRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
+            });
+            
+            // Labels
+            ctx.fillStyle = '#aaa';
+            ctx.font = 'bold 24px monospace';
+            ctx.textAlign = 'center';
+            gaps.forEach((gap, i) => {
+                const x = margin.left + i * barWidth + barWidth / 2;
+                ctx.fillText(`${gap}`, x, h - margin.bottom + 50);
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 48px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Log-Scale Product Growth: log(P_g)', w / 2, margin.top - 30);
+            
+            ctx.save();
+            ctx.translate(60, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('log(P_g)', 0, 0);
+            ctx.restore();
+            
+            ctx.font = 'bold 42px sans-serif';
+            ctx.fillText('Gap Size', w / 2, h - 40);
+        }
+        
+        // Animation functions
+        function startAnimation() {
+            if (isAnimating) return;
+            
+            const startRange = parseInt(document.getElementById('animStart').value);
+            const endRange = parseInt(document.getElementById('animEnd').value);
+            
+            if (startRange >= endRange) {
+                alert('Animation start must be less than end');
+                return;
+            }
+            
+            isAnimating = true;
+            let currentRange = startRange;
+            const step = Math.max(100, Math.floor((endRange - startRange) / 100));
+            
+            const statusBar = document.getElementById('statusBar');
+            const progressContainer = document.getElementById('progressContainer');
+            const progressFill = document.getElementById('progressFill');
+            
+            statusBar.style.display = 'block';
+            progressContainer.style.display = 'block';
+            
+            function animateFrame() {
+                if (!isAnimating || currentRange > endRange) {
+                    stopAnimation();
+                    return;
+                }
+                
+                const maxGap = parseInt(document.getElementById('maxGap').value);
+                analysisResults = computeGapDecomposition(currentRange, maxGap);
+                
+                const progress = ((currentRange - startRange) / (endRange - startRange)) * 100;
+                progressFill.style.width = progress + '%';
+                
+                statusBar.className = 'status-bar computing';
+                statusBar.textContent = `Animating: ${currentRange.toLocaleString()} / ${endRange.toLocaleString()} primes (${progress.toFixed(1)}%)`;
+                
+                updateStatistics();
+                renderAllCharts();
+                
+                currentRange += step;
+                animationId = requestAnimationFrame(animateFrame);
+            }
+            
+            animateFrame();
+        }
+        
+        function stopAnimation() {
+            isAnimating = false;
+            if (animationId) {
+                cancelAnimationFrame(animationId);
+                animationId = null;
+            }
+            
+            const statusBar = document.getElementById('statusBar');
+            const progressContainer = document.getElementById('progressContainer');
+            
+            statusBar.className = 'status-bar complete';
+            statusBar.textContent = 'Animation complete';
+            progressContainer.style.display = 'none';
+        }
+        
+        // Export functions
+        function exportAllData() {
+            if (!analysisResults) {
+                alert('Please run analysis first');
+                return;
+            }
+            
+            let csv = 'Gap-Class Decomposition of zeta(2) = pi^2/6\n';
+            csv += `Analysis Date,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
+            csv += `Total Primes,${analysisResults.totalPrimes}\n`;
+            csv += `Target zeta(2),${analysisResults.targetZeta2}\n`;
+            csv += `Computed Product,${analysisResults.finalProduct}\n`;
+            csv += `Absolute Error,${analysisResults.finalError}\n`;
+            csv += `Relative Error,${analysisResults.finalRelativeError}\n\n`;
+            
+            csv += 'Gap Family Analysis\n';
+            csv += 'Gap,Prime Count,Product P_g,Log Product,Percentage Contribution,First 20 Primes\n';
+            analysisResults.evenGaps.forEach(gap => {
+                const data = analysisResults.gapProducts[gap];
+                const pct = analysisResults.percentageContributions[gap];
+                const primes = data.primes.slice(0, 20).join(' ');
+                csv += `${gap},${data.count},${data.product},${data.logProduct},${pct},"${primes}"\n`;
+            });
+            
+            csv += '\nProgressive Convergence\n';
+            csv += 'Gap,Cumulative Product,Log Product,Absolute Error,Relative Error\n';
+            analysisResults.progressiveProducts.forEach(p => {
+                csv += `${p.gap},${p.value},${p.logValue},${p.error},${p.relativeError}\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.download = `gap_decomposition_${analysisResults.maxPrime}.csv`;
+            link.href = URL.createObjectURL(blob);
+            link.click();
+        }
+        
+        function exportAllCharts() {
+            if (!analysisResults) {
+                alert('Please run analysis first');
+                return;
+            }
+            
+            const canvases = [
+                { id: 'convergenceChart', name: 'convergence' },
+                { id: 'gapContribChart', name: 'gap_contributions' },
+                { id: 'gapDistChart', name: 'gap_distribution' },
+                { id: 'percentageChart', name: 'percentage' },
+                { id: 'errorChart', name: 'error_analysis' },
+                { id: 'logScaleChart', name: 'log_scale' }
+            ];
+            
+            canvases.forEach(({ id, name }) => {
+                const canvas = document.getElementById(id);
+                const link = document.createElement('a');
+                link.download = `${name}_${analysisResults.maxPrime}.png`;
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            });
+        }
+        
+        // Event listeners
+        document.getElementById('maxPrime').addEventListener('input', updateDisplays);
+        document.getElementById('maxGap').addEventListener('input', updateDisplays);
+        document.getElementById('animStart').addEventListener('input', updateDisplays);
+        document.getElementById('animEnd').addEventListener('input', updateDisplays);
+        
+        // Table toggle function
+        const tableStates = {
+            convergenceTable: false,
+            gapContribTable: false,
+            gapDistTable: false,
+            percentageTable: false,
+            errorTable: false,
+            logScaleTable: false,
+            stepByStepTable: true
+        };
+        
+        function toggleTable(tableId) {
+            const container = document.getElementById(tableId);
+            const button = event.target;
+            
+            tableStates[tableId] = !tableStates[tableId];
+            
+            if (tableStates[tableId]) {
+                container.classList.add('expanded');
+                button.textContent = 'Show Less';
+            } else {
+                container.classList.remove('expanded');
+                button.textContent = 'Show All';
+            }
+            
+            updateStatsTables();
+        }
+        
+        // Update all stats tables
+        function updateStatsTables() {
+            if (!analysisResults) return;
+            
+            updateConvergenceTable();
+            updateGapContribTable();
+            updateGapDistTable();
+            updatePercentageTable();
+            updateErrorTable();
+            updateLogScaleTable();
+            updateStepByStepTable();
+        }
+        
+        function updateConvergenceTable() {
+            const precision = parseInt(document.getElementById('convergencePrecision').value);
+            const showAll = tableStates.convergenceTable;
+            const data = analysisResults.progressiveProducts;
+            const displayData = showAll ? data : data.slice(0, 5);
+            
+            const table = document.getElementById('convergenceTableContent');
+            let html = `
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Cumulative Product</th>
+                        <th>Log Product</th>
+                        <th>Target ζ(2)</th>
+                        <th>Absolute Error</th>
+                        <th>Relative Error (%)</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            displayData.forEach(row => {
+                html += `
+                    <tr>
+                        <td>${row.gap}</td>
+                        <td>${row.value.toFixed(precision)}</td>
+                        <td>${row.logValue.toFixed(precision)}</td>
+                        <td>${analysisResults.targetZeta2.toFixed(precision)}</td>
+                        <td>${row.error.toExponential(precision)}</td>
+                        <td>${(row.relativeError * 100).toFixed(precision)}</td>
+                    </tr>
+                `;
+            });
+            
+            if (!showAll && data.length > 5) {
+                html += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #888; font-style: italic;">
+                            ... ${data.length - 5} more rows (click "Show All" to expand)
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+        
+        function updateGapContribTable() {
+            const precision = parseInt(document.getElementById('gapContribPrecision').value);
+            const showAll = tableStates.gapContribTable;
+            const gaps = analysisResults.evenGaps;
+            const displayGaps = showAll ? gaps : gaps.slice(0, 5);
+            
+            const table = document.getElementById('gapContribTableContent');
+            let html = `
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Product P<sub>g</sub></th>
+                        <th>Log(P<sub>g</sub>)</th>
+                        <th>Prime Count</th>
+                        <th>First 10 Primes</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            displayGaps.forEach(gap => {
+                const data = analysisResults.gapProducts[gap];
+                const primeList = data.primes.slice(0, 10).join(', ');
+                html += `
+                    <tr>
+                        <td>${gap}</td>
+                        <td>${data.product.toFixed(precision)}</td>
+                        <td>${data.logProduct.toFixed(precision)}</td>
+                        <td>${data.count}</td>
+                        <td class="prime-list">${primeList}${data.count > 10 ? '...' : ''}</td>
+                    </tr>
+                `;
+            });
+            
+            if (!showAll && gaps.length > 5) {
+                html += `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #888; font-style: italic;">
+                            ... ${gaps.length - 5} more rows (click "Show All" to expand)
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+        
+        function updateGapDistTable() {
+            const precision = parseInt(document.getElementById('gapDistPrecision').value);
+            const showAll = tableStates.gapDistTable;
+            const gaps = analysisResults.evenGaps;
+            const displayGaps = showAll ? gaps : gaps.slice(0, 5);
+            
+            const totalPrimes = analysisResults.totalPrimes;
+            
+            const table = document.getElementById('gapDistTableContent');
+            let html = `
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Prime Count</th>
+                        <th>Percentage of Total</th>
+                        <th>Cumulative Count</th>
+                        <th>Cumulative %</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            let cumulative = 0;
+            displayGaps.forEach(gap => {
+                const data = analysisResults.gapProducts[gap];
+                cumulative += data.count;
+                const percentage = (data.count / totalPrimes) * 100;
+                const cumulativePercentage = (cumulative / totalPrimes) * 100;
+                
+                html += `
+                    <tr>
+                        <td>${gap}</td>
+                        <td>${data.count}</td>
+                        <td>${percentage.toFixed(precision)}%</td>
+                        <td>${cumulative}</td>
+                        <td>${cumulativePercentage.toFixed(precision)}%</td>
+                    </tr>
+                `;
+            });
+            
+            if (!showAll && gaps.length > 5) {
+                html += `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #888; font-style: italic;">
+                            ... ${gaps.length - 5} more rows (click "Show All" to expand)
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+        
+        function updatePercentageTable() {
+            const precision = parseInt(document.getElementById('percentagePrecision').value);
+            const showAll = tableStates.percentageTable;
+            const gaps = analysisResults.evenGaps;
+            const displayGaps = showAll ? gaps : gaps.slice(0, 5);
+            
+            const table = document.getElementById('percentageTableContent');
+            let html = `
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Contribution to log(ζ(2))</th>
+                        <th>Product P<sub>g</sub></th>
+                        <th>Ratio to ζ(2)</th>
+                        <th>Log Contribution</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            displayGaps.forEach(gap => {
+                const data = analysisResults.gapProducts[gap];
+                const percentage = analysisResults.percentageContributions[gap];
+                const ratio = data.product / analysisResults.targetZeta2;
+                
+                html += `
+                    <tr>
+                        <td>${gap}</td>
+                        <td>${percentage.toFixed(precision)}%</td>
+                        <td>${data.product.toFixed(precision)}</td>
+                        <td>${ratio.toFixed(precision)}</td>
+                        <td>${data.logProduct.toFixed(precision)}</td>
+                    </tr>
+                `;
+            });
+            
+            if (!showAll && gaps.length > 5) {
+                html += `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #888; font-style: italic;">
+                            ... ${gaps.length - 5} more rows (click "Show All" to expand)
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+        
+        function updateErrorTable() {
+            const precision = parseInt(document.getElementById('errorPrecision').value);
+            const showAll = tableStates.errorTable;
+            const data = analysisResults.progressiveProducts;
+            const displayData = showAll ? data : data.slice(0, 5);
+            
+            const table = document.getElementById('errorTableContent');
+            let html = `
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Product Value</th>
+                        <th>Absolute Error</th>
+                        <th>Relative Error</th>
+                        <th>Log10(Error)</th>
+                        <th>Error Reduction</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            displayData.forEach((row, idx) => {
+                const logError = Math.log10(row.relativeError);
+                const prevError = idx > 0 ? data[idx - 1].relativeError : row.relativeError;
+                const errorReduction = idx > 0 ? ((prevError - row.relativeError) / prevError * 100) : 0;
+                
+                html += `
+                    <tr>
+                        <td>${row.gap}</td>
+                        <td>${row.value.toFixed(precision)}</td>
+                        <td>${row.error.toExponential(precision)}</td>
+                        <td>${(row.relativeError * 100).toFixed(precision)}%</td>
+                        <td>${logError.toFixed(precision)}</td>
+                        <td>${errorReduction.toFixed(precision)}%</td>
+                    </tr>
+                `;
+            });
+            
+            if (!showAll && data.length > 5) {
+                html += `
+                    <tr>
+                        <td colspan="6" style="text-align: center; color: #888; font-style: italic;">
+                            ... ${data.length - 5} more rows (click "Show All" to expand)
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+        
+        function updateLogScaleTable() {
+            const precision = parseInt(document.getElementById('logScalePrecision').value);
+            const showAll = tableStates.logScaleTable;
+            const gaps = analysisResults.evenGaps;
+            const displayGaps = showAll ? gaps : gaps.slice(0, 5);
+            
+            const table = document.getElementById('logScaleTableContent');
+            let html = `
+                <thead>
+                    <tr>
+                        <th>Gap</th>
+                        <th>Log(P<sub>g</sub>)</th>
+                        <th>P<sub>g</sub></th>
+                        <th>Prime Count</th>
+                        <th>Avg Log per Prime</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            displayGaps.forEach(gap => {
+                const data = analysisResults.gapProducts[gap];
+                const avgLogPerPrime = data.logProduct / data.count;
+                
+                html += `
+                    <tr>
+                        <td>${gap}</td>
+                        <td>${data.logProduct.toFixed(precision)}</td>
+                        <td>${data.product.toFixed(precision)}</td>
+                        <td>${data.count}</td>
+                        <td>${avgLogPerPrime.toFixed(precision)}</td>
+                    </tr>
+                `;
+            });
+            
+            if (!showAll && gaps.length > 5) {
+                html += `
+                    <tr>
+                        <td colspan="5" style="text-align: center; color: #888; font-style: italic;">
+                            ... ${gaps.length - 5} more rows (click "Show All" to expand)
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+        
+        function updateStepByStepTable() {
+            const precision = parseInt(document.getElementById('stepByStepPrecision').value);
+            const showAll = tableStates.stepByStepTable;
+            const gaps = analysisResults.evenGaps;
+            const displayGaps = showAll ? gaps : gaps.slice(0, 5);
+            const target = analysisResults.targetZeta2;
+            
+            const table = document.getElementById('stepByStepTableContent');
+            let html = `
+                <thead>
+                    <tr>
+                        <th>Step</th>
+                        <th>Gap Added</th>
+                        <th>P<sub>g</sub></th>
+                        <th>Formula</th>
+                        <th>Cumulative Product</th>
+                        <th>Distance to π²/6</th>
+                        <th>% Complete</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            displayGaps.forEach((gap, idx) => {
+                const data = analysisResults.gapProducts[gap];
+                const cumulative = analysisResults.progressiveProducts[idx].value;
+                const distance = target - cumulative;
+                const percentComplete = (cumulative / target) * 100;
+                
+                // Build formula string showing multiplication
+                let formula = 'P₀';
+                for (let i = 1; i <= idx; i++) {
+                    formula += ` × P${gaps[i]}`;
+                }
+                
+                html += `
+                    <tr>
+                        <td>${idx + 1}</td>
+                        <td>${gap}</td>
+                        <td>${data.product.toFixed(precision)}</td>
+                        <td style="font-size: 0.85rem; color: #aaa;">${formula}</td>
+                        <td>${cumulative.toFixed(precision)}</td>
+                        <td>${distance.toFixed(precision)}</td>
+                        <td>${percentComplete.toFixed(precision)}%</td>
+                    </tr>
+                `;
+            });
+            
+            if (!showAll && gaps.length > 5) {
+                html += `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: #888; font-style: italic;">
+                            ... ${gaps.length - 5} more rows (click "Show All" to expand)
+                        </td>
+                    </tr>
+                `;
+            }
+            
+            // Add final target row
+            html += `
+                <tr style="border-top: 3px solid #ffd700; background: rgba(255, 215, 0, 0.1); font-weight: 600;">
+                    <td>Target</td>
+                    <td colspan="3" style="text-align: center;">ζ(2) = π²/6</td>
+                    <td>${target.toFixed(precision)}</td>
+                    <td>0.${'0'.repeat(precision)}</td>
+                    <td>100.${'0'.repeat(precision)}%</td>
+                </tr>
+            `;
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+        
+        // Export functions for individual tables and charts
+        function exportTableCSV(tableType) {
+            if (!analysisResults) {
+                alert('Please run analysis first');
+                return;
+            }
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            const maxPrime = analysisResults.maxPrime;
+            let csv = '';
+            let filename = '';
+            
+            switch(tableType) {
+                case 'convergence':
+                    csv = generateConvergenceCSV();
+                    filename = `convergence_${maxPrime}_${timestamp}.csv`;
+                    break;
+                case 'gapContrib':
+                    csv = generateGapContribCSV();
+                    filename = `gap_contributions_${maxPrime}_${timestamp}.csv`;
+                    break;
+                case 'gapDist':
+                    csv = generateGapDistCSV();
+                    filename = `gap_distribution_${maxPrime}_${timestamp}.csv`;
+                    break;
+                case 'percentage':
+                    csv = generatePercentageCSV();
+                    filename = `percentage_contributions_${maxPrime}_${timestamp}.csv`;
+                    break;
+                case 'error':
+                    csv = generateErrorCSV();
+                    filename = `error_analysis_${maxPrime}_${timestamp}.csv`;
+                    break;
+                case 'logScale':
+                    csv = generateLogScaleCSV();
+                    filename = `log_scale_products_${maxPrime}_${timestamp}.csv`;
+                    break;
+                case 'stepByStep':
+                    csv = generateStepByStepCSV();
+                    filename = `step_by_step_${maxPrime}_${timestamp}.csv`;
+                    break;
+            }
+            
+            const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = filename;
+            link.click();
+        }
+        
+        function exportChartPNG(canvasId, chartName) {
+            if (!analysisResults) {
+                alert('Please run analysis first');
+                return;
+            }
+            
+            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+            
+            // Create composite canvas
+            const compositeCanvas = document.createElement('canvas');
+            const ctx = compositeCanvas.getContext('2d');
+            
+            // Get source chart
+            const sourceCanvas = document.getElementById(canvasId);
+            const chartW = sourceCanvas.width;
+            const chartH = sourceCanvas.height;
+            
+            // Calculate dimensions
+            const headerH = 250;
+            const statsBarH = 120;
+            const tableH = 800; // Height for stats table
+            const padding = 40;
+            
+            compositeCanvas.width = chartW;
+            compositeCanvas.height = headerH + statsBarH + chartH + tableH;
+            
+            // Background
+            ctx.fillStyle = '#0a0a0f';
+            ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
+            
+            // Title section
+            const titleMap = {
+                'convergenceChart': 'Progressive Convergence to ζ(2) = π²/6',
+                'gapContribChart': 'Individual Gap Family Products P_g',
+                'gapDistChart': 'Prime Distribution by Gap Class',
+                'percentageChart': 'Percentage Contribution to ζ(2)',
+                'errorChart': 'Convergence Error Analysis',
+                'logScaleChart': 'Log-Scale Product Growth'
+            };
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 72px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(titleMap[canvasId] || 'Chart', compositeCanvas.width / 2, 90);
+            
+            ctx.fillStyle = '#888';
+            ctx.font = '36px monospace';
+            const dateStr = new Date().toLocaleDateString('en-GB', { 
+                day: '2-digit', 
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+            ctx.fillText(`Analysis Date: ${dateStr}`, compositeCanvas.width / 2, 160);
+            
+            // Stats summary bar
+            const statsY = headerH + padding;
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(padding, statsY, compositeCanvas.width - 2 * padding, statsBarH - 2 * padding);
+            
+            ctx.strokeStyle = '#3a3a5a';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(padding, statsY, compositeCanvas.width - 2 * padding, statsBarH - 2 * padding);
+            
+            // Stats content - 6 boxes
+            const boxW = (compositeCanvas.width - 2 * padding - 5 * 20) / 6;
+            const statsData = [
+                { label: 'N Range', value: analysisResults.maxPrime.toLocaleString() },
+                { label: 'Total Primes', value: analysisResults.totalPrimes.toLocaleString() },
+                { label: 'Gap Families', value: analysisResults.evenGaps.length.toString() },
+                { label: 'Target ζ(2)', value: analysisResults.targetZeta2.toFixed(8) },
+                { label: 'Final Product', value: analysisResults.finalProduct.toFixed(8) },
+                { label: 'Rel. Error', value: (analysisResults.finalRelativeError * 100).toFixed(6) + '%' }
+            ];
+            
+            statsData.forEach((stat, idx) => {
+                const x = padding + idx * (boxW + 20);
+                
+                ctx.fillStyle = '#888';
+                ctx.font = '28px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(stat.label, x + boxW / 2, statsY + 30);
+                
+                ctx.fillStyle = '#ffd700';
+                ctx.font = 'bold 40px monospace';
+                ctx.fillText(stat.value, x + boxW / 2, statsY + 70);
+            });
+            
+            // Draw chart
+            const chartY = headerH + statsBarH;
+            ctx.drawImage(sourceCanvas, 0, chartY, chartW, chartH);
+            
+            // Draw stats table
+            const tableY = chartY + chartH + padding;
+            renderStatsTableToCanvas(ctx, canvasId, tableY, compositeCanvas.width);
+            
+            // Export
+            const link = document.createElement('a');
+            link.download = `${chartName}_with_stats_${analysisResults.maxPrime}_${timestamp}.png`;
+            link.href = compositeCanvas.toDataURL('image/png');
+            link.click();
+        }
+        
+        function renderStatsTableToCanvas(ctx, canvasId, startY, canvasWidth) {
+            // Determine which table data to render based on canvasId
+            const tableMap = {
+                'convergenceChart': renderConvergenceTableData,
+                'gapContribChart': renderGapContribTableData,
+                'gapDistChart': renderGapDistTableData,
+                'percentageChart': renderPercentageTableData,
+                'errorChart': renderErrorTableData,
+                'logScaleChart': renderLogScaleTableData
+            };
+            
+            const renderFunc = tableMap[canvasId];
+            if (renderFunc) {
+                renderFunc(ctx, startY, canvasWidth);
+            }
+        }
+        
+        function renderConvergenceTableData(ctx, startY, canvasWidth) {
+            const precision = parseInt(document.getElementById('convergencePrecision').value);
+            const data = analysisResults.progressiveProducts.slice(0, 10); // First 10 rows
+            
+            const headers = ['Gap', 'Cumulative Product', 'Log Product', 'Target ζ(2)', 'Abs Error', 'Rel Error (%)'];
+            const colW = (canvasWidth - 80) / headers.length;
+            
+            // Header background
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(40, startY, canvasWidth - 80, 60);
+            
+            // Headers
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'center';
+            headers.forEach((header, idx) => {
+                ctx.fillText(header, 40 + idx * colW + colW / 2, startY + 40);
+            });
+            
+            // Rows
+            ctx.font = '28px monospace';
+            data.forEach((row, rowIdx) => {
+                const y = startY + 60 + rowIdx * 50;
+                
+                // Alternating row background
+                if (rowIdx % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                    ctx.fillRect(40, y, canvasWidth - 80, 50);
+                }
+                
+                ctx.fillStyle = '#e0e0e0';
+                const rowData = [
+                    row.gap.toString(),
+                    row.value.toFixed(precision),
+                    row.logValue.toFixed(precision),
+                    analysisResults.targetZeta2.toFixed(precision),
+                    row.error.toExponential(precision),
+                    (row.relativeError * 100).toFixed(precision)
+                ];
+                
+                rowData.forEach((cell, colIdx) => {
+                    ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
+                });
+            });
+        }
+        
+        function renderGapContribTableData(ctx, startY, canvasWidth) {
+            const precision = parseInt(document.getElementById('gapContribPrecision').value);
+            const gaps = analysisResults.evenGaps.slice(0, 10);
+            
+            const headers = ['Gap', 'Product P_g', 'Log(P_g)', 'Prime Count', 'First Primes'];
+            const colWidths = [0.1, 0.2, 0.2, 0.15, 0.35];
+            
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(40, startY, canvasWidth - 80, 60);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'center';
+            let xPos = 40;
+            headers.forEach((header, idx) => {
+                const w = (canvasWidth - 80) * colWidths[idx];
+                ctx.fillText(header, xPos + w / 2, startY + 40);
+                xPos += w;
+            });
+            
+            ctx.font = '28px monospace';
+            gaps.forEach((gap, rowIdx) => {
+                const y = startY + 60 + rowIdx * 50;
+                const data = analysisResults.gapProducts[gap];
+                
+                if (rowIdx % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                    ctx.fillRect(40, y, canvasWidth - 80, 50);
+                }
+                
+                ctx.fillStyle = '#e0e0e0';
+                const primes = data.primes.slice(0, 5).join(', ');
+                const rowData = [
+                    gap.toString(),
+                    data.product.toFixed(precision),
+                    data.logProduct.toFixed(precision),
+                    data.count.toString(),
+                    primes
+                ];
+                
+                xPos = 40;
+                rowData.forEach((cell, colIdx) => {
+                    const w = (canvasWidth - 80) * colWidths[colIdx];
+                    ctx.textAlign = colIdx === 4 ? 'left' : 'center';
+                    const textX = colIdx === 4 ? xPos + 10 : xPos + w / 2;
+                    ctx.fillText(cell, textX, y + 35);
+                    xPos += w;
+                });
+            });
+        }
+        
+        function renderGapDistTableData(ctx, startY, canvasWidth) {
+            const precision = parseInt(document.getElementById('gapDistPrecision').value);
+            const gaps = analysisResults.evenGaps.slice(0, 10);
+            
+            const headers = ['Gap', 'Count', '% of Total', 'Cumulative', 'Cumulative %'];
+            const colW = (canvasWidth - 80) / headers.length;
+            
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(40, startY, canvasWidth - 80, 60);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'center';
+            headers.forEach((header, idx) => {
+                ctx.fillText(header, 40 + idx * colW + colW / 2, startY + 40);
+            });
+            
+            ctx.font = '28px monospace';
+            let cumulative = 0;
+            gaps.forEach((gap, rowIdx) => {
+                const y = startY + 60 + rowIdx * 50;
+                const data = analysisResults.gapProducts[gap];
+                cumulative += data.count;
+                
+                if (rowIdx % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                    ctx.fillRect(40, y, canvasWidth - 80, 50);
+                }
+                
+                ctx.fillStyle = '#e0e0e0';
+                const percentage = (data.count / analysisResults.totalPrimes) * 100;
+                const cumulativePercentage = (cumulative / analysisResults.totalPrimes) * 100;
+                
+                const rowData = [
+                    gap.toString(),
+                    data.count.toString(),
+                    percentage.toFixed(precision) + '%',
+                    cumulative.toString(),
+                    cumulativePercentage.toFixed(precision) + '%'
+                ];
+                
+                rowData.forEach((cell, colIdx) => {
+                    ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
+                });
+            });
+        }
+        
+        function renderPercentageTableData(ctx, startY, canvasWidth) {
+            const precision = parseInt(document.getElementById('percentagePrecision').value);
+            const gaps = analysisResults.evenGaps.slice(0, 10);
+            
+            const headers = ['Gap', 'Contribution %', 'Product P_g', 'Ratio', 'Log Contrib'];
+            const colW = (canvasWidth - 80) / headers.length;
+            
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(40, startY, canvasWidth - 80, 60);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'center';
+            headers.forEach((header, idx) => {
+                ctx.fillText(header, 40 + idx * colW + colW / 2, startY + 40);
+            });
+            
+            ctx.font = '28px monospace';
+            gaps.forEach((gap, rowIdx) => {
+                const y = startY + 60 + rowIdx * 50;
+                const data = analysisResults.gapProducts[gap];
+                
+                if (rowIdx % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                    ctx.fillRect(40, y, canvasWidth - 80, 50);
+                }
+                
+                ctx.fillStyle = '#e0e0e0';
+                const percentage = analysisResults.percentageContributions[gap];
+                const ratio = data.product / analysisResults.targetZeta2;
+                
+                const rowData = [
+                    gap.toString(),
+                    percentage.toFixed(precision) + '%',
+                    data.product.toFixed(precision),
+                    ratio.toFixed(precision),
+                    data.logProduct.toFixed(precision)
+                ];
+                
+                rowData.forEach((cell, colIdx) => {
+                    ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
+                });
+            });
+        }
+        
+        function renderErrorTableData(ctx, startY, canvasWidth) {
+            const precision = parseInt(document.getElementById('errorPrecision').value);
+            const data = analysisResults.progressiveProducts.slice(0, 10);
+            
+            const headers = ['Gap', 'Product', 'Abs Error', 'Rel Error', 'Log10(Error)'];
+            const colW = (canvasWidth - 80) / headers.length;
+            
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(40, startY, canvasWidth - 80, 60);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'center';
+            headers.forEach((header, idx) => {
+                ctx.fillText(header, 40 + idx * colW + colW / 2, startY + 40);
+            });
+            
+            ctx.font = '28px monospace';
+            data.forEach((row, rowIdx) => {
+                const y = startY + 60 + rowIdx * 50;
+                
+                if (rowIdx % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                    ctx.fillRect(40, y, canvasWidth - 80, 50);
+                }
+                
+                ctx.fillStyle = '#e0e0e0';
+                const logError = Math.log10(row.relativeError);
+                
+                const rowData = [
+                    row.gap.toString(),
+                    row.value.toFixed(precision),
+                    row.error.toExponential(precision),
+                    (row.relativeError * 100).toFixed(precision) + '%',
+                    logError.toFixed(precision)
+                ];
+                
+                rowData.forEach((cell, colIdx) => {
+                    ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
+                });
+            });
+        }
+        
+        function renderLogScaleTableData(ctx, startY, canvasWidth) {
+            const precision = parseInt(document.getElementById('logScalePrecision').value);
+            const gaps = analysisResults.evenGaps.slice(0, 10);
+            
+            const headers = ['Gap', 'Log(P_g)', 'P_g', 'Count', 'Avg/Prime'];
+            const colW = (canvasWidth - 80) / headers.length;
+            
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(40, startY, canvasWidth - 80, 60);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'center';
+            headers.forEach((header, idx) => {
+                ctx.fillText(header, 40 + idx * colW + colW / 2, startY + 40);
+            });
+            
+            ctx.font = '28px monospace';
+            gaps.forEach((gap, rowIdx) => {
+                const y = startY + 60 + rowIdx * 50;
+                const data = analysisResults.gapProducts[gap];
+                
+                if (rowIdx % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                    ctx.fillRect(40, y, canvasWidth - 80, 50);
+                }
+                
+                ctx.fillStyle = '#e0e0e0';
+                const avgLogPerPrime = data.logProduct / data.count;
+                
+                const rowData = [
+                    gap.toString(),
+                    data.logProduct.toFixed(precision),
+                    data.product.toFixed(precision),
+                    data.count.toString(),
+                    avgLogPerPrime.toFixed(precision)
+                ];
+                
+                rowData.forEach((cell, colIdx) => {
+                    ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
+                });
+            });
+        }
+        
+        function generateConvergenceCSV() {
+            const precision = parseInt(document.getElementById('convergencePrecision').value);
+            let csv = 'Gap-Class Decomposition - Progressive Convergence\n';
+            csv += `Analysis Date,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
+            csv += `Target zeta(2),${analysisResults.targetZeta2}\n\n`;
+            csv += 'Gap,Cumulative Product,Log Product,Target zeta(2),Absolute Error,Relative Error (%)\n';
+            
+            analysisResults.progressiveProducts.forEach(row => {
+                csv += `${row.gap},${row.value.toFixed(precision)},${row.logValue.toFixed(precision)},`;
+                csv += `${analysisResults.targetZeta2.toFixed(precision)},${row.error.toExponential(precision)},`;
+                csv += `${(row.relativeError * 100).toFixed(precision)}\n`;
+            });
+            
+            return csv;
+        }
+        
+        function generateGapContribCSV() {
+            const precision = parseInt(document.getElementById('gapContribPrecision').value);
+            let csv = 'Gap-Class Decomposition - Individual Gap Products\n';
+            csv += `Analysis Date,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime,${analysisResults.maxPrime}\n\n`;
+            csv += 'Gap,Product P_g,Log(P_g),Prime Count,First 20 Primes\n';
+            
+            analysisResults.evenGaps.forEach(gap => {
+                const data = analysisResults.gapProducts[gap];
+                const primes = data.primes.slice(0, 20).join(' ');
+                csv += `${gap},${data.product.toFixed(precision)},${data.logProduct.toFixed(precision)},`;
+                csv += `${data.count},"${primes}"\n`;
+            });
+            
+            return csv;
+        }
+        
+        function generateGapDistCSV() {
+            const precision = parseInt(document.getElementById('gapDistPrecision').value);
+            let csv = 'Gap-Class Decomposition - Prime Distribution\n';
+            csv += `Analysis Date,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
+            csv += `Total Primes,${analysisResults.totalPrimes}\n\n`;
+            csv += 'Gap,Prime Count,Percentage of Total,Cumulative Count,Cumulative Percentage\n';
+            
+            let cumulative = 0;
+            analysisResults.evenGaps.forEach(gap => {
+                const data = analysisResults.gapProducts[gap];
+                cumulative += data.count;
+                const percentage = (data.count / analysisResults.totalPrimes) * 100;
+                const cumulativePercentage = (cumulative / analysisResults.totalPrimes) * 100;
+                
+                csv += `${gap},${data.count},${percentage.toFixed(precision)},`;
+                csv += `${cumulative},${cumulativePercentage.toFixed(precision)}\n`;
+            });
+            
+            return csv;
+        }
+        
+        function generatePercentageCSV() {
+            const precision = parseInt(document.getElementById('percentagePrecision').value);
+            let csv = 'Gap-Class Decomposition - Contribution Percentages\n';
+            csv += `Analysis Date,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
+            csv += `Target zeta(2),${analysisResults.targetZeta2}\n\n`;
+            csv += 'Gap,Contribution to log(zeta(2)) (%),Product P_g,Ratio to zeta(2),Log Contribution\n';
+            
+            analysisResults.evenGaps.forEach(gap => {
+                const data = analysisResults.gapProducts[gap];
+                const percentage = analysisResults.percentageContributions[gap];
+                const ratio = data.product / analysisResults.targetZeta2;
+                
+                csv += `${gap},${percentage.toFixed(precision)},${data.product.toFixed(precision)},`;
+                csv += `${ratio.toFixed(precision)},${data.logProduct.toFixed(precision)}\n`;
+            });
+            
+            return csv;
+        }
+        
+        function generateErrorCSV() {
+            const precision = parseInt(document.getElementById('errorPrecision').value);
+            let csv = 'Gap-Class Decomposition - Error Analysis\n';
+            csv += `Analysis Date,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
+            csv += `Target zeta(2),${analysisResults.targetZeta2}\n\n`;
+            csv += 'Gap,Product Value,Absolute Error,Relative Error,Log10(Error),Error Reduction (%)\n';
+            
+            const data = analysisResults.progressiveProducts;
+            data.forEach((row, idx) => {
+                const logError = Math.log10(row.relativeError);
+                const prevError = idx > 0 ? data[idx - 1].relativeError : row.relativeError;
+                const errorReduction = idx > 0 ? ((prevError - row.relativeError) / prevError * 100) : 0;
+                
+                csv += `${row.gap},${row.value.toFixed(precision)},${row.error.toExponential(precision)},`;
+                csv += `${(row.relativeError * 100).toFixed(precision)},${logError.toFixed(precision)},`;
+                csv += `${errorReduction.toFixed(precision)}\n`;
+            });
+            
+            return csv;
+        }
+        
+        function generateLogScaleCSV() {
+            const precision = parseInt(document.getElementById('logScalePrecision').value);
+            let csv = 'Gap-Class Decomposition - Log-Scale Analysis\n';
+            csv += `Analysis Date,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime,${analysisResults.maxPrime}\n\n`;
+            csv += 'Gap,Log(P_g),P_g,Prime Count,Average Log per Prime\n';
+            
+            analysisResults.evenGaps.forEach(gap => {
+                const data = analysisResults.gapProducts[gap];
+                const avgLogPerPrime = data.logProduct / data.count;
+                
+                csv += `${gap},${data.logProduct.toFixed(precision)},${data.product.toFixed(precision)},`;
+                csv += `${data.count},${avgLogPerPrime.toFixed(precision)}\n`;
+            });
+            
+            return csv;
+        }
+        
+        function generateStepByStepCSV() {
+            const precision = parseInt(document.getElementById('stepByStepPrecision').value);
+            let csv = 'Gap-Class Decomposition - Step-by-Step Accumulation\n';
+            csv += `Analysis Date,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
+            csv += `Target zeta(2),${analysisResults.targetZeta2}\n\n`;
+            csv += 'Step,Gap Added,P_g,Formula,Cumulative Product,Distance to pi^2/6,Percent Complete\n';
+            
+            const gaps = analysisResults.evenGaps;
+            gaps.forEach((gap, idx) => {
+                const data = analysisResults.gapProducts[gap];
+                const cumulative = analysisResults.progressiveProducts[idx].value;
+                const distance = analysisResults.targetZeta2 - cumulative;
+                const percentComplete = (cumulative / analysisResults.targetZeta2) * 100;
+                
+                let formula = 'P_0';
+                for (let i = 1; i <= idx; i++) {
+                    formula += ` × P_${gaps[i]}`;
+                }
+                
+                csv += `${idx + 1},${gap},${data.product.toFixed(precision)},"${formula}",`;
+                csv += `${cumulative.toFixed(precision)},${distance.toFixed(precision)},`;
+                csv += `${percentComplete.toFixed(precision)}\n`;
+            });
+            
+            csv += `\nTarget,,,zeta(2) = pi^2/6,${analysisResults.targetZeta2.toFixed(precision)},0,100\n`;
+            
+            return csv;
+        }
+        
+        // Screenshot generation
+        function generateScreenshot(isHighRes = false) {
+            if (!analysisResults) {
+                alert('Please run analysis first');
+                return;
+            }
+            
+            const statusBar = document.getElementById('screenshotStatus');
+            statusBar.style.display = 'block';
+            statusBar.className = 'status-bar computing';
+            statusBar.textContent = 'Generating comprehensive screenshot...';
+            
+            setTimeout(() => {
+                try {
+                    const canvas = document.getElementById('compositeCanvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    // Determine which charts to include
+                    const includeCharts = {
+                        convergence: document.getElementById('includeConvergence').checked,
+                        gapContrib: document.getElementById('includeGapContrib').checked,
+                        gapDist: document.getElementById('includeGapDist').checked,
+                        percentage: document.getElementById('includePercentage').checked,
+                        error: document.getElementById('includeError').checked,
+                        logScale: document.getElementById('includeLogScale').checked
+                    };
+                    
+                    const selectedCharts = Object.entries(includeCharts)
+                        .filter(([_, include]) => include)
+                        .map(([name, _]) => name);
+                    
+                    if (selectedCharts.length === 0) {
+                        statusBar.className = 'status-bar';
+                        statusBar.style.color = '#ff6464';
+                        statusBar.textContent = 'Please select at least one chart';
+                        return;
+                    }
+                    
+                    const layout = document.getElementById('screenshotLayout').value;
+                    const resolution = isHighRes ? 2 : 1;
+                    
+                    // Calculate layout
+                    let cols, rows;
+                    switch(layout) {
+                        case 'grid':
+                            cols = 2;
+                            rows = Math.ceil(selectedCharts.length / 2);
+                            break;
+                        case 'vertical':
+                            cols = 1;
+                            rows = selectedCharts.length;
+                            break;
+                        case 'compact':
+                            cols = 3;
+                            rows = Math.ceil(selectedCharts.length / 3);
+                            break;
+                    }
+                    
+                    const chartWidth = 1920 * resolution;
+                    const chartHeight = 1080 * resolution;
+                    const headerHeight = 300 * resolution;
+                    const footerHeight = 600 * resolution;
+                    const padding = 40 * resolution;
+                    
+                    const canvasWidth = cols * chartWidth + (cols + 1) * padding;
+                    const canvasHeight = headerHeight + rows * chartHeight + (rows + 1) * padding + footerHeight;
+                    
+                    canvas.width = canvasWidth;
+                    canvas.height = canvasHeight;
+                    
+                    // Background
+                    ctx.fillStyle = '#0a0a0f';
+                    ctx.fillRect(0, 0, canvasWidth, canvasHeight);
+                    
+                    // Header
+                    const title = document.getElementById('screenshotTitle').value;
+                    const subtitle = document.getElementById('screenshotSubtitle').value;
+                    
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = `bold ${80 * resolution}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText(title, canvasWidth / 2, 100 * resolution);
+                    
+                    ctx.fillStyle = '#aaa';
+                    ctx.font = `${40 * resolution}px sans-serif`;
+                    ctx.fillText(subtitle, canvasWidth / 2, 170 * resolution);
+                    
+                    // Stats summary
+                    const statsText = `Analysis: ${analysisResults.totalPrimes.toLocaleString()} primes up to ${analysisResults.maxPrime.toLocaleString()} | ${analysisResults.evenGaps.length} gap families | Error: ${(analysisResults.finalRelativeError * 100).toFixed(6)}%`;
+                    ctx.fillStyle = '#888';
+                    ctx.font = `${32 * resolution}px monospace`;
+                    ctx.fillText(statsText, canvasWidth / 2, 240 * resolution);
+                    
+                    // Draw charts
+                    const chartMap = {
+                        convergence: 'convergenceChart',
+                        gapContrib: 'gapContribChart',
+                        gapDist: 'gapDistChart',
+                        percentage: 'percentageChart',
+                        error: 'errorChart',
+                        logScale: 'logScaleChart'
+                    };
+                    
+                    selectedCharts.forEach((chartName, idx) => {
+                        const row = Math.floor(idx / cols);
+                        const col = idx % cols;
+                        
+                        const x = col * chartWidth + (col + 1) * padding;
+                        const y = headerHeight + row * chartHeight + (row + 1) * padding;
+                        
+                        const sourceCanvas = document.getElementById(chartMap[chartName]);
+                        ctx.drawImage(sourceCanvas, x, y, chartWidth, chartHeight);
+                    });
+                    
+                    // Footer commentary
+                    const commentaryY = headerHeight + rows * chartHeight + (rows + 1) * padding + 60 * resolution;
+                    const commentary = generateCommentary();
+                    
+                    ctx.fillStyle = '#1a1a2a';
+                    ctx.fillRect(padding, commentaryY - 40 * resolution, canvasWidth - 2 * padding, footerHeight - 80 * resolution);
+                    
+                    ctx.strokeStyle = '#ffd700';
+                    ctx.lineWidth = 3 * resolution;
+                    ctx.strokeRect(padding, commentaryY - 40 * resolution, canvasWidth - 2 * padding, footerHeight - 80 * resolution);
+                    
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = `bold ${36 * resolution}px serif`;
+                    ctx.textAlign = 'left';
+                    ctx.fillText('Mathematical Observations:', padding + 40 * resolution, commentaryY);
+                    
+                    // Wrap commentary text
+                    ctx.fillStyle = '#e0e0e0';
+                    ctx.font = `${28 * resolution}px serif`;
+                    const maxWidth = canvasWidth - 2 * padding - 80 * resolution;
+                    const lineHeight = 42 * resolution;
+                    let currentY = commentaryY + 60 * resolution;
+                    
+                    const paragraphs = commentary.split('\n\n');
+                    paragraphs.forEach(para => {
+                        const words = para.split(' ');
+                        let line = '';
+                        
+                        words.forEach(word => {
+                            const testLine = line + word + ' ';
+                            const metrics = ctx.measureText(testLine);
+                            
+                            if (metrics.width > maxWidth && line !== '') {
+                                ctx.fillText(line, padding + 40 * resolution, currentY);
+                                currentY += lineHeight;
+                                line = word + ' ';
+                            } else {
+                                line = testLine;
+                            }
+                        });
+                        
+                        if (line !== '') {
+                            ctx.fillText(line, padding + 40 * resolution, currentY);
+                            currentY += lineHeight;
+                        }
+                        currentY += lineHeight * 0.5;
+                    });
+                    
+                    // Date stamp
+                    ctx.fillStyle = '#666';
+                    ctx.font = `${24 * resolution}px monospace`;
+                    ctx.textAlign = 'right';
+                    ctx.fillText(new Date().toISOString().slice(0, 10), canvasWidth - padding - 40 * resolution, canvasHeight - 40 * resolution);
+                    
+                    // Export
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    const link = document.createElement('a');
+                    link.download = `gap_decomposition_comprehensive_${analysisResults.maxPrime}_${isHighRes ? '8K' : '4K'}_${timestamp}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    statusBar.className = 'status-bar complete';
+                    statusBar.textContent = `Screenshot generated successfully (${isHighRes ? '8K' : '4K'} resolution, ${selectedCharts.length} charts)`;
+                    
+                } catch (error) {
+                    statusBar.className = 'status-bar';
+                    statusBar.style.color = '#ff6464';
+                    statusBar.textContent = `Error: ${error.message}`;
+                    console.error(error);
+                }
+            }, 100);
+        }
+        
+        function generateCommentary() {
+            const style = document.getElementById('commentaryStyle').value;
+            const res = analysisResults;
+            
+            // Extract key insights
+            const dominantGap = res.evenGaps[0];
+            const dominantProduct = res.gapProducts[dominantGap].product;
+            const dominantContribution = (dominantProduct / res.targetZeta2) * 100;
+            
+            const twinPrimeCount = res.gapProducts[2] ? res.gapProducts[2].count : 0;
+            const twinContribution = res.percentageContributions[2] || 0;
+            
+            const finalError = res.finalRelativeError;
+            const gapFamilies = res.evenGaps.length;
+            
+            // Calculate convergence rate
+            const midPoint = Math.floor(res.progressiveProducts.length / 2);
+            const midError = res.progressiveProducts[midPoint].relativeError;
+            
+            switch(style) {
+                case 'ramanujan':
+                    return `My dear Hardy,\n\nI have been examining the most curious decomposition of ζ(2). When one partitions the Euler product by prime gap classes, the structure reveals itself with remarkable clarity. The twin primes alone—those ${twinPrimeCount} noble pairs separated by the minimal even gap—contribute approximately ${twinContribution.toFixed(2)}% to the logarithmic measure, a proportion that strikes me as deeply significant.\n\nWhat arrests my attention most profoundly is the precipitous convergence: after incorporating merely ${gapFamilies} gap families, we achieve agreement with π²/6 to within ${(finalError * 100).toExponential(2)}%. The dominant gap class (gap=${dominantGap}) alone accounts for ${dominantContribution.toFixed(2)}% of the final value—surely this concentration of contribution must encode some deeper principle about the distribution of primes.\n\nI venture to suggest that if we could determine the exact asymptotic for each P_g, we might illuminate the very nature of prime constellations. The logarithmic products appear to follow a pattern that may yield to analysis, though I confess the precise form eludes me still.`;
+                
+                case 'euler':
+                    return `Concerning the remarkable decomposition of the series Σ 1/n² = π²/6:\n\nBy partitioning the infinite product over primes according to their forward gaps, we observe that the contributions admit a natural hierarchical ordering. The gap class of magnitude ${dominantGap} dominates, contributing ${dominantContribution.toFixed(2)}% of the total value. The twin primes, numbering ${twinPrimeCount} among the first ${res.maxPrime.toLocaleString()} primes, provide ${twinContribution.toFixed(2)}% to the logarithmic sum.\n\nThe convergence proceeds with geometric rapidity—a mere ${gapFamilies} terms suffice to approximate π²/6 with relative error ${(finalError * 100).toExponential(2)}%. This elegant factorization suggests that the mysterious constant π emerges not merely from circular geometry, but from the very arithmetic structure of prime gaps.`;
+                
+                case 'gauss':
+                    return `Observations on the gap-class partition of ζ(2):\n\nThe decomposition ζ(2) = ∏P_g exhibits striking regularity. Among ${res.totalPrimes.toLocaleString()} primes analyzed, the distribution across ${gapFamilies} gap families reveals a clear hierarchy. Gap ${dominantGap} contains the plurality, accounting for ${dominantContribution.toFixed(2)}% of the product value.\n\nThe twin prime family (gap=2), comprising ${twinPrimeCount} instances, contributes ${twinContribution.toFixed(2)}% to log(ζ(2)). The rapid convergence (error = ${(finalError * 100).toExponential(2)}% after ${gapFamilies} terms) suggests an underlying simplicity worthy of deeper investigation. One suspects a connection to the prime number theorem, though the precise relationship remains to be established.`;
+                
+                case 'riemann':
+                    return `Analysis of the gap-class decomposition in the critical strip:\n\nThe partition ζ(2) = ∏_{g even} P_g where P_g = ∏_{p: gap(p)=g} p²/(p²-1) reveals analytic structure relevant to the distribution of zeros. Examining ${res.totalPrimes.toLocaleString()} primes up to ${res.maxPrime.toLocaleString()}, we observe ${gapFamilies} significant gap families.\n\nThe logarithmic contributions exhibit monotonic decay: gap ${dominantGap} provides ${dominantContribution.toFixed(2)}% of the total, while twin primes (${twinPrimeCount} instances) contribute ${twinContribution.toFixed(2)}%. The exceptional convergence rate—relative error ${(finalError * 100).toExponential(2)}% with finite truncation—suggests that the gap structure encodes information about the analytic continuation of ζ(s) into the critical strip. This decomposition may offer a discrete approach to understanding the continuous properties of the zeta function.`;
+                
+                default:
+                    return generateCommentary(); // Default to Ramanujan
+            }
+        }
+        
+        // Composite screenshot generation
+        function generateCompositeScreenshot() {
+            if (!analysisResults) {
+                alert('Please run analysis first');
+                return;
+            }
+            
+            const statusBar = document.getElementById('screenshotStatus');
+            statusBar.style.display = 'block';
+            statusBar.className = 'status-bar computing';
+            statusBar.textContent = 'Generating composite screenshot...';
+            
+            setTimeout(() => {
+                try {
+                    // Collect selected charts
+                    const chartSelections = {
+                        convergence: document.getElementById('screenshotConvergence').checked,
+                        gapContrib: document.getElementById('screenshotGapContrib').checked,
+                        gapDist: document.getElementById('screenshotGapDist').checked,
+                        percentage: document.getElementById('screenshotPercentage').checked,
+                        error: document.getElementById('screenshotError').checked,
+                        logScale: document.getElementById('screenshotLogScale').checked
+                    };
+                    
+                    const selectedCharts = [];
+                    const chartCanvasIds = {
+                        convergence: 'convergenceChart',
+                        gapContrib: 'gapContribChart',
+                        gapDist: 'gapDistChart',
+                        percentage: 'percentageChart',
+                        error: 'errorChart',
+                        logScale: 'logScaleChart'
+                    };
+                    
+                    Object.keys(chartSelections).forEach(key => {
+                        if (chartSelections[key]) {
+                            selectedCharts.push({
+                                name: key,
+                                canvasId: chartCanvasIds[key]
+                            });
+                        }
+                    });
+                    
+                    if (selectedCharts.length === 0) {
+                        statusBar.className = 'status-bar';
+                        statusBar.style.color = '#ff6464';
+                        statusBar.textContent = 'Please select at least one chart';
+                        return;
+                    }
+                    
+                    const baseRes = parseInt(document.getElementById('screenshotResolution').value);
+                    const scale = baseRes / 1920;
+                    
+                    const layout = document.getElementById('screenshotLayout').value;
+                    const title = document.getElementById('screenshotTitle').value;
+                    const subtitle = document.getElementById('screenshotSubtitle').value;
+                    
+                    // Calculate dimensions
+                    let cols, rows;
+                    if (layout === 'grid') {
+                        cols = 2;
+                        rows = Math.ceil(selectedCharts.length / 2);
+                    } else if (layout === 'vertical') {
+                        cols = 1;
+                        rows = selectedCharts.length;
+                    } else { // horizontal
+                        cols = Math.min(3, selectedCharts.length);
+                        rows = Math.ceil(selectedCharts.length / cols);
+                    }
+                    
+                    const chartW = 1920 * scale;
+                    const chartH = 1080 * scale;
+                    const headerH = 250 * scale;
+                    const footerH = 800 * scale;
+                    const padding = 40 * scale;
+                    const statsH = 100 * scale;
+                    
+                    const canvasW = cols * chartW + (cols + 1) * padding;
+                    const canvasH = headerH + statsH + rows * chartH + (rows + 1) * padding + footerH;
+                    
+                    const canvas = document.getElementById('compositeCanvas');
+                    const ctx = canvas.getContext('2d');
+                    
+                    canvas.width = canvasW;
+                    canvas.height = canvasH;
+                    
+                    // Background
+                    ctx.fillStyle = '#0a0a0f';
+                    ctx.fillRect(0, 0, canvasW, canvasH);
+                    
+                    // Header section
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = `bold ${72 * scale}px sans-serif`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText(title, canvasW / 2, 80 * scale);
+                    
+                    ctx.fillStyle = '#aaa';
+                    ctx.font = `${36 * scale}px sans-serif`;
+                    ctx.fillText(subtitle, canvasW / 2, 140 * scale);
+                    
+                    // Stats summary bar
+                    const statsY = headerH + 20 * scale;
+                    ctx.fillStyle = '#1a1a2a';
+                    ctx.fillRect(padding, statsY, canvasW - 2 * padding, statsH - 40 * scale);
+                    
+                    ctx.strokeStyle = '#3a3a5a';
+                    ctx.lineWidth = 2 * scale;
+                    ctx.strokeRect(padding, statsY, canvasW - 2 * padding, statsH - 40 * scale);
+                    
+                    const statsText = `${analysisResults.totalPrimes.toLocaleString()} primes analyzed | Maximum: ${analysisResults.maxPrime.toLocaleString()} | ${analysisResults.evenGaps.length} gap families | Final error: ${(analysisResults.finalRelativeError * 100).toFixed(8)}%`;
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = `${28 * scale}px monospace`;
+                    ctx.textAlign = 'center';
+                    ctx.fillText(statsText, canvasW / 2, statsY + (statsH - 40 * scale) / 2 + 10 * scale);
+                    
+                    // Draw charts
+                    selectedCharts.forEach((chart, idx) => {
+                        const row = Math.floor(idx / cols);
+                        const col = idx % cols;
+                        
+                        const x = col * chartW + (col + 1) * padding;
+                        const y = headerH + statsH + row * chartH + (row + 1) * padding;
+                        
+                        const sourceCanvas = document.getElementById(chart.canvasId);
+                        
+                        // Draw border
+                        ctx.strokeStyle = '#2a2a4a';
+                        ctx.lineWidth = 3 * scale;
+                        ctx.strokeRect(x - 2 * scale, y - 2 * scale, chartW + 4 * scale, chartH + 4 * scale);
+                        
+                        // Draw chart
+                        ctx.drawImage(sourceCanvas, x, y, chartW, chartH);
+                    });
+                    
+                    // Footer narrative section
+                    const footerY = headerH + statsH + rows * chartH + (rows + 1) * padding + 40 * scale;
+                    
+                    ctx.fillStyle = '#12121a';
+                    ctx.fillRect(padding, footerY, canvasW - 2 * padding, footerH - 80 * scale);
+                    
+                    ctx.strokeStyle = '#ffd700';
+                    ctx.lineWidth = 4 * scale;
+                    ctx.strokeRect(padding, footerY, canvasW - 2 * padding, footerH - 80 * scale);
+                    
+                    // Narrative title
+                    ctx.fillStyle = '#ffd700';
+                    ctx.font = `bold ${38 * scale}px serif`;
+                    ctx.textAlign = 'left';
+                    ctx.fillText('Mathematical Observations', padding + 30 * scale, footerY + 50 * scale);
+                    
+                    // Generate and render narrative
+                    const narrative = generateRamanujanNarrative();
+                    ctx.fillStyle = '#e0e0e0';
+                    ctx.font = `${26 * scale}px Georgia, serif`;
+                    
+                    const maxLineWidth = canvasW - 2 * padding - 60 * scale;
+                    const lineHeight = 38 * scale;
+                    let currentY = footerY + 100 * scale;
+                    
+                    const paragraphs = narrative.split('\n\n');
+                    paragraphs.forEach(para => {
+                        const words = para.split(' ');
+                        let line = '';
+                        
+                        for (let i = 0; i < words.length; i++) {
+                            const testLine = line + words[i] + ' ';
+                            const metrics = ctx.measureText(testLine);
+                            
+                            if (metrics.width > maxLineWidth && line !== '') {
+                                ctx.fillText(line.trim(), padding + 30 * scale, currentY);
+                                currentY += lineHeight;
+                                line = words[i] + ' ';
+                            } else {
+                                line = testLine;
+                            }
+                        }
+                        
+                        if (line.trim() !== '') {
+                            ctx.fillText(line.trim(), padding + 30 * scale, currentY);
+                            currentY += lineHeight;
+                        }
+                        currentY += lineHeight * 0.3;
+                    });
+                    
+                    // Date stamp
+                    ctx.fillStyle = '#666';
+                    ctx.font = `${22 * scale}px monospace`;
+                    ctx.textAlign = 'right';
+                    const dateStr = new Date().toLocaleDateString('en-GB', { 
+                        day: '2-digit', 
+                        month: 'long', 
+                        year: 'numeric' 
+                    });
+                    ctx.fillText(dateStr, canvasW - padding - 30 * scale, canvasH - 30 * scale);
+                    
+                    // Export
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    const resLabel = baseRes >= 3840 ? (baseRes >= 7680 ? '8K' : '4K') : (baseRes >= 2560 ? 'QHD' : 'HD');
+                    const link = document.createElement('a');
+                    link.download = `gap_decomposition_composite_${analysisResults.maxPrime}_${resLabel}_${timestamp}.png`;
+                    link.href = canvas.toDataURL('image/png');
+                    link.click();
+                    
+                    statusBar.className = 'status-bar complete';
+                    statusBar.textContent = `Composite screenshot generated: ${selectedCharts.length} charts, ${resLabel} resolution`;
+                    
+                } catch (error) {
+                    statusBar.className = 'status-bar';
+                    statusBar.style.color = '#ff6464';
+                    statusBar.textContent = `Error: ${error.message}`;
+                    console.error(error);
+                }
+            }, 100);
+        }
+        
+        function generateRamanujanNarrative() {
+            const r = analysisResults;
+            
+            // Extract key numerical insights
+            const twinCount = r.gapProducts[2] ? r.gapProducts[2].count : 0;
+            const twinProduct = r.gapProducts[2] ? r.gapProducts[2].product : 1;
+            const twinPct = r.percentageContributions[2] ? r.percentageContributions[2].toFixed(3) : 0;
+            
+            const gap4Count = r.gapProducts[4] ? r.gapProducts[4].count : 0;
+            const gap4Pct = r.percentageContributions[4] ? r.percentageContributions[4].toFixed(3) : 0;
+            
+            const gap6Count = r.gapProducts[6] ? r.gapProducts[6].count : 0;
+            const gap6Pct = r.percentageContributions[6] ? r.percentageContributions[6].toFixed(3) : 0;
+            
+            const errorExp = Math.floor(Math.log10(r.finalRelativeError));
+            const errorMantissa = (r.finalRelativeError / Math.pow(10, errorExp)).toFixed(2);
+            
+            // Calculate what portion of product comes from first few gaps
+            const firstThreeGaps = r.progressiveProducts.length >= 3 ? r.progressiveProducts[2].value : 0;
+            const firstThreePct = ((firstThreeGaps / r.targetZeta2) * 100).toFixed(2);
+            
+            const narrative = `My dear Hardy,
 
-<div class="paper-header">
-    <h1>The Deterministic Structure of Finite Coprime Lattices</h1>
-    <div class="author">Wessen Getachew</div>
-    <div class="affiliation">Principal Investigator, G-Sector Research Platform</div>
-    <div>January 29, 2026</div>
-</div>
+I write to you with great excitement concerning a most remarkable partition of Euler's celebrated identity ζ(2) = π²/6. By decomposing the infinite product according to prime gap classes, the structure reveals itself with extraordinary clarity.
 
-<div class="abstract">
-    <span class="abstract-title">Abstract</span>
-    This research formalizes a deterministic framework for the analysis of coprime k-tuples within finite integer lattices. While asymptotic density is traditionally defined as \(1/\zeta(k)\), finite constraints introduce a geometric residue, denoted as \(\Delta(R)\). We introduce the <strong>G-Sector Density Identity</strong> to map local population variances and define the <strong>Unity Bound</strong> (\(\sqrt{3}/\pi\)) as the critical threshold for rational resolution. Experimental data from the GCD Discovery Engine confirms that \(\Delta(R)\) is not stochastic noise but a result of boundary shell truncation of Möbius inversion cycles.
-</div>
+Consider: among the ${r.totalPrimes.toLocaleString()} primes examined up to ${r.maxPrime.toLocaleString()}, we find ${twinCount} twin prime pairs (gap 2), ${gap4Count} cousin pairs (gap 4), and ${gap6Count} sexy prime pairs (gap 6). The twin primes alone contribute ${twinPct}% to the logarithmic measure of ζ(2), while gaps 4 and 6 provide ${gap4Pct}% and ${gap6Pct}% respectively. What strikes me most profoundly is that merely the first three gap families—accounting for but a fraction of all primes—already capture ${firstThreePct}% of the final value.
 
-<h2>1. Introduction</h2>
-<p>The study of coprime distribution has historically relied on asymptotic limits. However, computational models require a precise understanding of finite search radii \(R\). This paper bridges the gap between the infinite limit and discrete lattice observation by defining specific sectors of the Farey sequence and their corresponding density identities.</p>
+The convergence proceeds with geometric swiftness: after partitioning across ${r.evenGaps.length} gap families, our finite product differs from π²/6 by merely ${errorMantissa} × 10^${errorExp} in relative terms. This precipitous approach to the transcendental limit suggests to me that each gap class P_g must admit an asymptotic formula, perhaps expressible in terms of π itself.
 
-<h2>2. The Sector Density Identity</h2>
-<p>In a Farey sequence of order \(N\), the population of coprime pairs within a specific sector \(n\) is governed by the inverse square of the index. We define the density \(C(n, N)\) as:</p>
+I venture to propose that the logarithmic products log(P_g) follow a pattern inversely proportional to some power of g, though the precise exponent eludes me still. If we could establish the exact form, we might illuminate not merely the structure of ζ(2), but the very distribution of prime constellations throughout the integers. The twin prime conjecture itself may be encoded in the behavior of P_2 as we extend to infinity.
 
-<div class="formula-block">
-    $$C(n, N) = \frac{3N^2}{\pi^2 n(n+1)}$$
-</div>
+The beauty of this decomposition lies in its reduction of the continuous (π²/6) to the discrete (prime gaps), bridging analysis and arithmetic in a manner reminiscent of your own work on partitions.`;
 
-<h3>2.1 The Unity Bound (The G-Constant)</h3>
-<p>The "Unity Bound" represents the transition where the density of a sector becomes exactly 1. This identifies the limit of rational resolution within the lattice. Solving for \(n\) when \(C(n, N) = 1\) provides the scaling constant:</p>
-
-<div class="formula-block">
-    $$n_{unity} \approx N \cdot \frac{\sqrt{3}}{\pi} \approx 0.55132 \cdot N$$
-</div>
-
-<p>This constant implies an underlying 2D geometric structure—specifically hexagonal circle packing—inherent in the distribution of rational numbers.</p>
-
-<h2>3. The Boundary Cancellation Principle (BCP)</h2>
-<p>The error term \(\Delta(R)\) is the residual difference between the exact count of coprime k-tuples \(N(R)\) and the expected asymptotic value:</p>
-
-<div class="formula-block">
-    $$\Delta(R) = \sum_{d=1}^{R} \mu(d) \lfloor \frac{R}{d} \rfloor^k - \frac{R^k}{\zeta(k)}$$
-</div>
-
-<p>The <strong>Boundary Cancellation Principle</strong> asserts that \(\Delta(R)\) originates at the truncation limits of the lattice. Because the search radius is finite, the Möbius inversion cycle remains incomplete at the boundary shell, leading to a deterministic residue. Experimental analysis shows that this residue is structurally concentrated at the truncation limits, rather than being randomly distributed.</p>
-
-
-
-<h2>4. Identity Growth and Decomposition</h2>
-<p>To analyze the "metabolism" of the lattice, we decompose the population into four identities based on coordinate primality (Prime: P, Composite: C):</p>
-
-<table class="identity-table">
-    <thead>
-        <tr>
-            <th>Identity Type</th>
-            <th>Growth Characteristics</th>
-            <th>Description</th>
-        </tr>
-    </thead>
-    <tbody>
-        <tr>
-            <td><strong>PP (Prime-Prime)</strong></td>
-            <td>Logarithmic Growth</td>
-            <td>Strictly bounded by the Prime Number Theorem. High information density.</td>
-        </tr>
-        <tr>
-            <td><strong>PC / CP</strong></td>
-            <td>Linear-Logarithmic</td>
-            <td>Hybrid identities representing prime-to-composite transitions.</td>
-        </tr>
-        <tr>
-            <td><strong>CC (Composite-Composite)</strong></td>
-            <td>Quadratic Growth</td>
-            <td>High-entropy distribution; becomes dominant as the range \(N\) increases.</td>
-        </tr>
-    </tbody>
-</table>
-
-<p>The observed <strong>Identity Decay</strong> proves that as \(N \to \infty\), the ratio of Prime-Prime identities to the total population approaches zero, while Composite-Composite identities reach near-total saturation of the lattice growth.</p>
-
-<h2>5. Stability Offset and Phase Shift</h2>
-<p>The mathematical distance between the lattice midpoint and the Unity Bound is defined by the <strong>Stability Offset</strong> (\(\delta\)):</p>
-
-<div class="formula-block">
-    $$\delta = \frac{\sqrt{3}}{\pi} - \frac{1}{2} \approx 0.0513$$
-</div>
-
-<p>This constant determines the phase shift of the Möbius wave relative to the lattice boundaries. It marks the region where the boundary residue reaches peak oscillation amplitude before undergoing self-correction.</p>
-
-<h2>6. Experimental Verification</h2>
-<p>Verification was conducted using the following digital engines:</p>
-<ul>
-    <li><strong>GCD Discovery Engine:</strong> Confirmed boundary shell truncation as the source of \(\Delta(R)\).</li>
-    <li><strong>Farey Sector Platform:</strong> Validated the \(C(n, N)\) identity with a 100% match across 826 sectors at \(N=1500\).</li>
-</ul>
-
-<div class="footer">
-    &copy; 2026 Wessen Getachew. All mathematical identities and experimental protocols are open-source. 
-    <br>
-    Primary Documentation: <a href="https://wessengetachew.github.io/GCD/" class="citation">https://wessengetachew.github.io/GCD/</a>
-</div>
-
+            return narrative;
+        }
+        
+        // Initialize
+        updateDisplays();
+    </script>
 </body>
 </html>
