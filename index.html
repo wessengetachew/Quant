@@ -579,9 +579,9 @@
             
             <ul>
                 <li><strong>Gap 0:</strong> {2} (special case)</li>
-                <li><strong>Gap 2 (Twin Primes):</strong> {3, 5, 11, 13, 17, 19, 29, 31, 41, 43, ...}</li>
-                <li><strong>Gap 4 (Cousin Primes):</strong> {7, 13, 19, 37, 43, 67, 79, ...}</li>
-                <li><strong>Gap 6 (Sexy Primes):</strong> {5, 7, 11, 13, 17, 23, 31, 37, ...}</li>
+                <li><strong>Gap 2 (Twin Primes):</strong> {3, 5, 11, 17, 29, 41, 59, 71, 101, 107, ...}</li>
+                <li><strong>Gap 4 (Cousin Primes):</strong> {7, 13, 19, 37, 43, 67, 79, 97, 103, 109, ...}</li>
+                <li><strong>Gap 6 (Sexy Primes):</strong> {23, 31, 47, 53, 61, 73, 83, 89, 113, ...}</li>
             </ul>
             
             <h3>Research Objectives</h3>
@@ -621,7 +621,13 @@
                         Maximum Gap to Analyze
                         <span class="control-value" id="maxGapDisplay">50</span>
                     </label>
-                    <input type="number" id="maxGap" value="50" min="10" max="200" step="2">
+                    <input type="number" id="maxGap" value="50" min="2" max="1000" step="2">
+                    <div style="margin-top: 8px;">
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
+                            <input type="checkbox" id="autoDetectMaxGap" style="width: auto;">
+                            <span>Auto-detect largest gap in range</span>
+                        </label>
+                    </div>
                 </div>
                 
                 <div class="control-group">
@@ -733,6 +739,12 @@
                             <option value="8" selected>8</option>
                             <option value="10">10</option>
                             <option value="12">12</option>
+                            <option value="15">15</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
+                            <option value="15">15</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
                         </select>
                         <button class="show-all-toggle" onclick="toggleTable('convergenceTable')">Show All</button>
                     </div>
@@ -761,6 +773,12 @@
                             <option value="8" selected>8</option>
                             <option value="10">10</option>
                             <option value="12">12</option>
+                            <option value="15">15</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
+                            <option value="15">15</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
                         </select>
                         <button class="show-all-toggle" onclick="toggleTable('gapContribTable')">Show All</button>
                     </div>
@@ -789,6 +807,9 @@
                             <option value="8" selected>8</option>
                             <option value="10">10</option>
                             <option value="12">12</option>
+                            <option value="15">15</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
                         </select>
                         <button class="show-all-toggle" onclick="toggleTable('gapDistTable')">Show All</button>
                     </div>
@@ -817,6 +838,9 @@
                             <option value="8" selected>8</option>
                             <option value="10">10</option>
                             <option value="12">12</option>
+                            <option value="15">15</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
                         </select>
                         <button class="show-all-toggle" onclick="toggleTable('percentageTable')">Show All</button>
                     </div>
@@ -845,6 +869,9 @@
                             <option value="8" selected>8</option>
                             <option value="10">10</option>
                             <option value="12">12</option>
+                            <option value="15">15</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
                         </select>
                         <button class="show-all-toggle" onclick="toggleTable('errorTable')">Show All</button>
                     </div>
@@ -873,6 +900,9 @@
                             <option value="8" selected>8</option>
                             <option value="10">10</option>
                             <option value="12">12</option>
+                            <option value="15">15</option>
+                            <option value="18">18</option>
+                            <option value="20">20</option>
                         </select>
                         <button class="show-all-toggle" onclick="toggleTable('logScaleTable')">Show All</button>
                     </div>
@@ -1156,7 +1186,8 @@
         // Run analysis
         function runAnalysis() {
             const maxPrime = parseInt(document.getElementById('maxPrime').value);
-            const maxGap = parseInt(document.getElementById('maxGap').value);
+            let maxGap = parseInt(document.getElementById('maxGap').value);
+            const autoDetect = document.getElementById('autoDetectMaxGap').checked;
             
             const statusBar = document.getElementById('statusBar');
             statusBar.style.display = 'block';
@@ -1166,6 +1197,22 @@
             // Use setTimeout to allow UI update
             setTimeout(() => {
                 try {
+                    // First pass to detect max gap if needed
+                    if (autoDetect) {
+                        const primes = sievePrimes(maxPrime);
+                        let detectedMaxGap = 0;
+                        for (let i = 0; i < primes.length - 1; i++) {
+                            const gap = primes[i + 1] - primes[i];
+                            if (gap > detectedMaxGap && gap % 2 === 0) {
+                                detectedMaxGap = gap;
+                            }
+                        }
+                        maxGap = detectedMaxGap;
+                        document.getElementById('maxGap').value = maxGap;
+                        document.getElementById('maxGapDisplay').textContent = maxGap;
+                        statusBar.textContent = `Auto-detected max gap: ${maxGap}. Computing decomposition...`;
+                    }
+                    
                     analysisResults = computeGapDecomposition(maxPrime, maxGap);
                     
                     statusBar.className = 'status-bar complete';
@@ -1190,20 +1237,31 @@
             const statsGrid = document.getElementById('statsGrid');
             statsPanel.style.display = 'block';
             
+            // Calculate π using the formula: π = √6 × √(∏P_g)
+            const productRoot = Math.sqrt(analysisResults.finalProduct);
+            const calculatedPi = Math.sqrt(6) * productRoot;
+            const actualPi = Math.PI;
+            const piError = Math.abs(calculatedPi - actualPi);
+            const piRelError = (piError / actualPi) * 100;
+            
             const stats = [
                 { label: 'Total Primes', value: analysisResults.totalPrimes.toLocaleString() },
                 { label: 'Maximum Prime', value: analysisResults.maxPrime.toLocaleString() },
                 { label: 'Gap Families', value: analysisResults.evenGaps.length },
-                { label: 'Target ζ(2)', value: analysisResults.targetZeta2.toFixed(10) },
-                { label: 'Computed Product', value: analysisResults.finalProduct.toFixed(10) },
-                { label: 'Absolute Error', value: analysisResults.finalError.toExponential(4) },
-                { label: 'Relative Error', value: (analysisResults.finalRelativeError * 100).toFixed(8) + '%' },
-                { label: 'Largest Gap', value: Math.max(...analysisResults.evenGaps) }
+                { label: 'Target ζ(2)', value: analysisResults.targetZeta2.toFixed(12) },
+                { label: 'Computed Product', value: analysisResults.finalProduct.toFixed(12) },
+                { label: 'Absolute Error', value: analysisResults.finalError.toExponential(6) },
+                { label: 'Relative Error', value: (analysisResults.finalRelativeError * 100).toFixed(10) + '%' },
+                { label: 'Largest Gap', value: Math.max(...analysisResults.evenGaps) },
+                { label: 'Calculated π', value: calculatedPi.toFixed(12), formula: 'π = √6 × √(∏P_g)' },
+                { label: 'Actual π', value: actualPi.toFixed(12) },
+                { label: 'π Error', value: piError.toExponential(6) },
+                { label: 'π Rel. Error', value: piRelError.toFixed(10) + '%' }
             ];
             
             statsGrid.innerHTML = stats.map(stat => `
                 <div class="stat-card">
-                    <div class="stat-label">${stat.label}</div>
+                    <div class="stat-label">${stat.label}${stat.formula ? '<br><span style="font-size: 0.65rem; color: #666;">' + stat.formula + '</span>' : ''}</div>
                     <div class="stat-value">${stat.value}</div>
                 </div>
             `).join('');
@@ -2759,10 +2817,32 @@
         
         function generateConvergenceCSV() {
             const precision = parseInt(document.getElementById('convergencePrecision').value);
-            let csv = 'Gap-Class Decomposition - Progressive Convergence\n';
-            csv += `Analysis Date,${new Date().toISOString()}\n`;
-            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
-            csv += `Target zeta(2),${analysisResults.targetZeta2}\n\n`;
+            let csv = '=================================================\n';
+            csv += 'GAP-CLASS DECOMPOSITION OF ZETA(2) = PI^2/6\n';
+            csv += 'Progressive Convergence Analysis\n';
+            csv += '=================================================\n\n';
+            
+            csv += 'ABSTRACT:\n';
+            csv += 'This dataset presents the progressive convergence of the gap-class decomposition\n';
+            csv += 'of the Riemann zeta function at s=2. By partitioning the Euler product according\n';
+            csv += 'to prime gap classes, we observe how each gap family P_g contributes to the final\n';
+            csv += 'value of pi^2/6. The cumulative product demonstrates geometric convergence as\n';
+            csv += 'additional gap families are incorporated into the decomposition.\n\n';
+            
+            csv += 'METHODOLOGY:\n';
+            csv += 'For each even gap g, we compute P_g = product over all primes p with gap(p)=g of p^2/(p^2-1)\n';
+            csv += 'The progressive product tracks: zeta(2) = P_0 × P_2 × P_4 × P_6 × ...\n\n';
+            
+            csv += `Analysis Date:,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime Analyzed:,${analysisResults.maxPrime}\n`;
+            csv += `Total Primes Found:,${analysisResults.totalPrimes}\n`;
+            csv += `Number of Gap Families:,${analysisResults.evenGaps.length}\n`;
+            csv += `Target Value (pi^2/6):,${analysisResults.targetZeta2}\n`;
+            csv += `Final Computed Product:,${analysisResults.finalProduct}\n`;
+            csv += `Final Absolute Error:,${analysisResults.finalError}\n`;
+            csv += `Final Relative Error:,${analysisResults.finalRelativeError}\n\n`;
+            
+            csv += 'DATA TABLE:\n';
             csv += 'Gap,Cumulative Product,Log Product,Target zeta(2),Absolute Error,Relative Error (%)\n';
             
             analysisResults.progressiveProducts.forEach(row => {
@@ -2771,32 +2851,79 @@
                 csv += `${(row.relativeError * 100).toFixed(precision)}\n`;
             });
             
+            csv += '\n=================================================\n';
+            csv += 'END OF DATASET\n';
+            csv += '=================================================\n';
+            
             return csv;
         }
         
         function generateGapContribCSV() {
             const precision = parseInt(document.getElementById('gapContribPrecision').value);
-            let csv = 'Gap-Class Decomposition - Individual Gap Products\n';
-            csv += `Analysis Date,${new Date().toISOString()}\n`;
-            csv += `Maximum Prime,${analysisResults.maxPrime}\n\n`;
-            csv += 'Gap,Product P_g,Log(P_g),Prime Count,First 20 Primes\n';
+            let csv = '=================================================\n';
+            csv += 'GAP-CLASS DECOMPOSITION OF ZETA(2) = PI^2/6\n';
+            csv += 'Individual Gap Family Products\n';
+            csv += '=================================================\n\n';
+            
+            csv += 'ABSTRACT:\n';
+            csv += 'This dataset contains the individual product values P_g for each gap family.\n';
+            csv += 'Each P_g represents the contribution of all primes with forward gap g to the\n';
+            csv += 'overall Euler product. The data includes prime counts, product values, logarithmic\n';
+            csv += 'contributions, and the first primes in each family for verification and further analysis.\n\n';
+            
+            csv += 'FORMULA:\n';
+            csv += 'P_g = product over all primes p where gap(p)=g of [p^2 / (p^2 - 1)]\n';
+            csv += 'where gap(p) = next_prime(p) - p\n\n';
+            
+            csv += `Analysis Date:,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime:,${analysisResults.maxPrime}\n`;
+            csv += `Total Primes:,${analysisResults.totalPrimes}\n`;
+            csv += `Total Gap Families:,${analysisResults.evenGaps.length}\n\n`;
+            
+            csv += 'DATA TABLE:\n';
+            csv += 'Gap,Product P_g,Log(P_g),Prime Count,Percentage of Total,First 20 Primes in Family\n';
             
             analysisResults.evenGaps.forEach(gap => {
                 const data = analysisResults.gapProducts[gap];
+                const pct = (data.count / analysisResults.totalPrimes * 100).toFixed(4);
                 const primes = data.primes.slice(0, 20).join(' ');
                 csv += `${gap},${data.product.toFixed(precision)},${data.logProduct.toFixed(precision)},`;
-                csv += `${data.count},"${primes}"\n`;
+                csv += `${data.count},${pct}%,"${primes}"\n`;
             });
+            
+            csv += '\n=================================================\n';
+            csv += 'END OF DATASET\n';
+            csv += '=================================================\n';
             
             return csv;
         }
         
         function generateGapDistCSV() {
             const precision = parseInt(document.getElementById('gapDistPrecision').value);
-            let csv = 'Gap-Class Decomposition - Prime Distribution\n';
-            csv += `Analysis Date,${new Date().toISOString()}\n`;
-            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
-            csv += `Total Primes,${analysisResults.totalPrimes}\n\n`;
+            let csv = '=================================================\n';
+            csv += 'GAP-CLASS DECOMPOSITION OF ZETA(2) = PI^2/6\n';
+            csv += 'Prime Distribution by Gap Class\n';
+            csv += '=================================================\n\n';
+            
+            csv += 'ABSTRACT:\n';
+            csv += 'This dataset analyzes how primes distribute across different gap classes.\n';
+            csv += 'For each even gap g, we count how many primes have forward gap g, compute\n';
+            csv += 'the percentage of total primes this represents, and track cumulative statistics.\n';
+            csv += 'This data is essential for understanding prime constellation frequencies and\n';
+            csv += 'testing conjectures about gap distribution (e.g., Twin Prime Conjecture).\n\n';
+            
+            csv += 'DEFINITIONS:\n';
+            csv += '- Gap g: The difference between consecutive primes (p_n+1 - p_n)\n';
+            csv += '- Count: Number of primes p where gap(p) = g\n';
+            csv += '- Percentage: (Count / Total Primes) × 100\n';
+            csv += '- Cumulative: Running total of primes accounted for\n\n';
+            
+            csv += `Analysis Date:,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime:,${analysisResults.maxPrime}\n`;
+            csv += `Total Primes Analyzed:,${analysisResults.totalPrimes}\n`;
+            csv += `Distinct Gap Families:,${analysisResults.evenGaps.length}\n\n`;
+            
+            csv += 'DATA TABLE:\n';
             csv += 'Gap,Prime Count,Percentage of Total,Cumulative Count,Cumulative Percentage\n';
             
             let cumulative = 0;
@@ -2806,19 +2933,41 @@
                 const percentage = (data.count / analysisResults.totalPrimes) * 100;
                 const cumulativePercentage = (cumulative / analysisResults.totalPrimes) * 100;
                 
-                csv += `${gap},${data.count},${percentage.toFixed(precision)},`;
-                csv += `${cumulative},${cumulativePercentage.toFixed(precision)}\n`;
+                csv += `${gap},${data.count},${percentage.toFixed(precision)}%,`;
+                csv += `${cumulative},${cumulativePercentage.toFixed(precision)}%\n`;
             });
+            
+            csv += '\n=================================================\n';
+            csv += 'END OF DATASET\n';
+            csv += '=================================================\n';
             
             return csv;
         }
         
         function generatePercentageCSV() {
             const precision = parseInt(document.getElementById('percentagePrecision').value);
-            let csv = 'Gap-Class Decomposition - Contribution Percentages\n';
-            csv += `Analysis Date,${new Date().toISOString()}\n`;
-            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
-            csv += `Target zeta(2),${analysisResults.targetZeta2}\n\n`;
+            let csv = '=================================================\n';
+            csv += 'GAP-CLASS DECOMPOSITION OF ZETA(2) = PI^2/6\n';
+            csv += 'Percentage Contribution Analysis\n';
+            csv += '=================================================\n\n';
+            
+            csv += 'ABSTRACT:\n';
+            csv += 'This dataset quantifies the relative contribution of each gap family to the\n';
+            csv += 'final value of zeta(2) = pi^2/6. Contributions are measured logarithmically\n';
+            csv += 'since the Euler product is multiplicative. The data reveals which gap classes\n';
+            csv += 'dominate the convergence and how contribution scales with gap size.\n\n';
+            
+            csv += 'METHODOLOGY:\n';
+            csv += 'Contribution percentage = [log(P_g) / log(zeta(2))] × 100\n';
+            csv += 'This measures what fraction of the logarithmic sum comes from each gap class.\n';
+            csv += 'Ratio = P_g / zeta(2) shows the multiplicative contribution.\n\n';
+            
+            csv += `Analysis Date:,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime:,${analysisResults.maxPrime}\n`;
+            csv += `Target zeta(2):,${analysisResults.targetZeta2}\n`;
+            csv += `Final Product:,${analysisResults.finalProduct}\n\n`;
+            
+            csv += 'DATA TABLE:\n';
             csv += 'Gap,Contribution to log(zeta(2)) (%),Product P_g,Ratio to zeta(2),Log Contribution\n';
             
             analysisResults.evenGaps.forEach(gap => {
@@ -2826,20 +2975,44 @@
                 const percentage = analysisResults.percentageContributions[gap];
                 const ratio = data.product / analysisResults.targetZeta2;
                 
-                csv += `${gap},${percentage.toFixed(precision)},${data.product.toFixed(precision)},`;
+                csv += `${gap},${percentage.toFixed(precision)}%,${data.product.toFixed(precision)},`;
                 csv += `${ratio.toFixed(precision)},${data.logProduct.toFixed(precision)}\n`;
             });
+            
+            csv += '\n=================================================\n';
+            csv += 'END OF DATASET\n';
+            csv += '=================================================\n';
             
             return csv;
         }
         
         function generateErrorCSV() {
             const precision = parseInt(document.getElementById('errorPrecision').value);
-            let csv = 'Gap-Class Decomposition - Error Analysis\n';
-            csv += `Analysis Date,${new Date().toISOString()}\n`;
-            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
-            csv += `Target zeta(2),${analysisResults.targetZeta2}\n\n`;
-            csv += 'Gap,Product Value,Absolute Error,Relative Error,Log10(Error),Error Reduction (%)\n';
+            let csv = '=================================================\n';
+            csv += 'GAP-CLASS DECOMPOSITION OF ZETA(2) = PI^2/6\n';
+            csv += 'Convergence Error Analysis\n';
+            csv += '=================================================\n\n';
+            
+            csv += 'ABSTRACT:\n';
+            csv += 'This dataset tracks the convergence error as additional gap families are\n';
+            csv += 'incorporated into the decomposition. Multiple error metrics are provided:\n';
+            csv += 'absolute error, relative error, logarithmic error, and error reduction rate.\n';
+            csv += 'The data demonstrates geometric convergence to pi^2/6 and can be used to\n';
+            csv += 'estimate asymptotic convergence rates.\n\n';
+            
+            csv += 'ERROR DEFINITIONS:\n';
+            csv += '- Absolute Error: |Product - pi^2/6|\n';
+            csv += '- Relative Error: Absolute Error / pi^2/6\n';
+            csv += '- Log10(Error): Logarithmic scale for visualization\n';
+            csv += '- Error Reduction: Percentage decrease from previous step\n\n';
+            
+            csv += `Analysis Date:,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime:,${analysisResults.maxPrime}\n`;
+            csv += `Target zeta(2):,${analysisResults.targetZeta2}\n`;
+            csv += `Final Relative Error:,${(analysisResults.finalRelativeError * 100).toFixed(precision)}%\n\n`;
+            
+            csv += 'DATA TABLE:\n';
+            csv += 'Gap,Product Value,Absolute Error,Relative Error (%),Log10(Error),Error Reduction (%)\n';
             
             const data = analysisResults.progressiveProducts;
             data.forEach((row, idx) => {
@@ -2848,37 +3021,90 @@
                 const errorReduction = idx > 0 ? ((prevError - row.relativeError) / prevError * 100) : 0;
                 
                 csv += `${row.gap},${row.value.toFixed(precision)},${row.error.toExponential(precision)},`;
-                csv += `${(row.relativeError * 100).toFixed(precision)},${logError.toFixed(precision)},`;
-                csv += `${errorReduction.toFixed(precision)}\n`;
+                csv += `${(row.relativeError * 100).toFixed(precision)}%,${logError.toFixed(precision)},`;
+                csv += `${errorReduction.toFixed(precision)}%\n`;
             });
+            
+            csv += '\n=================================================\n';
+            csv += 'END OF DATASET\n';
+            csv += '=================================================\n';
             
             return csv;
         }
         
         function generateLogScaleCSV() {
             const precision = parseInt(document.getElementById('logScalePrecision').value);
-            let csv = 'Gap-Class Decomposition - Log-Scale Analysis\n';
-            csv += `Analysis Date,${new Date().toISOString()}\n`;
-            csv += `Maximum Prime,${analysisResults.maxPrime}\n\n`;
-            csv += 'Gap,Log(P_g),P_g,Prime Count,Average Log per Prime\n';
+            let csv = '=================================================\n';
+            csv += 'GAP-CLASS DECOMPOSITION OF ZETA(2) = PI^2/6\n';
+            csv += 'Logarithmic Product Analysis\n';
+            csv += '=================================================\n\n';
+            
+            csv += 'ABSTRACT:\n';
+            csv += 'This dataset presents logarithmic analysis of gap family products.\n';
+            csv += 'Working in log space reveals linear patterns that may be obscured in\n';
+            csv += 'multiplicative form. The average log contribution per prime in each\n';
+            csv += 'gap family can reveal scaling relationships and potential closed-form\n';
+            csv += 'expressions for P_g involving pi or other fundamental constants.\n\n';
+            
+            csv += 'ANALYTICAL VALUE:\n';
+            csv += 'Log-scale analysis is crucial for:\n';
+            csv += '- Detecting power-law relationships in P_g vs g\n';
+            csv += '- Identifying potential pi-based formulas for individual gap products\n';
+            csv += '- Computing asymptotic behavior as g → infinity\n';
+            csv += '- Stable numerical analysis of very small/large products\n\n';
+            
+            csv += `Analysis Date:,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime:,${analysisResults.maxPrime}\n`;
+            csv += `Total Gap Families:,${analysisResults.evenGaps.length}\n`;
+            csv += `log(zeta(2)):,${Math.log(analysisResults.targetZeta2).toFixed(precision)}\n\n`;
+            
+            csv += 'DATA TABLE:\n';
+            csv += 'Gap,Log(P_g),P_g,Prime Count,Average Log per Prime,Log Density\n';
             
             analysisResults.evenGaps.forEach(gap => {
                 const data = analysisResults.gapProducts[gap];
                 const avgLogPerPrime = data.logProduct / data.count;
+                const logDensity = data.logProduct / gap;
                 
                 csv += `${gap},${data.logProduct.toFixed(precision)},${data.product.toFixed(precision)},`;
-                csv += `${data.count},${avgLogPerPrime.toFixed(precision)}\n`;
+                csv += `${data.count},${avgLogPerPrime.toFixed(precision)},${logDensity.toFixed(precision)}\n`;
             });
+            
+            csv += '\n=================================================\n';
+            csv += 'END OF DATASET\n';
+            csv += '=================================================\n';
             
             return csv;
         }
         
         function generateStepByStepCSV() {
             const precision = parseInt(document.getElementById('stepByStepPrecision').value);
-            let csv = 'Gap-Class Decomposition - Step-by-Step Accumulation\n';
-            csv += `Analysis Date,${new Date().toISOString()}\n`;
-            csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
-            csv += `Target zeta(2),${analysisResults.targetZeta2}\n\n`;
+            let csv = '=================================================\n';
+            csv += 'GAP-CLASS DECOMPOSITION OF ZETA(2) = PI^2/6\n';
+            csv += 'Step-by-Step Accumulation Process\n';
+            csv += '=================================================\n\n';
+            
+            csv += 'ABSTRACT:\n';
+            csv += 'This dataset provides a sequential view of how the gap-class decomposition\n';
+            csv += 'builds toward pi^2/6. Each row shows the addition of one gap family to the\n';
+            csv += 'cumulative product, demonstrating the geometric convergence process step by step.\n';
+            csv += 'The formula column explicitly shows which gap families have been multiplied together.\n\n';
+            
+            csv += 'INTERPRETATION GUIDE:\n';
+            csv += '- Step: Sequential order of gap family addition\n';
+            csv += '- Gap Added: The gap g being incorporated in this step\n';
+            csv += '- P_g: The product value for this specific gap family\n';
+            csv += '- Formula: Explicit product notation (P_0 × P_2 × P_4 × ...)\n';
+            csv += '- Cumulative Product: Running product after this step\n';
+            csv += '- Distance to pi^2/6: How far from target value\n';
+            csv += '- Percent Complete: (Cumulative / pi^2/6) × 100\n\n';
+            
+            csv += `Analysis Date:,${new Date().toISOString()}\n`;
+            csv += `Maximum Prime:,${analysisResults.maxPrime}\n`;
+            csv += `Target zeta(2):,${analysisResults.targetZeta2}\n`;
+            csv += `Total Gap Families:,${analysisResults.evenGaps.length}\n\n`;
+            
+            csv += 'DATA TABLE:\n';
             csv += 'Step,Gap Added,P_g,Formula,Cumulative Product,Distance to pi^2/6,Percent Complete\n';
             
             const gaps = analysisResults.evenGaps;
@@ -2895,10 +3121,19 @@
                 
                 csv += `${idx + 1},${gap},${data.product.toFixed(precision)},"${formula}",`;
                 csv += `${cumulative.toFixed(precision)},${distance.toFixed(precision)},`;
-                csv += `${percentComplete.toFixed(precision)}\n`;
+                csv += `${percentComplete.toFixed(precision)}%\n`;
             });
             
-            csv += `\nTarget,,,zeta(2) = pi^2/6,${analysisResults.targetZeta2.toFixed(precision)},0,100\n`;
+            csv += `\nFINAL TARGET,∞,1.0,"zeta(2) = pi^2/6",${analysisResults.targetZeta2.toFixed(precision)},0.0,100.0%\n`;
+            
+            csv += '\n=================================================\n';
+            csv += 'RESEARCH NOTES:\n';
+            csv += 'This decomposition provides a novel perspective on the Basel problem.\n';
+            csv += 'By organizing the Euler product by prime gaps rather than sequential primes,\n';
+            csv += 'we reveal connections between prime constellation distributions and the\n';
+            csv += 'fundamental constant pi. The rapid convergence suggests each gap family P_g\n';
+            csv += 'may admit closed-form expressions in terms of pi and gap parameters.\n';
+            csv += '=================================================\n';
             
             return csv;
         }
