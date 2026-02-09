@@ -196,6 +196,26 @@
             background: #3a3a5a;
             box-shadow: none;
         }
+
+        .preset-btn {
+            padding: 6px 12px;
+            background: #1e40af;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .preset-btn:hover {
+            background: #2563eb;
+            transform: scale(1.05);
+        }
+
+        .preset-btn:active {
+            transform: scale(0.98);
+        }
         
         .button-row {
             display: flex;
@@ -488,6 +508,112 @@
         .stats-table-container::-webkit-scrollbar-thumb:hover {
             background: #4a4a6a;
         }
+
+        /* TAB SYSTEM */
+        .tab-navigation {
+            display: flex;
+            gap: 4px;
+            background: #12121a;
+            padding: 8px;
+            border-radius: 8px 8px 0 0;
+            border-bottom: 2px solid #2a2a4a;
+        }
+
+        .tab-btn {
+            padding: 12px 24px;
+            background: transparent;
+            border: none;
+            color: #888;
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            border-radius: 6px 6px 0 0;
+            transition: all 0.3s;
+            white-space: nowrap;
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 215, 0, 0.1);
+            color: #ccc;
+        }
+
+        .tab-btn.active {
+            background: linear-gradient(135deg, #ffd700 0%, #ffaa00 100%);
+            color: #000;
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .data-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: #12121a;
+        }
+
+        .data-table th {
+            background: #1a1a2a;
+            color: #ffd700;
+            padding: 12px;
+            text-align: left;
+            border-bottom: 2px solid #2a2a4a;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .data-table td {
+            padding: 10px 12px;
+            border-bottom: 1px solid #2a2a4a;
+            color: #ccc;
+        }
+
+        .data-table tr:hover {
+            background: #1a1a2a;
+        }
+
+        .data-table tbody {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+
+        .copy-btn {
+            padding: 6px 12px;
+            background: #3b82f6;
+            border: none;
+            border-radius: 4px;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .copy-btn:hover {
+            background: #2563eb;
+        }
+
+        .data-container {
+            background: #12121a;
+            border-radius: 8px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+
+        .chart-description {
+            background: rgba(255, 215, 0, 0.1);
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 4px solid #ffd700;
+            margin-bottom: 20px;
+            color: #ccc;
+            line-height: 1.6;
+        }
         
         .export-row {
             display: flex;
@@ -544,7 +670,10 @@
     <header class="header">
         <h1>Gap-Class Decomposition of ζ(2) = π²/6</h1>
         <div class="subtitle">Analytical Framework for Prime Gap Contributions to the Riemann Zeta Function</div>
-        <div class="author">Mathematical Research Tool | 2025</div>
+        <div class="author">By Wessen Getachew | 2026</div>
+        <div class="author" style="margin-top: 8px; font-size: 0.85rem;">
+            Related work: <a href="https://wessengetachew.github.io/Ethiopian/" target="_blank" style="color: #4ecdc4; text-decoration: none; border-bottom: 1px dotted #4ecdc4;">Modular Sieve Calculator</a>
+        </div>
     </header>
     
     <div class="introduction">
@@ -629,6 +758,57 @@
                         </label>
                     </div>
                 </div>
+
+                <div class="control-group" style="grid-column: 1 / -1; border: 2px solid #3b82f6; padding: 16px; border-radius: 8px; background: rgba(59, 130, 246, 0.05);">
+                    <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
+                        <h4 style="margin: 0; color: #3b82f6; font-size: 1rem;">Gap Range Filter (Zoom)</h4>
+                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
+                            <input type="checkbox" id="enableGapFilter" style="width: auto;" onchange="toggleGapFilter()">
+                            <span style="color: #60a5fa; font-weight: 600;">Enable Filter</span>
+                        </label>
+                    </div>
+                    
+                    <div id="gapFilterControls" style="display: none;">
+                        <p style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 12px 0;">
+                            Filter which gaps appear in all charts. Perfect for examining larger gaps without small gaps dominating.
+                        </p>
+                        
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                            <div>
+                                <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; color: #94a3b8;">Min Gap</label>
+                                <input type="number" id="minGapFilter" value="2" min="0" max="1000" step="2" 
+                                       style="width: 100%; padding: 6px; background: #1a1a2a; border: 1px solid #3a3a5a; border-radius: 4px; color: #e0e0e0;"
+                                       onchange="updateGapFilterDisplay()">
+                            </div>
+                            <div>
+                                <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; color: #94a3b8;">Max Gap</label>
+                                <input type="number" id="maxGapFilter" value="50" min="2" max="1000" step="2" 
+                                       style="width: 100%; padding: 6px; background: #1a1a2a; border: 1px solid #3a3a5a; border-radius: 4px; color: #e0e0e0;"
+                                       onchange="updateGapFilterDisplay()">
+                            </div>
+                        </div>
+
+                        <div style="margin-bottom: 12px;">
+                            <label style="display: block; font-size: 0.85rem; margin-bottom: 6px; color: #94a3b8;">Quick Presets:</label>
+                            <div style="display: flex; flex-wrap: wrap; gap: 6px;">
+                                <button onclick="setGapRange(2, 10)" class="preset-btn">Tiny (2-10)</button>
+                                <button onclick="setGapRange(2, 20)" class="preset-btn">Small (2-20)</button>
+                                <button onclick="setGapRange(20, 50)" class="preset-btn">Medium (20-50)</button>
+                                <button onclick="setGapRange(30, 90)" class="preset-btn">Large (30-90)</button>
+                                <button onclick="setGapRange(50, 150)" class="preset-btn">Huge (50-150)</button>
+                                <button onclick="setGapRangeToLast(20)" class="preset-btn" style="background: #ea580c;">Last 20</button>
+                                <button onclick="setGapRangeToLast(10)" class="preset-btn" style="background: #ea580c;">Last 10</button>
+                                <button onclick="resetGapFilter()" class="preset-btn" style="background: #475569;">Reset</button>
+                            </div>
+                        </div>
+
+                        <div style="background: rgba(34, 197, 94, 0.1); padding: 10px; border-radius: 6px; border-left: 3px solid #22c55e;">
+                            <p style="margin: 0; font-size: 0.85rem; color: #4ade80;">
+                                <strong>Active:</strong> <span id="gapFilterStatus">Showing all gaps</span>
+                            </p>
+                        </div>
+                    </div>
+                </div>
                 
                 <div class="control-group">
                     <label>
@@ -644,6 +824,39 @@
                         <span class="control-value" id="animEndDisplay">100000</span>
                     </label>
                     <input type="number" id="animEnd" value="100000" min="1000" max="10000000" step="1000">
+                </div>
+
+                <div class="control-group" style="grid-column: 1 / -1; border: 2px solid #ffd700; padding: 16px; border-radius: 8px; background: rgba(255, 215, 0, 0.05); margin-top: 12px;">
+                    <h4 style="margin: 0 0 12px 0; color: #ffd700; font-size: 1rem;">⚡ Research Presets</h4>
+                    <p style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 12px 0;">
+                        Quick configurations for common research scenarios
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                        <button onclick="applyResearchPreset('twins')" class="preset-btn" style="background: #dc2626; padding: 10px;">
+                            <strong>Twin Prime Focus</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 100K, Gaps: 2-10</span>
+                        </button>
+                        <button onclick="applyResearchPreset('goldbach')" class="preset-btn" style="background: #ea580c; padding: 10px;">
+                            <strong>Goldbach Range</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 500K, Gaps: 2-30</span>
+                        </button>
+                        <button onclick="applyResearchPreset('topology')" class="preset-btn" style="background: #7c3aed; padding: 10px;">
+                            <strong>Large Gap Topology</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, Gaps: 30-90</span>
+                        </button>
+                        <button onclick="applyResearchPreset('extreme')" class="preset-btn" style="background: #c026d3; padding: 10px;">
+                            <strong>Extreme Range</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 5M, Gaps: 100+</span>
+                        </button>
+                        <button onclick="applyResearchPreset('full')" class="preset-btn" style="background: #059669; padding: 10px;">
+                            <strong>Full Spectrum</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, All Gaps</span>
+                        </button>
+                        <button onclick="applyResearchPreset('rh')" class="preset-btn" style="background: #0891b2; padding: 10px;">
+                            <strong>RH Investigation</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 2M, Gaps: 2-50</span>
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -723,6 +936,20 @@
             <div class="stats-grid" id="statsGrid"></div>
         </div>
     </div>
+    
+    <!-- TAB NAVIGATION -->
+    <div style="max-width: 1400px; margin: 40px auto 0 auto; padding: 0 40px;">
+        <div class="tab-navigation">
+            <button class="tab-btn active" onclick="switchTab('main')">Gap Decomposition</button>
+            <button class="tab-btn" onclick="switchTab('density')">Prime Density</button>
+            <button class="tab-btn" onclick="switchTab('twins')">Twin Primes</button>
+            <button class="tab-btn" onclick="switchTab('gaps')">Prime Gaps</button>
+            <button class="tab-btn" onclick="switchTab('constellations')">Prime Constellations</button>
+        </div>
+    </div>
+
+    <!-- TAB CONTENT: MAIN (Gap Decomposition) -->
+    <div id="tab-main" class="tab-content active">
     
     <div class="charts-container">
         <div class="chart-wrapper" id="convergenceWrapper">
@@ -1051,11 +1278,266 @@
     
     <canvas id="compositeCanvas" style="display: none;"></canvas>
     
+    </div>
+    <!-- END TAB: Main -->
+
+    <!-- TAB CONTENT: Goldbach Conjecture -->
+    <!-- TAB CONTENT: Prime Density -->
+    <div id="tab-density" class="tab-content">
+        <div class="data-container" style="max-width: 1400px; margin: 20px auto;">
+            <h2 style="color: #ffd700; margin-bottom: 20px;">Prime Density Analysis</h2>
+            
+            <div class="chart-description">
+                <strong>Prime Density:</strong> The number of primes in successive intervals shows how primes become sparser as numbers grow.
+                <br><br>
+                The Prime Number Theorem states that the density of primes near n is approximately 1/ln(n).
+                This tool analyzes actual prime density in your selected range.
+            </div>
+
+            <div style="margin: 20px 0;">
+                <button class="btn" onclick="computeDensity()">Analyze Prime Density</button>
+                <button class="copy-btn" onclick="copyDensityList()" style="margin-left: 10px;">Copy All Data</button>
+                <button class="export-btn csv" onclick="exportDensityCSV()" style="margin-left: 10px;">Export CSV</button>
+            </div>
+
+            <div id="densityStatus" style="margin: 20px 0; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; display: none;"></div>
+
+            <canvas id="densityChart" width="3840" height="2160" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;"></canvas>
+
+            <div style="max-height: 600px; overflow-y: auto; border: 1px solid #2a2a4a; border-radius: 6px;">
+                <table class="data-table" id="densityTable">
+                    <thead>
+                        <tr>
+                            <th>Range Start</th>
+                            <th>Range End</th>
+                            <th>Prime Count</th>
+                            <th>Density</th>
+                            <th>Predicted (1/ln(n))</th>
+                        </tr>
+                    </thead>
+                    <tbody id="densityTableBody">
+                        <tr><td colspan="5" style="text-align: center; padding: 40px; color: #888;">Run analysis to see results</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB CONTENT: Twin Primes -->
+    <div id="tab-twins" class="tab-content">
+        <div class="data-container" style="max-width: 1400px; margin: 20px auto;">
+            <h2 style="color: #ffd700; margin-bottom: 20px;">Twin Prime Analyzer</h2>
+            
+            <div class="chart-description">
+                <strong>Twin Primes:</strong> Pairs of primes that differ by 2 (e.g., 3&5, 11&13, 17&19).
+                <br>The Twin Prime Conjecture states there are infinitely many twin primes.
+            </div>
+
+            <div style="margin: 20px 0;">
+                <button class="btn" onclick="computeTwinPrimes()">Find All Twin Primes</button>
+                <button class="copy-btn" onclick="copyTwinsList()" style="margin-left: 10px;">Copy All Pairs</button>
+                <button class="export-btn csv" onclick="exportTwinsCSV()" style="margin-left: 10px;">Export CSV</button>
+            </div>
+
+            <div id="twinsStatus" style="margin: 20px 0; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; display: none;"></div>
+
+            <canvas id="twinsChart" width="3840" height="2160" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;"></canvas>
+
+            <div style="max-height: 600px; overflow-y: auto; border: 1px solid #2a2a4a; border-radius: 6px;">
+                <table class="data-table" id="twinsTable">
+                    <thead>
+                        <tr>
+                            <th>#</th>
+                            <th>Twin Pair</th>
+                            <th>Gap Before</th>
+                            <th>Gap After</th>
+                        </tr>
+                    </thead>
+                    <tbody id="twinsTableBody">
+                        <tr><td colspan="4" style="text-align: center; padding: 40px; color: #888;">Run analysis to see results</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB CONTENT: Prime Gaps -->
+    <div id="tab-gaps" class="tab-content">
+        <div class="data-container" style="max-width: 1400px; margin: 20px auto;">
+            <h2 style="color: #ffd700; margin-bottom: 20px;">Prime Gap Statistics</h2>
+            
+            <div class="chart-description">
+                <strong>Prime Gaps:</strong> The difference between consecutive primes. Shows detailed statistics about gap occurrences and records.
+            </div>
+
+            <div style="margin: 20px 0;">
+                <button class="btn" onclick="computeGapStats()">Analyze Prime Gaps</button>
+                <button class="copy-btn" onclick="copyGapsList()" style="margin-left: 10px;">Copy Gap List</button>
+                <button class="export-btn csv" onclick="exportGapsCSV()" style="margin-left: 10px;">Export CSV</button>
+            </div>
+
+            <div id="gapsStatus" style="margin: 20px 0; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; display: none;"></div>
+
+            <canvas id="gapsChart" width="3840" height="2160" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;"></canvas>
+
+            <div style="max-height: 600px; overflow-y: auto; border: 1px solid #2a2a4a; border-radius: 6px;">
+                <table class="data-table" id="gapsTable">
+                    <thead>
+                        <tr>
+                            <th>Gap Size</th>
+                            <th>Frequency</th>
+                            <th>Percentage</th>
+                            <th>First Occurrence</th>
+                        </tr>
+                    </thead>
+                    <tbody id="gapsTableBody">
+                        <tr><td colspan="4" style="text-align: center; padding: 40px; color: #888;">Run analysis to see results</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TAB CONTENT: Prime Constellations -->
+    <div id="tab-constellations" class="tab-content">
+        <div class="data-container" style="max-width: 1400px; margin: 20px auto;">
+            <h2 style="color: #ffd700; margin-bottom: 20px;">Prime Constellation Finder</h2>
+            
+            <div class="chart-description">
+                <strong>Prime Constellations:</strong> Twin (p,p+2), Cousin (p,p+4), Sexy (p,p+6), Triplets, Quadruplets, etc.
+            </div>
+
+            <div style="margin: 20px 0;">
+                <button class="btn" onclick="computeConstellations()">Find All Constellations</button>
+                <button class="copy-btn" onclick="copyConstellationsList()" style="margin-left: 10px;">Copy Results</button>
+                <button class="export-btn csv" onclick="exportConstellationsCSV()" style="margin-left: 10px;">Export CSV</button>
+            </div>
+
+            <div id="constellationsStatus" style="margin: 20px 0; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; display: none;"></div>
+
+            <canvas id="constellationsChart" width="3840" height="2160" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;"></canvas>
+
+            <div style="max-height: 600px; overflow-y: auto; border: 1px solid #2a2a4a; border-radius: 6px;">
+                <table class="data-table" id="constellationsTable">
+                    <thead>
+                        <tr>
+                            <th>Type</th>
+                            <th>Count</th>
+                            <th>Examples</th>
+                        </tr>
+                    </thead>
+                    <tbody id="constellationsTableBody">
+                        <tr><td colspan="3" style="text-align: center; padding: 40px; color: #888;">Run analysis to see results</td></tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
     <script>
         // Global variables
         let analysisResults = null;
         let animationId = null;
         let isAnimating = false;
+
+        // Gap filter functions
+        function toggleGapFilter() {
+            const enabled = document.getElementById('enableGapFilter').checked;
+            const controls = document.getElementById('gapFilterControls');
+            controls.style.display = enabled ? 'block' : 'none';
+            
+            if (enabled) {
+                updateGapFilterDisplay();
+            } else {
+                document.getElementById('gapFilterStatus').textContent = 'Showing all gaps';
+            }
+            
+            if (analysisResults) {
+                renderAllCharts();
+            }
+        }
+
+        function setGapRange(min, max) {
+            document.getElementById('minGapFilter').value = min;
+            document.getElementById('maxGapFilter').value = max;
+            document.getElementById('enableGapFilter').checked = true;
+            toggleGapFilter();
+            if (analysisResults) {
+                renderAllCharts();
+            }
+        }
+
+        function setGapRangeToLast(count) {
+            if (!analysisResults || !analysisResults.evenGaps) {
+                alert('Please run analysis first');
+                return;
+            }
+            
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = "#888";
+                ctx.font = "48px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No data in selected gap range", w/2, h/2);
+                return;
+            }
+            const lastGaps = gaps.slice(-count);
+            const min = Math.min(...lastGaps);
+            const max = Math.max(...lastGaps);
+            
+            setGapRange(min, max);
+        }
+
+        function resetGapFilter() {
+            document.getElementById('minGapFilter').value = 2;
+            document.getElementById('maxGapFilter').value = 50;
+            document.getElementById('enableGapFilter').checked = false;
+            toggleGapFilter();
+        }
+
+        function updateGapFilterDisplay() {
+            const min = parseInt(document.getElementById('minGapFilter').value);
+            const max = parseInt(document.getElementById('maxGapFilter').value);
+            document.getElementById('gapFilterStatus').textContent = `Showing gaps ${min} to ${max}`;
+            
+            if (analysisResults) {
+                renderAllCharts();
+            }
+        }
+
+        function getFilteredGaps() {
+            if (!analysisResults) return [];
+            
+            const filterEnabled = document.getElementById('enableGapFilter').checked;
+            if (!filterEnabled) {
+                return analysisResults.evenGaps;
+            }
+            
+            const min = parseInt(document.getElementById('minGapFilter').value);
+            const max = parseInt(document.getElementById('maxGapFilter').value);
+            
+            return analysisResults.evenGaps.filter(g => g >= min && g <= max);
+        }
+
+        function getFilteredProgressiveProducts() {
+            if (!analysisResults) return [];
+            
+            const filteredGaps = getFilteredGaps();
+            return analysisResults.progressiveProducts.filter(p => filteredGaps.includes(p.gap));
+        }
+
+        function getFilteredGapProducts() {
+            if (!analysisResults) return {};
+            
+            const filteredGaps = getFilteredGaps();
+            const filtered = {};
+            filteredGaps.forEach(gap => {
+                if (analysisResults.gapProducts[gap]) {
+                    filtered[gap] = analysisResults.gapProducts[gap];
+                }
+            });
+            return filtered;
+        }
         
         // Sieve of Eratosthenes
         function sievePrimes(max) {
@@ -1305,7 +1787,15 @@
             ctx.fillStyle = '#0a0a10';
             ctx.fillRect(0, 0, w, h);
             
-            const data = analysisResults.progressiveProducts;
+            const data = getFilteredProgressiveProducts();
+            if (data.length === 0) {
+                ctx.fillStyle = '#888';
+                ctx.font = '48px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data in selected gap range', w/2, h/2);
+                return;
+            }
+            
             const target = analysisResults.targetZeta2;
             
             // Margins
@@ -1411,7 +1901,15 @@
             ctx.fillStyle = '#0a0a10';
             ctx.fillRect(0, 0, w, h);
             
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = '#888';
+                ctx.font = '48px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data in selected gap range', w/2, h/2);
+                return;
+            }
+            
             const products = gaps.map(g => analysisResults.gapProducts[g]);
             
             const margin = { left: 200, right: 100, top: 100, bottom: 150 };
@@ -1492,7 +1990,15 @@
             ctx.fillStyle = '#0a0a10';
             ctx.fillRect(0, 0, w, h);
             
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = '#888';
+                ctx.font = '48px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data in selected gap range', w/2, h/2);
+                return;
+            }
+            
             const counts = gaps.map(g => analysisResults.gapProducts[g].count);
             
             const margin = { left: 200, right: 100, top: 100, bottom: 150 };
@@ -1573,7 +2079,14 @@
             ctx.fillStyle = '#0a0a10';
             ctx.fillRect(0, 0, w, h);
             
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = "#888";
+                ctx.font = "48px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No data in selected gap range", w/2, h/2);
+                return;
+            }
             const percentages = gaps.map(g => analysisResults.percentageContributions[g]);
             
             const margin = { left: 200, right: 100, top: 100, bottom: 150 };
@@ -1749,7 +2262,14 @@
             ctx.fillStyle = '#0a0a10';
             ctx.fillRect(0, 0, w, h);
             
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = "#888";
+                ctx.font = "48px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No data in selected gap range", w/2, h/2);
+                return;
+            }
             const logProducts = gaps.map(g => analysisResults.gapProducts[g].logProduct);
             
             const margin = { left: 200, right: 100, top: 100, bottom: 150 };
@@ -2045,7 +2565,14 @@
         function updateGapContribTable() {
             const precision = parseInt(document.getElementById('gapContribPrecision').value);
             const showAll = tableStates.gapContribTable;
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = "#888";
+                ctx.font = "48px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No data in selected gap range", w/2, h/2);
+                return;
+            }
             const displayGaps = showAll ? gaps : gaps.slice(0, 5);
             
             const table = document.getElementById('gapContribTableContent');
@@ -2093,7 +2620,14 @@
         function updateGapDistTable() {
             const precision = parseInt(document.getElementById('gapDistPrecision').value);
             const showAll = tableStates.gapDistTable;
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = "#888";
+                ctx.font = "48px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No data in selected gap range", w/2, h/2);
+                return;
+            }
             const displayGaps = showAll ? gaps : gaps.slice(0, 5);
             
             const totalPrimes = analysisResults.totalPrimes;
@@ -2147,7 +2681,14 @@
         function updatePercentageTable() {
             const precision = parseInt(document.getElementById('percentagePrecision').value);
             const showAll = tableStates.percentageTable;
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = "#888";
+                ctx.font = "48px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No data in selected gap range", w/2, h/2);
+                return;
+            }
             const displayGaps = showAll ? gaps : gaps.slice(0, 5);
             
             const table = document.getElementById('percentageTableContent');
@@ -2249,7 +2790,14 @@
         function updateLogScaleTable() {
             const precision = parseInt(document.getElementById('logScalePrecision').value);
             const showAll = tableStates.logScaleTable;
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = "#888";
+                ctx.font = "48px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No data in selected gap range", w/2, h/2);
+                return;
+            }
             const displayGaps = showAll ? gaps : gaps.slice(0, 5);
             
             const table = document.getElementById('logScaleTableContent');
@@ -2298,7 +2846,14 @@
         function updateStepByStepTable() {
             const precision = parseInt(document.getElementById('stepByStepPrecision').value);
             const showAll = tableStates.stepByStepTable;
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = "#888";
+                ctx.font = "48px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No data in selected gap range", w/2, h/2);
+                return;
+            }
             const displayGaps = showAll ? gaps : gaps.slice(0, 5);
             const target = analysisResults.targetZeta2;
             
@@ -3107,7 +3662,14 @@
             csv += 'DATA TABLE:\n';
             csv += 'Step,Gap Added,P_g,Formula,Cumulative Product,Distance to pi^2/6,Percent Complete\n';
             
-            const gaps = analysisResults.evenGaps;
+            const gaps = getFilteredGaps();
+            if (gaps.length === 0) {
+                ctx.fillStyle = "#888";
+                ctx.font = "48px sans-serif";
+                ctx.textAlign = "center";
+                ctx.fillText("No data in selected gap range", w/2, h/2);
+                return;
+            }
             gaps.forEach((gap, idx) => {
                 const data = analysisResults.gapProducts[gap];
                 const cumulative = analysisResults.progressiveProducts[idx].value;
@@ -3534,6 +4096,572 @@
         
         // Initialize
         updateDisplays();
+        function applyResearchPreset(preset) {
+            const presets = {
+                'twins': { maxPrime: 100000, maxGap: 10, gapFilter: true, minGap: 2, maxGapFilter: 10, desc: 'Twin Prime Focus' },
+                'goldbach': { maxPrime: 500000, maxGap: 30, gapFilter: false, minGap: 2, maxGapFilter: 30, desc: 'Goldbach Range' },
+                'topology': { maxPrime: 1000000, maxGap: 150, gapFilter: true, minGap: 30, maxGapFilter: 90, desc: 'Large Gap Topology' },
+                'extreme': { maxPrime: 5000000, maxGap: 500, gapFilter: true, minGap: 100, maxGapFilter: 500, desc: 'Extreme Range' },
+                'full': { maxPrime: 1000000, maxGap: 200, gapFilter: false, minGap: 2, maxGapFilter: 200, desc: 'Full Spectrum' },
+                'rh': { maxPrime: 2000000, maxGap: 50, gapFilter: false, minGap: 2, maxGapFilter: 50, desc: 'RH Investigation' }
+            };
+            const config = presets[preset];
+            if (!config) return;
+            document.getElementById('maxPrime').value = config.maxPrime;
+            document.getElementById('maxGap').value = config.maxGap;
+            document.getElementById('enableGapFilter').checked = config.gapFilter;
+            document.getElementById('minGapFilter').value = config.minGap;
+            document.getElementById('maxGapFilter').value = config.maxGapFilter;
+            toggleGapFilter();
+            const statusBar = document.getElementById('statusBar');
+            statusBar.style.display = 'block';
+            statusBar.style.background = 'rgba(34, 197, 94, 0.2)';
+            statusBar.style.borderLeft = '4px solid #22c55e';
+            statusBar.textContent = '✓ Applied preset: ' + config.desc + '. Click "Run Analysis" to compute.';
+            setTimeout(() => statusBar.style.display = 'none', 4000);
+        }
+
+
+        // TAB SWITCHING
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            
+            document.getElementById('tab-' + tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+
+        // PRIME DENSITY ANALYSIS
+        let densityData = null;
+        
+        function computeDensity() {
+            if (!analysisResults || !analysisResults.primes) {
+                alert('Please run main analysis first!');
+                return;
+            }
+            
+            const primes = analysisResults.primes;
+            const maxPrime = primes[primes.length - 1];
+            const intervalSize = Math.max(1000, Math.floor(maxPrime / 20));
+            
+            densityData = [];
+            let intervalStart = 2;
+            
+            while (intervalStart < maxPrime) {
+                const intervalEnd = Math.min(intervalStart + intervalSize, maxPrime);
+                const primesInInterval = primes.filter(p => p >= intervalStart && p < intervalEnd).length;
+                const density = primesInInterval / intervalSize;
+                const midpoint = (intervalStart + intervalEnd) / 2;
+                const predicted = 1 / Math.log(midpoint);
+                
+                densityData.push({
+                    start: intervalStart,
+                    end: intervalEnd,
+                    count: primesInInterval,
+                    density: density.toFixed(6),
+                    predicted: predicted.toFixed(6)
+                });
+                
+                intervalStart = intervalEnd;
+            }
+            
+            document.getElementById('densityStatus').style.display = 'block';
+            document.getElementById('densityStatus').innerHTML = `
+                <strong>✓ Prime Density Analysis Complete</strong><br>
+                Analyzed ${densityData.length} intervals of size ~${intervalSize.toLocaleString()}<br>
+                Max prime: ${maxPrime.toLocaleString()}
+            `;
+            
+            renderDensityTable();
+            renderDensityChart();
+        }
+
+        function renderDensityTable() {
+            const tbody = document.getElementById('densityTableBody');
+            tbody.innerHTML = '';
+            
+            densityData.forEach(item => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = item.start.toLocaleString();
+                row.insertCell(1).textContent = item.end.toLocaleString();
+                row.insertCell(2).textContent = item.count;
+                row.insertCell(3).textContent = item.density;
+                row.insertCell(4).textContent = item.predicted;
+            });
+        }
+
+        function renderDensityChart() {
+            const canvas = document.getElementById('densityChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const margin = {left: 250, right: 150, top: 200, bottom: 200};
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            const densities = densityData.map(d => parseFloat(d.density));
+            const maxDensity = Math.max(...densities);
+            
+            const xScale = chartW / densityData.length;
+            const yScale = chartH / maxDensity;
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a4a';
+            ctx.lineWidth = 3;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin.top + (chartH / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(w - margin.right, y);
+                ctx.stroke();
+            }
+            
+            // Bars
+            densityData.forEach((item, i) => {
+                const barH = parseFloat(item.density) * yScale;
+                const x = margin.left + i * xScale;
+                const y = margin.top + chartH - barH;
+                
+                const gradient = ctx.createLinearGradient(0, y, 0, y + barH);
+                gradient.addColorStop(0, '#ffd700');
+                gradient.addColorStop(1, '#ff8800');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x + xScale * 0.1, y, xScale * 0.8, barH);
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 80px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Prime Density by Interval', w / 2, 120);
+            
+            // Y-axis label
+            ctx.save();
+            ctx.translate(100, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 60px sans-serif';
+            ctx.fillText('Density (primes per unit)', 0, 0);
+            ctx.restore();
+            
+            // X-axis label
+            ctx.font = 'bold 60px sans-serif';
+            ctx.fillText('Interval Number', w / 2, h - 80);
+        }
+
+        function copyDensityList() {
+            const text = densityData.map(d => `[${d.start}-${d.end}]: ${d.count} primes, density ${d.density}`).join('\n');
+            navigator.clipboard.writeText(text);
+            alert('Copied to clipboard!');
+        }
+
+        function exportDensityCSV() {
+            let csv = 'Range Start,Range End,Prime Count,Actual Density,Predicted Density\n';
+            densityData.forEach(item => {
+                csv += `${item.start},${item.end},${item.count},${item.density},${item.predicted}\n`;
+            });
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'prime_density.csv';
+            a.click();
+        }
+
+        // TWIN PRIMES
+        let twinsData = null;
+        
+        function computeTwinPrimes() {
+            if (!analysisResults || !analysisResults.primes) {
+                alert('Please run main analysis first!');
+                return;
+            }
+            
+            const primes = analysisResults.primes;
+            twinsData = [];
+            
+            for (let i = 0; i < primes.length - 1; i++) {
+                if (primes[i+1] - primes[i] === 2) {
+                    const gapBefore = i > 0 ? primes[i] - primes[i-1] : 0;
+                    const gapAfter = i < primes.length - 2 ? primes[i+2] - primes[i+1] : 0;
+                    twinsData.push({
+                        p: primes[i],
+                        q: primes[i+1],
+                        gapBefore,
+                        gapAfter
+                    });
+                }
+            }
+            
+            document.getElementById('twinsStatus').style.display = 'block';
+            document.getElementById('twinsStatus').innerHTML = `
+                <strong>✓ Twin Prime Search Complete</strong><br>
+                Found ${twinsData.length} twin prime pairs<br>
+                Largest pair: (${twinsData[twinsData.length-1].p}, ${twinsData[twinsData.length-1].q})
+            `;
+            
+            renderTwinsTable();
+            renderTwinsChart();
+        }
+
+        function renderTwinsTable() {
+            const tbody = document.getElementById('twinsTableBody');
+            tbody.innerHTML = '';
+            
+            twinsData.forEach((item, idx) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = idx + 1;
+                row.insertCell(1).textContent = `(${item.p}, ${item.q})`;
+                row.insertCell(2).textContent = item.gapBefore || 'N/A';
+                row.insertCell(3).textContent = item.gapAfter || 'N/A';
+            });
+        }
+
+        function renderTwinsChart() {
+            const canvas = document.getElementById('twinsChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const margin = {left: 250, right: 150, top: 200, bottom: 200};
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            // Sample every Nth twin to avoid overcrowding
+            const sampleRate = Math.max(1, Math.floor(twinsData.length / 100));
+            const sampledTwins = twinsData.filter((_, i) => i % sampleRate === 0);
+            
+            const xScale = chartW / sampledTwins.length;
+            const maxP = twinsData[twinsData.length - 1].p;
+            const yScale = chartH / maxP;
+            
+            // Plot twin primes
+            ctx.fillStyle = '#ffd700';
+            sampledTwins.forEach((twin, i) => {
+                const x = margin.left + i * xScale;
+                const y = margin.top + chartH - (twin.p * yScale);
+                ctx.fillRect(x, y, xScale * 0.6, 10);
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 80px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Twin Primes Distribution (${twinsData.length} pairs)`, w/2, 120);
+            
+            ctx.font = 'bold 50px sans-serif';
+            ctx.fillText(`Sampled every ${sampleRate} pairs for visualization`, w/2, h - 80);
+        }
+
+        function copyTwinsList() {
+            const text = twinsData.map(d => `(${d.p}, ${d.q})`).join('\n');
+            navigator.clipboard.writeText(text);
+            alert('Copied to clipboard!');
+        }
+
+        function exportTwinsCSV() {
+            let csv = 'Index,Prime 1,Prime 2,Gap Before,Gap After\n';
+            twinsData.forEach((item, idx) => {
+                csv += `${idx+1},${item.p},${item.q},${item.gapBefore},${item.gapAfter}\n`;
+            });
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'twin_primes.csv';
+            a.click();
+        }
+
+        // PRIME GAPS
+        let gapsStatsData = null;
+        
+        function computeGapStats() {
+            if (!analysisResults || !analysisResults.primes) {
+                alert('Please run main analysis first!');
+                return;
+            }
+            
+            const primes = analysisResults.primes;
+            const gapCounts = {};
+            const firstOccurrence = {};
+            
+            for (let i = 0; i < primes.length - 1; i++) {
+                const gap = primes[i+1] - primes[i];
+                gapCounts[gap] = (gapCounts[gap] || 0) + 1;
+                if (!firstOccurrence[gap]) {
+                    firstOccurrence[gap] = `${primes[i]} → ${primes[i+1]}`;
+                }
+            }
+            
+            const totalGaps = primes.length - 1;
+            gapsStatsData = Object.entries(gapCounts).map(([gap, count]) => ({
+                gap: parseInt(gap),
+                count,
+                percentage: (count / totalGaps * 100).toFixed(2),
+                first: firstOccurrence[gap]
+            })).sort((a, b) => a.gap - b.gap);
+            
+            const mostCommon = gapsStatsData.reduce((a,b) => a.count > b.count ? a : b);
+            
+            document.getElementById('gapsStatus').style.display = 'block';
+            document.getElementById('gapsStatus').innerHTML = `
+                <strong>✓ Gap Analysis Complete</strong><br>
+                Found ${gapsStatsData.length} different gap sizes<br>
+                Most common: gap ${mostCommon.gap} (${mostCommon.count} occurrences, ${mostCommon.percentage}%)
+            `;
+            
+            renderGapsTable();
+            renderGapsChart();
+        }
+
+        function renderGapsTable() {
+            const tbody = document.getElementById('gapsTableBody');
+            tbody.innerHTML = '';
+            
+            gapsStatsData.forEach(item => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = item.gap;
+                row.insertCell(1).textContent = item.count;
+                row.insertCell(2).textContent = item.percentage + '%';
+                row.insertCell(3).textContent = item.first;
+            });
+        }
+
+        function renderGapsChart() {
+            const canvas = document.getElementById('gapsChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const margin = {left: 250, right: 150, top: 200, bottom: 200};
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            // Show top 50 most frequent gaps
+            const topGaps = [...gapsStatsData].sort((a,b) => b.count - a.count).slice(0, 50);
+            
+            const xScale = chartW / topGaps.length;
+            const maxCount = Math.max(...topGaps.map(g => g.count));
+            const yScale = chartH / maxCount;
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a4a';
+            ctx.lineWidth = 3;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin.top + (chartH / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(w - margin.right, y);
+                ctx.stroke();
+            }
+            
+            // Bars
+            topGaps.forEach((item, i) => {
+                const barH = item.count * yScale;
+                const x = margin.left + i * xScale;
+                const y = margin.top + chartH - barH;
+                
+                const gradient = ctx.createLinearGradient(0, y, 0, y + barH);
+                gradient.addColorStop(0, '#4ecdc4');
+                gradient.addColorStop(1, '#2a7a73');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x + xScale * 0.1, y, xScale * 0.8, barH);
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 80px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Prime Gap Frequency Distribution (Top 50)', w / 2, 120);
+            
+            ctx.save();
+            ctx.translate(100, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 60px sans-serif';
+            ctx.fillText('Frequency', 0, 0);
+            ctx.restore();
+        }
+
+        function copyGapsList() {
+            const text = gapsStatsData.map(d => `Gap ${d.gap}: ${d.count} (${d.percentage}%)`).join('\n');
+            navigator.clipboard.writeText(text);
+            alert('Copied to clipboard!');
+        }
+
+        function exportGapsCSV() {
+            let csv = 'Gap Size,Frequency,Percentage,First Occurrence\n';
+            gapsStatsData.forEach(item => {
+                csv += `${item.gap},${item.count},${item.percentage},${item.first}\n`;
+            });
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'gap_statistics.csv';
+            a.click();
+        }
+
+        // PRIME CONSTELLATIONS
+        let constellationsData = null;
+        
+        function computeConstellations() {
+            if (!analysisResults || !analysisResults.primes) {
+                alert('Please run main analysis first!');
+                return;
+            }
+            
+            const primes = analysisResults.primes;
+            const primeSet = new Set(primes);
+            
+            constellationsData = {
+                twins: [],
+                cousins: [],
+                sexy: [],
+                triplets: [],
+                quadruplets: []
+            };
+            
+            primes.forEach(p => {
+                if (primeSet.has(p+2)) constellationsData.twins.push([p, p+2]);
+                if (primeSet.has(p+4)) constellationsData.cousins.push([p, p+4]);
+                if (primeSet.has(p+6)) constellationsData.sexy.push([p, p+6]);
+                if (primeSet.has(p+2) && primeSet.has(p+6)) constellationsData.triplets.push([p, p+2, p+6]);
+                if (primeSet.has(p+2) && primeSet.has(p+6) && primeSet.has(p+8)) constellationsData.quadruplets.push([p, p+2, p+6, p+8]);
+            });
+            
+            document.getElementById('constellationsStatus').style.display = 'block';
+            document.getElementById('constellationsStatus').innerHTML = `
+                <strong>✓ Constellation Search Complete</strong><br>
+                Twins: ${constellationsData.twins.length} | Cousins: ${constellationsData.cousins.length} | Sexy: ${constellationsData.sexy.length}<br>
+                Triplets: ${constellationsData.triplets.length} | Quadruplets: ${constellationsData.quadruplets.length}
+            `;
+            
+            renderConstellationsTable();
+            renderConstellationsChart();
+        }
+
+        function renderConstellationsTable() {
+            const tbody = document.getElementById('constellationsTableBody');
+            tbody.innerHTML = '';
+            
+            Object.entries(constellationsData).forEach(([type, items]) => {
+                const row = tbody.insertRow();
+                row.insertCell(0).textContent = type.charAt(0).toUpperCase() + type.slice(1);
+                row.insertCell(1).textContent = items.length;
+                const examples = items.slice(0, 5).map(p => '(' + p.join(',') + ')').join(' ');
+                row.insertCell(2).textContent = examples;
+            });
+        }
+
+        function renderConstellationsChart() {
+            const canvas = document.getElementById('constellationsChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const margin = {left: 300, right: 150, top: 200, bottom: 250};
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            const types = Object.entries(constellationsData);
+            const counts = types.map(([_, items]) => items.length);
+            const maxCount = Math.max(...counts);
+            
+            const barWidth = chartW / types.length;
+            const yScale = chartH / maxCount;
+            
+            // Grid
+            ctx.strokeStyle = '#2a2a4a';
+            ctx.lineWidth = 3;
+            for (let i = 0; i <= 10; i++) {
+                const y = margin.top + (chartH / 10) * i;
+                ctx.beginPath();
+                ctx.moveTo(margin.left, y);
+                ctx.lineTo(w - margin.right, y);
+                ctx.stroke();
+                
+                const value = maxCount - (maxCount * (i / 10));
+                ctx.fillStyle = '#888';
+                ctx.font = 'bold 40px monospace';
+                ctx.textAlign = 'right';
+                ctx.fillText(Math.floor(value).toLocaleString(), margin.left - 30, y + 15);
+            }
+            
+            // Bars
+            const colors = ['#ffd700', '#ff8800', '#ff4444', '#8b5cf6', '#06b6d4'];
+            types.forEach(([name, items], i) => {
+                const barH = items.length * yScale;
+                const x = margin.left + i * barWidth;
+                const y = margin.top + chartH - barH;
+                
+                const gradient = ctx.createLinearGradient(0, y, 0, y + barH);
+                gradient.addColorStop(0, colors[i]);
+                gradient.addColorStop(1, colors[i] + '88');
+                
+                ctx.fillStyle = gradient;
+                ctx.fillRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
+                
+                // Labels
+                ctx.fillStyle = '#ccc';
+                ctx.font = 'bold 50px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.save();
+                ctx.translate(x + barWidth / 2, h - margin.bottom + 80);
+                ctx.rotate(-Math.PI / 4);
+                ctx.fillText(name.charAt(0).toUpperCase() + name.slice(1), 0, 0);
+                ctx.restore();
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 80px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Prime Constellation Counts', w / 2, 120);
+            
+            ctx.save();
+            ctx.translate(100, h / 2);
+            ctx.rotate(-Math.PI / 2);
+            ctx.font = 'bold 60px sans-serif';
+            ctx.fillText('Count', 0, 0);
+            ctx.restore();
+        }
+
+        function copyConstellationsList() {
+            let text = '';
+            Object.entries(constellationsData).forEach(([type, items]) => {
+                text += `${type}: ${items.length}\n`;
+            });
+            navigator.clipboard.writeText(text);
+            alert('Copied to clipboard!');
+        }
+
+        function exportConstellationsCSV() {
+            let csv = 'Type,Count,Examples (first 10)\n';
+            Object.entries(constellationsData).forEach(([type, items]) => {
+                const examples = items.slice(0, 10).map(p => '(' + p.join(',') + ')').join('; ');
+                csv += `${type},${items.length},"${examples}"\n`;
+            });
+            const blob = new Blob([csv], {type: 'text/csv'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'prime_constellations.csv';
+            a.click();
+        }
     </script>
 </body>
 </html>
