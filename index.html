@@ -576,6 +576,22 @@
 
         .data-table tr:hover {
             background: #1a1a2a;
+            cursor: pointer;
+        }
+
+        .data-table tr.highlighted {
+            background: rgba(255, 215, 0, 0.3);
+            border-left: 4px solid #ffd700;
+        }
+
+        .stats-table tr {
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .stats-table tr.highlighted {
+            background: rgba(255, 215, 0, 0.3);
+            border-left: 4px solid #ffd700;
         }
 
         .data-table tbody {
@@ -937,20 +953,6 @@
         </div>
     </div>
     
-    <!-- TAB NAVIGATION -->
-    <div style="max-width: 1400px; margin: 40px auto 0 auto; padding: 0 40px;">
-        <div class="tab-navigation">
-            <button class="tab-btn active" onclick="switchTab('main')">Gap Decomposition</button>
-            <button class="tab-btn" onclick="switchTab('density')">Prime Density</button>
-            <button class="tab-btn" onclick="switchTab('twins')">Twin Primes</button>
-            <button class="tab-btn" onclick="switchTab('gaps')">Prime Gaps</button>
-            <button class="tab-btn" onclick="switchTab('constellations')">Prime Constellations</button>
-        </div>
-    </div>
-
-    <!-- TAB CONTENT: MAIN (Gap Decomposition) -->
-    <div id="tab-main" class="tab-content active">
-    
     <div class="charts-container">
         <div class="chart-wrapper" id="convergenceWrapper">
             <div class="chart-title">Progressive Convergence to ζ(2) = π²/6</div>
@@ -1281,159 +1283,6 @@
     </div>
     <!-- END TAB: Main -->
 
-    <!-- TAB CONTENT: Goldbach Conjecture -->
-    <!-- TAB CONTENT: Prime Density -->
-    <div id="tab-density" class="tab-content">
-        <div class="data-container" style="max-width: 1400px; margin: 20px auto;">
-            <h2 style="color: #ffd700; margin-bottom: 20px;">Prime Density Analysis</h2>
-            
-            <div class="chart-description">
-                <strong>Prime Density:</strong> The number of primes in successive intervals shows how primes become sparser as numbers grow.
-                <br><br>
-                The Prime Number Theorem states that the density of primes near n is approximately 1/ln(n).
-                This tool analyzes actual prime density in your selected range.
-            </div>
-
-            <div style="margin: 20px 0;">
-                <button class="btn" onclick="computeDensity()">Analyze Prime Density</button>
-                <button class="copy-btn" onclick="copyDensityList()" style="margin-left: 10px;">Copy All Data</button>
-                <button class="export-btn csv" onclick="exportDensityCSV()" style="margin-left: 10px;">Export CSV</button>
-            </div>
-
-            <div id="densityStatus" style="margin: 20px 0; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; display: none;"></div>
-
-            <canvas id="densityChart" width="3840" height="2160" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;"></canvas>
-
-            <div style="max-height: 600px; overflow-y: auto; border: 1px solid #2a2a4a; border-radius: 6px;">
-                <table class="data-table" id="densityTable">
-                    <thead>
-                        <tr>
-                            <th>Range Start</th>
-                            <th>Range End</th>
-                            <th>Prime Count</th>
-                            <th>Density</th>
-                            <th>Predicted (1/ln(n))</th>
-                        </tr>
-                    </thead>
-                    <tbody id="densityTableBody">
-                        <tr><td colspan="5" style="text-align: center; padding: 40px; color: #888;">Run analysis to see results</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB CONTENT: Twin Primes -->
-    <div id="tab-twins" class="tab-content">
-        <div class="data-container" style="max-width: 1400px; margin: 20px auto;">
-            <h2 style="color: #ffd700; margin-bottom: 20px;">Twin Prime Analyzer</h2>
-            
-            <div class="chart-description">
-                <strong>Twin Primes:</strong> Pairs of primes that differ by 2 (e.g., 3&5, 11&13, 17&19).
-                <br>The Twin Prime Conjecture states there are infinitely many twin primes.
-            </div>
-
-            <div style="margin: 20px 0;">
-                <button class="btn" onclick="computeTwinPrimes()">Find All Twin Primes</button>
-                <button class="copy-btn" onclick="copyTwinsList()" style="margin-left: 10px;">Copy All Pairs</button>
-                <button class="export-btn csv" onclick="exportTwinsCSV()" style="margin-left: 10px;">Export CSV</button>
-            </div>
-
-            <div id="twinsStatus" style="margin: 20px 0; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; display: none;"></div>
-
-            <canvas id="twinsChart" width="3840" height="2160" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;"></canvas>
-
-            <div style="max-height: 600px; overflow-y: auto; border: 1px solid #2a2a4a; border-radius: 6px;">
-                <table class="data-table" id="twinsTable">
-                    <thead>
-                        <tr>
-                            <th>#</th>
-                            <th>Twin Pair</th>
-                            <th>Gap Before</th>
-                            <th>Gap After</th>
-                        </tr>
-                    </thead>
-                    <tbody id="twinsTableBody">
-                        <tr><td colspan="4" style="text-align: center; padding: 40px; color: #888;">Run analysis to see results</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB CONTENT: Prime Gaps -->
-    <div id="tab-gaps" class="tab-content">
-        <div class="data-container" style="max-width: 1400px; margin: 20px auto;">
-            <h2 style="color: #ffd700; margin-bottom: 20px;">Prime Gap Statistics</h2>
-            
-            <div class="chart-description">
-                <strong>Prime Gaps:</strong> The difference between consecutive primes. Shows detailed statistics about gap occurrences and records.
-            </div>
-
-            <div style="margin: 20px 0;">
-                <button class="btn" onclick="computeGapStats()">Analyze Prime Gaps</button>
-                <button class="copy-btn" onclick="copyGapsList()" style="margin-left: 10px;">Copy Gap List</button>
-                <button class="export-btn csv" onclick="exportGapsCSV()" style="margin-left: 10px;">Export CSV</button>
-            </div>
-
-            <div id="gapsStatus" style="margin: 20px 0; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; display: none;"></div>
-
-            <canvas id="gapsChart" width="3840" height="2160" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;"></canvas>
-
-            <div style="max-height: 600px; overflow-y: auto; border: 1px solid #2a2a4a; border-radius: 6px;">
-                <table class="data-table" id="gapsTable">
-                    <thead>
-                        <tr>
-                            <th>Gap Size</th>
-                            <th>Frequency</th>
-                            <th>Percentage</th>
-                            <th>First Occurrence</th>
-                        </tr>
-                    </thead>
-                    <tbody id="gapsTableBody">
-                        <tr><td colspan="4" style="text-align: center; padding: 40px; color: #888;">Run analysis to see results</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
-    <!-- TAB CONTENT: Prime Constellations -->
-    <div id="tab-constellations" class="tab-content">
-        <div class="data-container" style="max-width: 1400px; margin: 20px auto;">
-            <h2 style="color: #ffd700; margin-bottom: 20px;">Prime Constellation Finder</h2>
-            
-            <div class="chart-description">
-                <strong>Prime Constellations:</strong> Twin (p,p+2), Cousin (p,p+4), Sexy (p,p+6), Triplets, Quadruplets, etc.
-            </div>
-
-            <div style="margin: 20px 0;">
-                <button class="btn" onclick="computeConstellations()">Find All Constellations</button>
-                <button class="copy-btn" onclick="copyConstellationsList()" style="margin-left: 10px;">Copy Results</button>
-                <button class="export-btn csv" onclick="exportConstellationsCSV()" style="margin-left: 10px;">Export CSV</button>
-            </div>
-
-            <div id="constellationsStatus" style="margin: 20px 0; padding: 15px; background: rgba(34, 197, 94, 0.1); border-radius: 6px; display: none;"></div>
-
-            <canvas id="constellationsChart" width="3840" height="2160" style="max-width: 100%; height: auto; border-radius: 8px; margin: 20px 0;"></canvas>
-
-            <div style="max-height: 600px; overflow-y: auto; border: 1px solid #2a2a4a; border-radius: 6px;">
-                <table class="data-table" id="constellationsTable">
-                    <thead>
-                        <tr>
-                            <th>Type</th>
-                            <th>Count</th>
-                            <th>Examples</th>
-                        </tr>
-                    </thead>
-                    <tbody id="constellationsTableBody">
-                        <tr><td colspan="3" style="text-align: center; padding: 40px; color: #888;">Run analysis to see results</td></tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-
     <script>
         // Global variables
         let analysisResults = null;
@@ -1726,15 +1575,42 @@
             const piError = Math.abs(calculatedPi - actualPi);
             const piRelError = (piError / actualPi) * 100;
             
+            // Calculate additional stats
+            const primes = analysisResults.primes;
+            const primeSet = new Set(primes);
+            let twinCount = 0;
+            let cousinCount = 0;
+            let sexyCount = 0;
+            
+            for (let i = 0; i < primes.length - 1; i++) {
+                const p = primes[i];
+                if (primes[i+1] - p === 2) twinCount++;
+                if (primeSet.has(p + 4)) cousinCount++;
+                if (primeSet.has(p + 6)) sexyCount++;
+            }
+            
+            // Find most common gap
+            const gapCounts = {};
+            for (let i = 0; i < primes.length - 1; i++) {
+                const gap = primes[i+1] - primes[i];
+                gapCounts[gap] = (gapCounts[gap] || 0) + 1;
+            }
+            const mostCommonGap = Object.entries(gapCounts)
+                .sort((a, b) => b[1] - a[1])[0];
+            
             const stats = [
                 { label: 'Total Primes', value: analysisResults.totalPrimes.toLocaleString() },
                 { label: 'Maximum Prime', value: analysisResults.maxPrime.toLocaleString() },
                 { label: 'Gap Families', value: analysisResults.evenGaps.length },
+                { label: 'Twin Primes', value: twinCount, info: 'Pairs (p, p+2)' },
+                { label: 'Cousin Primes', value: cousinCount, info: 'Pairs (p, p+4)' },
+                { label: 'Sexy Primes', value: sexyCount, info: 'Pairs (p, p+6)' },
+                { label: 'Most Common Gap', value: `${mostCommonGap[0]} (${mostCommonGap[1]}×)` },
+                { label: 'Largest Gap', value: Math.max(...analysisResults.evenGaps) },
                 { label: 'Target ζ(2)', value: analysisResults.targetZeta2.toFixed(12) },
                 { label: 'Computed Product', value: analysisResults.finalProduct.toFixed(12) },
                 { label: 'Absolute Error', value: analysisResults.finalError.toExponential(6) },
                 { label: 'Relative Error', value: (analysisResults.finalRelativeError * 100).toFixed(10) + '%' },
-                { label: 'Largest Gap', value: Math.max(...analysisResults.evenGaps) },
                 { label: 'Calculated π', value: calculatedPi.toFixed(12), formula: 'π = √6 × √(∏P_g)' },
                 { label: 'Actual π', value: actualPi.toFixed(12) },
                 { label: 'π Error', value: piError.toExponential(6) },
@@ -1743,7 +1619,7 @@
             
             statsGrid.innerHTML = stats.map(stat => `
                 <div class="stat-card">
-                    <div class="stat-label">${stat.label}${stat.formula ? '<br><span style="font-size: 0.65rem; color: #666;">' + stat.formula + '</span>' : ''}</div>
+                    <div class="stat-label">${stat.label}${stat.info ? '<br><span style="font-size: 0.65rem; color: #666;">' + stat.info + '</span>' : ''}${stat.formula ? '<br><span style="font-size: 0.65rem; color: #666;">' + stat.formula + '</span>' : ''}</div>
                     <div class="stat-value">${stat.value}</div>
                 </div>
             `).join('');
@@ -1777,6 +1653,62 @@
         }
         
         // Chart rendering functions
+
+        // CLICK-TO-HIGHLIGHT FUNCTIONALITY
+        let highlightedGap = null;
+        
+        function addTableClickHandlers() {
+            // Add click handlers to all stat tables after they're rendered
+            const tables = [
+                'convergenceTableContent',
+                'gapContribTableContent', 
+                'gapDistTableContent',
+                'percentageTableContent',
+                'errorTableContent',
+                'logScaleTableContent'
+            ];
+            
+            tables.forEach(tableId => {
+                const table = document.getElementById(tableId);
+                if (!table) return;
+                
+                const rows = table.querySelectorAll('tbody tr');
+                rows.forEach((row, index) => {
+                    row.addEventListener('click', function() {
+                        // Remove previous highlights
+                        document.querySelectorAll('.stats-table tr.highlighted').forEach(r => {
+                            r.classList.remove('highlighted');
+                        });
+                        
+                        // Add highlight to clicked row
+                        this.classList.add('highlighted');
+                        
+                        // Get gap value from the row
+                        const gapCell = this.cells[0];
+                        if (gapCell) {
+                            const gapValue = parseInt(gapCell.textContent);
+                            if (!isNaN(gapValue)) {
+                                highlightedGap = gapValue;
+                                highlightGapOnCharts(gapValue);
+                            }
+                        }
+                    });
+                });
+            });
+        }
+        
+        function highlightGapOnCharts(gap) {
+            // Re-render charts with highlight
+            if (document.getElementById('showGapContributions').checked) {
+                renderGapContributionsChart(gap);
+            }
+            if (document.getElementById('showGapDistribution').checked) {
+                renderGapDistributionChart(gap);
+            }
+            if (document.getElementById('showPercentageContrib').checked) {
+                renderPercentageChart(gap);
+            }
+        }
         function renderConvergenceChart() {
             const canvas = document.getElementById('convergenceChart');
             const ctx = canvas.getContext('2d');
@@ -1892,7 +1824,7 @@
             ctx.fillText('Gap Family', w / 2, h - 40);
         }
         
-        function renderGapContributionsChart() {
+        function renderGapContributionsChart(highlightGap) {
             const canvas = document.getElementById('gapContribChart');
             const ctx = canvas.getContext('2d');
             const w = canvas.width;
@@ -1939,19 +1871,27 @@
             
             // Bars
             products.forEach((prod, i) => {
+                const gap = gaps[i];
                 const x = margin.left + i * barWidth;
                 const barH = prod.product * yScale;
                 const y = margin.top + chartH - barH;
                 
+                const isHighlighted = highlightGap && gap === highlightGap;
+                
                 const gradient = ctx.createLinearGradient(x, y, x, y + barH);
-                gradient.addColorStop(0, '#ffd700');
-                gradient.addColorStop(1, '#ffaa00');
+                if (isHighlighted) {
+                    gradient.addColorStop(0, '#ff0000');
+                    gradient.addColorStop(1, '#cc0000');
+                } else {
+                    gradient.addColorStop(0, '#ffd700');
+                    gradient.addColorStop(1, '#ffaa00');
+                }
                 
                 ctx.fillStyle = gradient;
                 ctx.fillRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
                 
-                ctx.strokeStyle = '#ffaa00';
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = isHighlighted ? '#ff0000' : '#ffaa00';
+                ctx.lineWidth = isHighlighted ? 8 : 3;
                 ctx.strokeRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
             });
             
@@ -1961,6 +1901,9 @@
             ctx.textAlign = 'center';
             gaps.forEach((gap, i) => {
                 const x = margin.left + i * barWidth + barWidth / 2;
+                const isHighlighted = highlightGap && gap === highlightGap;
+                ctx.fillStyle = isHighlighted ? '#ff0000' : '#aaa';
+                ctx.font = isHighlighted ? 'bold 32px monospace' : 'bold 24px monospace';
                 ctx.fillText(`${gap}`, x, h - margin.bottom + 50);
             });
             
@@ -1981,7 +1924,7 @@
             ctx.fillText('Gap Size', w / 2, h - 40);
         }
         
-        function renderGapDistributionChart() {
+        function renderGapDistributionChart(highlightGap) {
             const canvas = document.getElementById('gapDistChart');
             const ctx = canvas.getContext('2d');
             const w = canvas.width;
@@ -2070,7 +2013,7 @@
             ctx.fillText('Gap Size', w / 2, h - 40);
         }
         
-        function renderPercentageChart() {
+        function renderPercentageChart(highlightGap) {
             const canvas = document.getElementById('percentageChart');
             const ctx = canvas.getContext('2d');
             const w = canvas.width;
@@ -2512,6 +2455,9 @@
             updateErrorTable();
             updateLogScaleTable();
             updateStepByStepTable();
+            
+            // Add click handlers after tables are populated
+            setTimeout(() => addTableClickHandlers(), 100);
         }
         
         function updateConvergenceTable() {
