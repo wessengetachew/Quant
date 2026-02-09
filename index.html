@@ -1202,6 +1202,33 @@
                 Generate a comprehensive image combining selected charts with analysis summary and mathematical narrative
             </p>
             
+            <div style="background: rgba(78, 205, 196, 0.05); padding: 16px; border-radius: 8px; border-left: 4px solid #4ecdc4; margin-bottom: 20px;">
+                <h4 style="color: #4ecdc4; margin: 0 0 12px 0; font-size: 1rem;">📊 Global Export Settings</h4>
+                <p style="margin: 0 0 12px 0; color: #888; font-size: 0.85rem;">
+                    These settings apply to ALL chart exports (individual and composite)
+                </p>
+                
+                <div class="control-grid" style="grid-template-columns: 1fr;">
+                    <div class="control-group">
+                        <label>Data Rows in Exported Tables</label>
+                        <select id="globalExportRows">
+                            <option value="5">5 rows</option>
+                            <option value="10">10 rows</option>
+                            <option value="15" selected>15 rows</option>
+                            <option value="20">20 rows</option>
+                            <option value="25">25 rows</option>
+                            <option value="30">30 rows</option>
+                            <option value="40">40 rows</option>
+                            <option value="50">50 rows</option>
+                            <option value="all">All rows (may be very large)</option>
+                        </select>
+                        <div style="margin-top: 4px; font-size: 0.75rem; color: #888;">
+                            When you click "Export Chart PNG" or "Export Table PNG", this many rows will be included
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
             <div class="control-grid" style="grid-template-columns: repeat(3, 1fr);">
                 <div class="toggle-wrapper">
                     <label class="toggle">
@@ -1281,6 +1308,24 @@
                     <option value="3840" selected>4K (3840×2160)</option>
                     <option value="7680">8K (7680×4320)</option>
                 </select>
+            </div>
+            
+            <div class="control-group">
+                <label>Data Table Rows in Screenshots</label>
+                <select id="screenshotTableRows">
+                    <option value="5">5 rows</option>
+                    <option value="10">10 rows</option>
+                    <option value="15" selected>15 rows</option>
+                    <option value="20">20 rows</option>
+                    <option value="25">25 rows</option>
+                    <option value="30">30 rows</option>
+                    <option value="40">40 rows</option>
+                    <option value="50">50 rows</option>
+                    <option value="all">All rows</option>
+                </select>
+                <div style="margin-top: 4px; font-size: 0.75rem; color: #888;">
+                    Applies to: Step-by-Step table PNG export
+                </div>
             </div>
             
             <div class="section-divider"></div>
@@ -3751,7 +3796,14 @@
             }
             
             const precision = parseInt(document.getElementById('stepByStepPrecision').value);
-            const gaps = analysisResults.evenGaps.slice(0, 15); // Top 15 rows
+            
+            // Get row count from global export setting (fallback to screenshot setting, then 15)
+            const globalRows = document.getElementById('globalExportRows')?.value;
+            const screenshotRows = document.getElementById('screenshotTableRows')?.value;
+            const rowCountSetting = globalRows || screenshotRows || '15';
+            
+            const maxRows = rowCountSetting === 'all' ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            const gaps = analysisResults.evenGaps.slice(0, maxRows);
             
             const canvas = document.createElement('canvas');
             const ctx = canvas.getContext('2d');
