@@ -750,15 +750,46 @@
     
     <div class="controls-container">
         <div class="control-panel">
+            <h3 style="color: #ffd700; margin-bottom: 20px;">⚡ Research Presets</h3>
+            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 16px;">
+                Quick configurations for common research scenarios - click to apply settings instantly
+            </p>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 30px;">
+                <button onclick="applyResearchPreset('twins')" class="preset-btn" style="background: #dc2626; padding: 10px;">
+                    <strong>Twin Prime Focus</strong><br>
+                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 100K, Gaps: 2-10</span>
+                </button>
+                <button onclick="applyResearchPreset('goldbach')" class="preset-btn" style="background: #ea580c; padding: 10px;">
+                    <strong>Goldbach Range</strong><br>
+                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 500K, Gaps: 2-30</span>
+                </button>
+                <button onclick="applyResearchPreset('topology')" class="preset-btn" style="background: #7c3aed; padding: 10px;">
+                    <strong>Large Gap Topology</strong><br>
+                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, Gaps: 30-90</span>
+                </button>
+                <button onclick="applyResearchPreset('extreme')" class="preset-btn" style="background: #c026d3; padding: 10px;">
+                    <strong>Extreme Range</strong><br>
+                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 5M, Gaps: 100+</span>
+                </button>
+                <button onclick="applyResearchPreset('full')" class="preset-btn" style="background: #059669; padding: 10px;">
+                    <strong>Full Spectrum</strong><br>
+                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, All Gaps</span>
+                </button>
+                <button onclick="applyResearchPreset('rh')" class="preset-btn" style="background: #0891b2; padding: 10px;">
+                    <strong>Riemann Hypothesis Analysis</strong><br>
+                    <span style="font-size: 0.85em; opacity: 0.9;">High-precision: 2M primes, Standard gap range</span>
+                </button>
+            </div>
+
             <h3>Computation Parameters</h3>
             
             <div class="control-grid">
                 <div class="control-group">
                     <label>
                         Maximum Prime
-                        <span class="control-value" id="maxPrimeDisplay">100000</span>
+                        <span class="control-value" id="maxPrimeDisplay">10000000</span>
                     </label>
-                    <input type="number" id="maxPrime" value="100000" min="1000" max="10000000" step="1000">
+                    <input type="number" id="maxPrime" value="10000000" min="1000" max="10000000" step="1000">
                 </div>
                 
                 <div class="control-group">
@@ -769,7 +800,7 @@
                     <input type="number" id="maxGap" value="50" min="2" max="1000" step="2">
                     <div style="margin-top: 8px;">
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
-                            <input type="checkbox" id="autoDetectMaxGap" style="width: auto;">
+                            <input type="checkbox" id="autoDetectMaxGap" style="width: auto;" checked>
                             <span>Auto-detect largest gap in range</span>
                         </label>
                     </div>
@@ -828,51 +859,40 @@
                 
                 <div class="control-group">
                     <label>
-                        Animation Range Start
+                        Animation Speed (ms delay)
+                        <span class="control-value" id="animSpeedDisplay">100</span>
+                    </label>
+                    <input type="range" id="animSpeed" min="10" max="500" value="100" step="10"
+                           oninput="document.getElementById('animSpeedDisplay').textContent = this.value">
+                    <div style="margin-top: 4px; font-size: 0.75rem; color: #888;">
+                        Lower = Faster | Higher = Slower
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label style="display: flex; align-items: center; gap: 8px;">
+                        <input type="checkbox" id="useMaxPrimeForAnim" style="width: auto;" checked>
+                        <span>Animate from 0 to Max Prime</span>
+                    </label>
+                    <div style="margin-top: 4px; font-size: 0.75rem; color: #888;">
+                        Uncheck to set custom range below
+                    </div>
+                </div>
+
+                <div class="control-group">
+                    <label>
+                        Custom Start (if unchecked above)
                         <span class="control-value" id="animStartDisplay">1000</span>
                     </label>
-                    <input type="number" id="animStart" value="1000" min="100" max="1000000" step="100">
+                    <input type="number" id="animStart" value="1000" min="100" max="10000000" step="100">
                 </div>
                 
                 <div class="control-group">
                     <label>
-                        Animation Range End
-                        <span class="control-value" id="animEndDisplay">100000</span>
+                        Custom End (if unchecked above)
+                        <span class="control-value" id="animEndDisplay">10000000</span>
                     </label>
-                    <input type="number" id="animEnd" value="100000" min="1000" max="10000000" step="1000">
-                </div>
-
-                <div class="control-group" style="grid-column: 1 / -1; border: 2px solid #ffd700; padding: 16px; border-radius: 8px; background: rgba(255, 215, 0, 0.05); margin-top: 12px;">
-                    <h4 style="margin: 0 0 12px 0; color: #ffd700; font-size: 1rem;">⚡ Research Presets</h4>
-                    <p style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 12px 0;">
-                        Quick configurations for common research scenarios
-                    </p>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
-                        <button onclick="applyResearchPreset('twins')" class="preset-btn" style="background: #dc2626; padding: 10px;">
-                            <strong>Twin Prime Focus</strong><br>
-                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 100K, Gaps: 2-10</span>
-                        </button>
-                        <button onclick="applyResearchPreset('goldbach')" class="preset-btn" style="background: #ea580c; padding: 10px;">
-                            <strong>Goldbach Range</strong><br>
-                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 500K, Gaps: 2-30</span>
-                        </button>
-                        <button onclick="applyResearchPreset('topology')" class="preset-btn" style="background: #7c3aed; padding: 10px;">
-                            <strong>Large Gap Topology</strong><br>
-                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, Gaps: 30-90</span>
-                        </button>
-                        <button onclick="applyResearchPreset('extreme')" class="preset-btn" style="background: #c026d3; padding: 10px;">
-                            <strong>Extreme Range</strong><br>
-                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 5M, Gaps: 100+</span>
-                        </button>
-                        <button onclick="applyResearchPreset('full')" class="preset-btn" style="background: #059669; padding: 10px;">
-                            <strong>Full Spectrum</strong><br>
-                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, All Gaps</span>
-                        </button>
-                        <button onclick="applyResearchPreset('rh')" class="preset-btn" style="background: #0891b2; padding: 10px;">
-                            <strong>RH Investigation</strong><br>
-                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 2M, Gaps: 2-50</span>
-                        </button>
-                    </div>
+                    <input type="number" id="animEnd" value="10000000" min="1000" max="10000000" step="1000">
                 </div>
             </div>
             
@@ -1209,7 +1229,7 @@
                 
                 <div class="toggle-wrapper">
                     <label class="toggle">
-                        <input type="checkbox" id="screenshotPercentage">
+                        <input type="checkbox" id="screenshotPercentage" checked>
                         <span class="toggle-slider"></span>
                     </label>
                     <span>Percentage Contributions</span>
@@ -1217,7 +1237,7 @@
                 
                 <div class="toggle-wrapper">
                     <label class="toggle">
-                        <input type="checkbox" id="screenshotError">
+                        <input type="checkbox" id="screenshotError" checked>
                         <span class="toggle-slider"></span>
                     </label>
                     <span>Error Analysis</span>
@@ -1225,7 +1245,7 @@
                 
                 <div class="toggle-wrapper">
                     <label class="toggle">
-                        <input type="checkbox" id="screenshotLogScale">
+                        <input type="checkbox" id="screenshotLogScale" checked>
                         <span class="toggle-slider"></span>
                     </label>
                     <span>Log-Scale Products</span>
@@ -1271,6 +1291,70 @@
             
             <div id="screenshotStatus" class="status-bar" style="display: none; margin-top: 12px;">
                 Generating screenshot...
+            </div>
+        </div>
+    </div>
+    
+    <!-- CREDITS SECTION -->
+    <div class="controls-container" style="margin-top: 40px;">
+        <div class="control-panel" style="background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%); border: 2px solid #ffd700;">
+            <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center; font-size: 1.4rem;">Credits & Attribution</h3>
+            
+            <div style="display: grid; gap: 20px;">
+                <!-- Author -->
+                <div style="background: rgba(255, 215, 0, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #ffd700;">
+                    <h4 style="color: #ffd700; margin: 0 0 10px 0; font-size: 1.1rem;">Author</h4>
+                    <p style="margin: 0; color: #e0e0e0; line-height: 1.8;">
+                        <strong>Wessen Getachew</strong><br>
+                        Independent Mathematical Researcher<br>
+                        Twitter: <a href="https://twitter.com/7dview" target="_blank" style="color: #4ecdc4; text-decoration: none;">@7dview</a>
+                    </p>
+                </div>
+                
+                <!-- Related Work -->
+                <div style="background: rgba(78, 205, 196, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                    <h4 style="color: #4ecdc4; margin: 0 0 10px 0; font-size: 1.1rem;">Related Research Tools</h4>
+                    <p style="margin: 0 0 12px 0; color: #ccc;">
+                        This tool is part of a broader investigation into prime number distribution and connections to the Riemann Hypothesis:
+                    </p>
+                    <ul style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
+                        <li>
+                            <a href="https://wessengetachew.github.io/Ethiopian/" target="_blank" style="color: #4ecdc4; text-decoration: none;">
+                                Modular Sieve Calculator
+                            </a> - Prime residue ring visualizations and ζ(2n) computations
+                        </li>
+                        <li>Farey Sequence Analysis - Fixed point at 1/2 and RH connections</li>
+                        <li>Gap Phase Alignment Framework - φ(p,t) = t·log(p) - π/2 mechanism</li>
+                        <li>Combinatorial Twin Prime Framework - T(M_n) = 3·2^n formula</li>
+                    </ul>
+                </div>
+                
+                <!-- Mathematical Foundation -->
+                <div style="background: rgba(139, 92, 246, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #8b5cf6;">
+                    <h4 style="color: #8b5cf6; margin: 0 0 10px 0; font-size: 1.1rem;">Mathematical Framework</h4>
+                    <p style="margin: 0; color: #ccc; line-height: 1.8;">
+                        This analysis builds on Leonhard Euler's 1734 proof that ζ(2) = π²/6 and introduces a novel 
+                        gap-class decomposition of the Euler product. The framework partitions primes by their forward 
+                        differences, revealing that twin primes contribute approximately 34.79% to the logarithmic product 
+                        log(ζ(2)), with contribution decay following precise combinatorial patterns.
+                    </p>
+                </div>
+                
+                <!-- License & Usage -->
+                <div style="background: rgba(255, 255, 255, 0.02); padding: 20px; border-radius: 8px; border: 1px solid #2a2a4a;">
+                    <h4 style="color: #aaa; margin: 0 0 10px 0; font-size: 1.1rem;">License & Usage</h4>
+                    <p style="margin: 0; color: #888; font-size: 0.9rem; line-height: 1.6;">
+                        This tool is provided for educational and research purposes. If you use this tool or its findings 
+                        in academic work, presentations, or publications, please provide appropriate attribution to 
+                        <strong>Wessen Getachew</strong> and cite the gap-class decomposition framework.
+                    </p>
+                </div>
+                
+                <!-- Build Info -->
+                <div style="text-align: center; padding: 15px; color: #666; font-size: 0.85rem; border-top: 1px solid #2a2a4a;">
+                    Gap-Class Decomposition Explorer v2.0 | Built February 2026<br>
+                    Interactive Mathematical Research Tool
+                </div>
             </div>
         </div>
     </div>
@@ -2289,13 +2373,23 @@
         function startAnimation() {
             if (isAnimating) return;
             
-            const startRange = parseInt(document.getElementById('animStart').value);
-            const endRange = parseInt(document.getElementById('animEnd').value);
+            const useMaxPrime = document.getElementById('useMaxPrimeForAnim').checked;
+            let startRange, endRange;
+            
+            if (useMaxPrime) {
+                startRange = 100;
+                endRange = parseInt(document.getElementById('maxPrime').value);
+            } else {
+                startRange = parseInt(document.getElementById('animStart').value);
+                endRange = parseInt(document.getElementById('animEnd').value);
+            }
             
             if (startRange >= endRange) {
                 alert('Animation start must be less than end');
                 return;
             }
+            
+            const animSpeed = parseInt(document.getElementById('animSpeed').value);
             
             isAnimating = true;
             let currentRange = startRange;
@@ -2327,7 +2421,11 @@
                 renderAllCharts();
                 
                 currentRange += step;
-                animationId = requestAnimationFrame(animateFrame);
+                
+                // Use setTimeout with speed control instead of requestAnimationFrame
+                setTimeout(() => {
+                    animationId = requestAnimationFrame(animateFrame);
+                }, animSpeed);
             }
             
             animateFrame();
@@ -4608,6 +4706,14 @@
             a.download = 'prime_constellations.csv';
             a.click();
         }
+        
+        // Auto-run analysis on page load with 10M default
+        window.addEventListener('DOMContentLoaded', function() {
+            console.log('Auto-running analysis with 10M primes...');
+            setTimeout(() => {
+                runAnalysis();
+            }, 500); // Small delay to ensure everything is loaded
+        });
     </script>
 </body>
 </html>
