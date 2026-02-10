@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -3335,14 +3335,21 @@
             const chartW = sourceCanvas.width;
             const chartH = sourceCanvas.height;
             
-            // Calculate dimensions
+            // Get row count from global export setting
+            const rowCountSetting = document.getElementById('globalExportRows')?.value || '15';
+            const maxRows = rowCountSetting === 'all' ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            
+            // Calculate dynamic dimensions
             const headerH = 250;
             const statsBarH = 120;
-            const tableH = 800; // Height for stats table
+            const tableHeaderH = 60;
+            const rowHeight = 50;
+            const tableH = tableHeaderH + (maxRows * rowHeight) + 100; // Header + rows + bottom padding
             const padding = 40;
+            const footerSpace = 80; // Empty space at bottom
             
             compositeCanvas.width = chartW;
-            compositeCanvas.height = headerH + statsBarH + chartH + tableH;
+            compositeCanvas.height = headerH + statsBarH + chartH + tableH + footerSpace;
             
             // Background
             ctx.fillStyle = '#0a0a0f';
@@ -3413,7 +3420,14 @@
             
             // Draw stats table
             const tableY = chartY + chartH + padding;
-            renderStatsTableToCanvas(ctx, canvasId, tableY, compositeCanvas.width);
+            const actualTableHeight = renderStatsTableToCanvas(ctx, canvasId, tableY, compositeCanvas.width, maxRows);
+            
+            // Add footer info
+            const footerY = tableY + actualTableHeight + 30;
+            ctx.fillStyle = '#666';
+            ctx.font = '24px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Showing ${maxRows} rows | Analysis: ${analysisResults.totalPrimes.toLocaleString()} primes up to ${analysisResults.maxPrime.toLocaleString()}`, compositeCanvas.width / 2, footerY);
             
             // Export
             const link = document.createElement('a');
@@ -3422,7 +3436,7 @@
             link.click();
         }
         
-        function renderStatsTableToCanvas(ctx, canvasId, startY, canvasWidth) {
+        function renderStatsTableToCanvas(ctx, canvasId, startY, canvasWidth, maxRows) {
             // Determine which table data to render based on canvasId
             const tableMap = {
                 'convergenceChart': renderConvergenceTableData,
@@ -3435,16 +3449,19 @@
             
             const renderFunc = tableMap[canvasId];
             if (renderFunc) {
-                renderFunc(ctx, startY, canvasWidth);
+                return renderFunc(ctx, startY, canvasWidth, maxRows);
             }
+            return 0;
         }
         
-        function renderConvergenceTableData(ctx, startY, canvasWidth) {
-            const precision = parseInt(document.getElementById('convergencePrecision').value);
+        function renderConvergenceTableData(ctx, startY, canvasWidth, maxRows) {
+            if (!maxRows) {
+                // Fallback if called without maxRows
+                const rowCountSetting = document.getElementById('globalExportRows')?.value || '15';
+                maxRows = rowCountSetting === 'all' ? analysisResults.progressiveProducts.length : parseInt(rowCountSetting);
+            }
             
-            // Get row count from global export setting
-            const rowCountSetting = document.getElementById('globalExportRows')?.value || '15';
-            const maxRows = rowCountSetting === 'all' ? analysisResults.progressiveProducts.length : parseInt(rowCountSetting);
+            const precision = parseInt(document.getElementById('convergencePrecision').value);
             const data = analysisResults.progressiveProducts.slice(0, maxRows);
             
             const headers = ['Gap', 'Cumulative Product', 'Log Product', 'Target ζ(2)', 'Abs Error', 'Rel Error (%)'];
@@ -3487,12 +3504,20 @@
                     ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
                 });
             });
+            
+            // Return actual height used
+            const tableHeaderH = 60;
+            const rowHeight = 50;
+            return tableHeaderH + (data.length * rowHeight);
         }
         
-        function renderGapContribTableData(ctx, startY, canvasWidth) {
+        function renderGapContribTableData(ctx, startY, canvasWidth, maxRows) {
+            if (!maxRows) {
+                const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
+                maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            }
+            
             const precision = parseInt(document.getElementById('gapContribPrecision').value);
-            const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
-            const maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
             const gaps = analysisResults.evenGaps.slice(0, maxRows);
             
             const headers = ['Gap', 'Product P_g', 'Log(P_g)', 'Prime Count', 'First Primes'];
@@ -3540,12 +3565,16 @@
                     xPos += w;
                 });
             });
+            
+            return 60 + (gaps.length * 50); // Header + rows
         }
         
-        function renderGapDistTableData(ctx, startY, canvasWidth) {
+        function renderGapDistTableData(ctx, startY, canvasWidth, maxRows) {
+            if (!maxRows) {
+                const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
+                maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            }
             const precision = parseInt(document.getElementById('gapDistPrecision').value);
-            const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
-            const maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
             const gaps = analysisResults.evenGaps.slice(0, maxRows);
             
             const headers = ['Gap', 'Count', '% of Total', 'Cumulative', 'Cumulative %'];
@@ -3589,12 +3618,16 @@
                     ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
                 });
             });
+            
+            return 60 + (gaps.length * 50); // Header + rows
         }
         
-        function renderPercentageTableData(ctx, startY, canvasWidth) {
+        function renderPercentageTableData(ctx, startY, canvasWidth, maxRows) {
+            if (!maxRows) {
+                const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
+                maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            }
             const precision = parseInt(document.getElementById('percentagePrecision').value);
-            const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
-            const maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
             const gaps = analysisResults.evenGaps.slice(0, maxRows);
             
             const headers = ['Gap', 'Contribution %', 'Product P_g', 'Ratio', 'Log Contrib'];
@@ -3636,11 +3669,17 @@
                     ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
                 });
             });
+            
+            return 60 + (gaps.length * 50);
         }
         
-        function renderErrorTableData(ctx, startY, canvasWidth) {
+        function renderErrorTableData(ctx, startY, canvasWidth, maxRows) {
+            if (!maxRows) {
+                const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
+                maxRows = rowCountSetting === "all" ? analysisResults.progressiveProducts.length : parseInt(rowCountSetting);
+            }
             const precision = parseInt(document.getElementById('errorPrecision').value);
-            const data = analysisResults.progressiveProducts.slice(0, 10);
+            const data = analysisResults.progressiveProducts.slice(0, maxRows);
             
             const headers = ['Gap', 'Product', 'Abs Error', 'Rel Error', 'Log10(Error)'];
             const colW = (canvasWidth - 80) / headers.length;
@@ -3679,12 +3718,16 @@
                     ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
                 });
             });
+            
+            return 60 + (data.length * 50);
         }
         
-        function renderLogScaleTableData(ctx, startY, canvasWidth) {
+        function renderLogScaleTableData(ctx, startY, canvasWidth, maxRows) {
+            if (!maxRows) {
+                const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
+                maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            }
             const precision = parseInt(document.getElementById('logScalePrecision').value);
-            const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
-            const maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
             const gaps = analysisResults.evenGaps.slice(0, maxRows);
             
             const headers = ['Gap', 'Log(P_g)', 'P_g', 'Count', 'Avg/Prime'];
@@ -3725,6 +3768,8 @@
                     ctx.fillText(cell, 40 + colIdx * colW + colW / 2, y + 35);
                 });
             });
+            
+            return 60 + (gaps.length * 50);
         }
         
         function generateConvergenceCSV() {
