@@ -3531,17 +3531,38 @@
                 });
             });
             
-            // Add TARGET row
-            const targetY = startY + 60 + data.length * 50;
+            // Add DISPLAYED row (last gap's actual state)
+            const displayedY = startY + 60 + data.length * 50;
+            ctx.fillStyle = 'rgba(78, 205, 196, 0.1)';
+            ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#4ecdc4';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, displayedY, canvasWidth - 80, 50);
             
-            // Target row background (gold border)
+            const lastRow = data[data.length - 1];
+            ctx.fillStyle = '#4ecdc4';
+            ctx.font = 'bold 32px monospace';
+            const displayedData = [
+                'Displayed',
+                lastRow.value.toFixed(precision),
+                lastRow.logValue.toFixed(precision),
+                analysisResults.targetZeta2.toFixed(precision),
+                lastRow.error.toExponential(precision),
+                (lastRow.relativeError * 100).toFixed(precision) + '%'
+            ];
+            
+            displayedData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, displayedY + 35);
+            });
+            
+            // Add LIMIT row (theoretical target at ∞)
+            const limitY = displayedY + 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
-            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
             ctx.lineWidth = 3;
-            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
             
-            // Target row data
             const s = analysisResults.s || 2;
             const known = getKnownZetaValue(s);
             const zetaLabel = known ? known.formula : `ζ(${s.toFixed(1)})`;
@@ -3549,8 +3570,8 @@
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
-            const targetData = [
-                'Target',
+            const limitData = [
+                'Limit',
                 analysisResults.targetZeta2.toFixed(precision),
                 targetLogValue.toFixed(precision),
                 analysisResults.targetZeta2.toFixed(precision),
@@ -3558,14 +3579,14 @@
                 '0.0%'
             ];
             
-            targetData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            limitData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, limitY + 35);
             });
             
-            // Return actual height used (including target row)
+            // Return actual height used (including both rows)
             const tableHeaderH = 60;
             const rowHeight = 50;
-            return tableHeaderH + (data.length * rowHeight) + rowHeight; // +1 for target row
+            return tableHeaderH + (data.length * rowHeight) + (2 * rowHeight); // +2 for displayed and limit rows
         }
         
         function renderGapContribTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3623,31 +3644,55 @@
                 });
             });
             
-            // Add TARGET row
-            const targetY = startY + 60 + gaps.length * 50;
+            // Add LIMIT row (theoretical limits as gap→∞)
+            const limitY = startY + 60 + gaps.length * 50;
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.font = 'bold 32px monospace';
+            const s = analysisResults.s || 2;
+            const known = getKnownZetaValue(s);
+            const zetaLabel = known ? known.formula : `ζ(${s.toFixed(1)})`;
+            const limitData = ['Limit', '1.0', '0.0', '0', '—'];
+            
+            xPos = 0;
+            limitData.forEach((cell, colIdx) => {
+                const w = (canvasWidth - 80) * colWidths[colIdx];
+                ctx.textAlign = colIdx === 4 ? 'left' : 'center';
+                const textX = colIdx === 4 ? 40 + xPos + 10 : 40 + xPos + w / 2;
+                ctx.fillText(cell, textX, limitY + 35);
+                xPos += w;
+            });
+            
+            // Add DISPLAYED row (cumulative totals for shown gaps)
+            const displayedY = limitY + 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
-            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
             ctx.lineWidth = 3;
-            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeRect(40, displayedY, canvasWidth - 80, 50);
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
             const totalLogProduct = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.logProduct || 0), 0);
             const totalProduct = Math.exp(totalLogProduct);
             const totalPrimes = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
-            const targetData = ['Target', totalProduct.toFixed(precision), totalLogProduct.toFixed(precision), totalPrimes.toLocaleString(), 'ALL'];
+            const displayedData = ['Displayed', totalProduct.toFixed(precision), totalLogProduct.toFixed(precision), totalPrimes.toLocaleString(), 'Shown'];
             
-            xPos = 0; // Reuse existing xPos variable
-            targetData.forEach((cell, colIdx) => {
+            xPos = 0;
+            displayedData.forEach((cell, colIdx) => {
                 const w = (canvasWidth - 80) * colWidths[colIdx];
                 ctx.textAlign = colIdx === 4 ? 'left' : 'center';
                 const textX = colIdx === 4 ? 40 + xPos + 10 : 40 + xPos + w / 2;
-                ctx.fillText(cell, textX, targetY + 35);
+                ctx.fillText(cell, textX, displayedY + 35);
                 xPos += w;
             });
             
-            return 60 + (gaps.length * 50) + 50; // Header + rows + target
+            return 60 + (gaps.length * 50) + 100; // Header + rows + 2 summary rows
         }
         
         function renderGapDistTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3700,25 +3745,41 @@
                 });
             });
             
-            // Add TARGET row
-            const targetY = startY + 60 + gaps.length * 50;
+            // Add LIMIT row (theoretical limits)
+            const limitY = startY + 60 + gaps.length * 50;
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.font = 'bold 32px monospace';
+            const limitData = ['Limit', '0', '0.0%', '∞', '100.0%'];
+            
+            limitData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, limitY + 35);
+            });
+            
+            // Add DISPLAYED row (totals for shown gaps)
+            const displayedY = limitY + 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
-            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
             ctx.lineWidth = 3;
-            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeRect(40, displayedY, canvasWidth - 80, 50);
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
             const displayedTotal = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
             const displayedPercentage = (displayedTotal / analysisResults.totalPrimes * 100).toFixed(precision);
-            const targetData = ['Total', displayedTotal.toLocaleString(), displayedPercentage + '%', displayedTotal.toLocaleString(), displayedPercentage + '%'];
+            const displayedData = ['Displayed', displayedTotal.toLocaleString(), displayedPercentage + '%', displayedTotal.toLocaleString(), displayedPercentage + '%'];
             
-            targetData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            displayedData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, displayedY + 35);
             });
             
-            return 60 + (gaps.length * 50) + 50; // Header + rows + target
+            return 60 + (gaps.length * 50) + 100; // Header + rows + 2 summary rows
         }
         
         function renderPercentageTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3769,13 +3830,29 @@
                 });
             });
             
-            // Add TARGET row  
-            const targetY = startY + 60 + gaps.length * 50;
+            // Add LIMIT row (theoretical limits)
+            const limitY = startY + 60 + gaps.length * 50;
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.font = 'bold 32px monospace';
+            const limitData = ['Limit', '0.0%', '1.0', '—', '0.0'];
+            
+            limitData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, limitY + 35);
+            });
+            
+            // Add DISPLAYED row (totals for shown gaps)
+            const displayedY = limitY + 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
-            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
             ctx.lineWidth = 3;
-            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeRect(40, displayedY, canvasWidth - 80, 50);
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
@@ -3783,13 +3860,13 @@
             const totalPercentage = gaps.reduce((sum, gap) => sum + (analysisResults.percentageContributions[gap] || 0), 0);
             const totalProduct = Math.exp(totalLogProduct);
             const totalRatio = totalProduct / analysisResults.targetZeta2;
-            const targetData = ['Total', totalPercentage.toFixed(precision) + '%', totalProduct.toFixed(precision), totalRatio.toFixed(precision), totalLogProduct.toFixed(precision)];
+            const displayedData = ['Displayed', totalPercentage.toFixed(precision) + '%', totalProduct.toFixed(precision), totalRatio.toFixed(precision), totalLogProduct.toFixed(precision)];
             
-            targetData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            displayedData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, displayedY + 35);
             });
             
-            return 60 + (gaps.length * 50) + 50;
+            return 60 + (gaps.length * 50) + 100;
         }
         
         function renderErrorTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3838,23 +3915,47 @@
                 });
             });
             
-            // Add TARGET row
-            const targetY = startY + 60 + data.length * 50;
+            // Add DISPLAYED row (last gap's actual state)
+            const displayedY = startY + 60 + data.length * 50;
+            ctx.fillStyle = 'rgba(78, 205, 196, 0.1)';
+            ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#4ecdc4';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, displayedY, canvasWidth - 80, 50);
+            
+            const lastRow = data[data.length - 1];
+            const lastLogError = Math.log10(lastRow.relativeError);
+            ctx.fillStyle = '#4ecdc4';
+            ctx.font = 'bold 32px monospace';
+            const displayedData = [
+                'Displayed',
+                lastRow.value.toFixed(precision),
+                lastRow.error.toExponential(precision),
+                (lastRow.relativeError * 100).toFixed(precision) + '%',
+                lastLogError.toFixed(precision)
+            ];
+            
+            displayedData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, displayedY + 35);
+            });
+            
+            // Add LIMIT row (theoretical target)
+            const limitY = displayedY + 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
-            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
             ctx.lineWidth = 3;
-            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
-            const targetData = ['Target', analysisResults.targetZeta2.toFixed(precision), '0.0', '0.0%', '—'];
+            const limitData = ['Limit', analysisResults.targetZeta2.toFixed(precision), '0.0', '0.0%', '—'];
             
-            targetData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            limitData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, limitY + 35);
             });
             
-            return 60 + (data.length * 50) + 50;
+            return 60 + (data.length * 50) + 100;
         }
         
         function renderLogScaleTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3904,13 +4005,29 @@
                 });
             });
             
-            // Add TARGET row
-            const targetY = startY + 60 + gaps.length * 50;
+            // Add LIMIT row (theoretical limits)
+            const limitY = startY + 60 + gaps.length * 50;
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.font = 'bold 32px monospace';
+            const limitData = ['Limit', '0.0', '1.0', '0', '—'];
+            
+            limitData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, limitY + 35);
+            });
+            
+            // Add DISPLAYED row (totals for shown gaps)
+            const displayedY = limitY + 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
-            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
             ctx.lineWidth = 3;
-            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeRect(40, displayedY, canvasWidth - 80, 50);
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
@@ -3918,13 +4035,13 @@
             const totalCount = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
             const totalProduct = Math.exp(totalLog);
             const avgLogPerPrime = totalCount > 0 ? (totalLog / totalCount).toFixed(precision) : '—';
-            const targetData = ['Total', totalLog.toFixed(precision), totalProduct.toFixed(precision), totalCount.toLocaleString(), avgLogPerPrime];
+            const displayedData = ['Displayed', totalLog.toFixed(precision), totalProduct.toFixed(precision), totalCount.toLocaleString(), avgLogPerPrime];
             
-            targetData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            displayedData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, displayedY + 35);
             });
             
-            return 60 + (gaps.length * 50) + 50;
+            return 60 + (gaps.length * 50) + 100;
         }
         
         function generateConvergenceCSV() {
@@ -4284,7 +4401,7 @@
             const padding = 40;
             
             const canvasW = 3840;
-            const canvasH = headerH + tableHeaderH + (gaps.length + 1) * rowH + footerH;
+            const canvasH = headerH + tableHeaderH + (gaps.length + 2) * rowH + footerH; // +2 for displayed and limit rows
             
             canvas.width = canvasW;
             canvas.height = canvasH;
@@ -4359,27 +4476,25 @@
                 });
             });
             
-            // Target row
-            const targetY = tableY + tableHeaderH + gaps.length * rowH;
-            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
-            ctx.fillRect(padding, targetY, canvasW - 2 * padding, rowH);
+            // DISPLAYED row (actual state at last gap)
+            const displayedY = tableY + tableHeaderH + gaps.length * rowH;
+            ctx.fillStyle = 'rgba(78, 205, 196, 0.1)';
+            ctx.fillRect(padding, displayedY, canvasW - 2 * padding, rowH);
             
-            ctx.strokeStyle = '#ffd700';
+            ctx.strokeStyle = '#4ecdc4';
             ctx.lineWidth = 4;
-            ctx.strokeRect(padding, targetY, canvasW - 2 * padding, rowH);
+            ctx.strokeRect(padding, displayedY, canvasW - 2 * padding, rowH);
             
-            ctx.fillStyle = '#ffd700';
-            ctx.font = 'bold 36px monospace';
-            
-            // Show the actual state at the last displayed gap (not theoretical infinity)
             const lastGap = gaps[gaps.length - 1];
             const lastData = analysisResults.gapProducts[lastGap];
             const lastCumulative = analysisResults.progressiveProducts[gaps.length - 1].value;
             const lastDistance = analysisResults.targetZeta2 - lastCumulative;
             const lastPercentComplete = (lastCumulative / analysisResults.targetZeta2) * 100;
             
-            const targetData = [
-                'Total',
+            ctx.fillStyle = '#4ecdc4';
+            ctx.font = 'bold 36px monospace';
+            const displayedData = [
+                'Displayed',
                 lastGap.toString(),
                 lastData.product.toFixed(precision),
                 lastCumulative.toFixed(precision),
@@ -4388,9 +4503,36 @@
             ];
             
             xPos = padding;
-            targetData.forEach((cell, colIdx) => {
+            displayedData.forEach((cell, colIdx) => {
                 const w = (canvasW - 2 * padding) * colWidths[colIdx];
-                ctx.fillText(cell, xPos + w / 2, targetY + 42);
+                ctx.fillText(cell, xPos + w / 2, displayedY + 42);
+                xPos += w;
+            });
+            
+            // LIMIT row (theoretical target at infinity)
+            const limitY = displayedY + rowH;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(padding, limitY, canvasW - 2 * padding, rowH);
+            
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 4;
+            ctx.strokeRect(padding, limitY, canvasW - 2 * padding, rowH);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 36px monospace';
+            const limitData = [
+                'Limit',
+                '∞',
+                '1.0',
+                analysisResults.targetZeta2.toFixed(precision),
+                '0.' + '0'.repeat(precision),
+                '100.' + '0'.repeat(precision) + '%'
+            ];
+            
+            xPos = padding;
+            limitData.forEach((cell, colIdx) => {
+                const w = (canvasW - 2 * padding) * colWidths[colIdx];
+                ctx.fillText(cell, xPos + w / 2, limitY + 42);
                 xPos += w;
             });
             
