@@ -813,10 +813,24 @@
                     </label>
                     <input type="range" id="zetaS" value="2" min="1.01" max="20" step="0.01"
                            oninput="updateZetaSDisplay()" onchange="updateZetaSDisplay()">
-                    <div style="margin-top: 8px; font-size: 0.85rem; color: #a78bfa;">
+                    
+                    <!-- Preset Buttons -->
+                    <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 12px;">
+                        <button onclick="setZetaS(1.5)" class="preset-btn" style="background: #7c3aed; padding: 6px; font-size: 0.8rem;">s=1.5</button>
+                        <button onclick="setZetaS(2)" class="preset-btn" style="background: #6366f1; padding: 6px; font-size: 0.8rem;">s=2</button>
+                        <button onclick="setZetaS(3)" class="preset-btn" style="background: #3b82f6; padding: 6px; font-size: 0.8rem;">s=3</button>
+                        <button onclick="setZetaS(4)" class="preset-btn" style="background: #0891b2; padding: 6px; font-size: 0.8rem;">s=4</button>
+                        <button onclick="setZetaS(Math.PI)" class="preset-btn" style="background: #059669; padding: 6px; font-size: 0.8rem;">s=π</button>
+                        <button onclick="setZetaS(10)" class="preset-btn" style="background: #dc2626; padding: 6px; font-size: 0.8rem;">s=10</button>
+                    </div>
+                    
+                    <div style="margin-top: 12px; font-size: 0.85rem; color: #a78bfa;">
                         <div id="zetaSInfo" style="font-weight: 600;">ζ(2) = π²/6 ≈ 1.6449</div>
-                        <div style="margin-top: 4px; color: #888; font-size: 0.8rem;">
-                            Analyzes: ζ(s) = ∏ p^s/(p^s-1)
+                        <div id="zetaSBehavior" style="margin-top: 8px; color: #888; font-size: 0.8rem;">
+                            Twin primes dominate at s=2
+                        </div>
+                        <div style="margin-top: 4px; color: #888; font-size: 0.75rem;">
+                            Formula: ζ(s) = ∏ p^s/(p^s-1)
                         </div>
                     </div>
                 </div>
@@ -4302,18 +4316,39 @@
             return knownValues[s] || null;
         }
         
+        function setZetaS(value) {
+            document.getElementById('zetaS').value = value;
+            updateZetaSDisplay();
+        }
+        
         function updateZetaSDisplay() {
             const s = parseFloat(document.getElementById('zetaS').value);
             document.getElementById('zetaSDisplay').textContent = s.toFixed(2);
             
             const known = getKnownZetaValue(s);
             const infoDiv = document.getElementById('zetaSInfo');
+            const behaviorDiv = document.getElementById('zetaSBehavior');
             
             if (known) {
                 infoDiv.innerHTML = `<strong>ζ(${s}) = ${known.formula} ≈ ${known.value.toFixed(6)}</strong>`;
             } else {
                 const approx = computeApproximateZeta(s);
                 infoDiv.innerHTML = `ζ(${s.toFixed(2)}) ≈ ${approx.toFixed(6)}`;
+            }
+            
+            // Update behavioral description
+            if (s < 1.3) {
+                behaviorDiv.textContent = 'Approaches divergence - all gaps contribute equally';
+            } else if (s < 1.8) {
+                behaviorDiv.textContent = 'Gap 1 and Gap 2 nearly balanced (~45% vs 39%)';
+            } else if (s < 2.5) {
+                behaviorDiv.textContent = 'Twin primes (Gap 2) dominate - optimal for twin prime research';
+            } else if (s < 3.5) {
+                behaviorDiv.textContent = 'Gap 1 begins to dominate - twin prime influence fading';
+            } else if (s < 5) {
+                behaviorDiv.textContent = 'Gap 1 strongly dominant (~80%) - small primes control ζ(s)';
+            } else {
+                behaviorDiv.textContent = 'Gap 1 nearly total dominance (>90%) - prime 2 dominates everything';
             }
         }
         
