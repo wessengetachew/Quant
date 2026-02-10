@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -2045,7 +2045,8 @@
                 'gapDistTableContent',
                 'percentageTableContent',
                 'errorTableContent',
-                'logScaleTableContent'
+                'logScaleTableContent',
+                'stepByStepTableContent'
             ];
             
             tables.forEach(tableId => {
@@ -2054,6 +2055,7 @@
                 
                 const rows = table.querySelectorAll('tbody tr');
                 rows.forEach((row, index) => {
+                    row.style.cursor = 'pointer';
                     row.addEventListener('click', function() {
                         // Remove previous highlights
                         document.querySelectorAll('.stats-table tr.highlighted').forEach(r => {
@@ -2064,12 +2066,15 @@
                         this.classList.add('highlighted');
                         
                         // Get gap value from the row
-                        const gapCell = this.cells[0];
+                        const gapCell = this.cells[0] || this.cells[1]; // Try first or second column
                         if (gapCell) {
                             const gapValue = parseInt(gapCell.textContent);
                             if (!isNaN(gapValue)) {
                                 highlightedGap = gapValue;
                                 highlightGapOnCharts(gapValue);
+                                
+                                // Show detailed popup
+                                showGapDetails(gapValue);
                             }
                         }
                     });
@@ -3436,7 +3441,11 @@
         
         function renderConvergenceTableData(ctx, startY, canvasWidth) {
             const precision = parseInt(document.getElementById('convergencePrecision').value);
-            const data = analysisResults.progressiveProducts.slice(0, 10); // First 10 rows
+            
+            // Get row count from global export setting
+            const rowCountSetting = document.getElementById('globalExportRows')?.value || '15';
+            const maxRows = rowCountSetting === 'all' ? analysisResults.progressiveProducts.length : parseInt(rowCountSetting);
+            const data = analysisResults.progressiveProducts.slice(0, maxRows);
             
             const headers = ['Gap', 'Cumulative Product', 'Log Product', 'Target ζ(2)', 'Abs Error', 'Rel Error (%)'];
             const colW = (canvasWidth - 80) / headers.length;
@@ -3482,7 +3491,9 @@
         
         function renderGapContribTableData(ctx, startY, canvasWidth) {
             const precision = parseInt(document.getElementById('gapContribPrecision').value);
-            const gaps = analysisResults.evenGaps.slice(0, 10);
+            const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
+            const maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            const gaps = analysisResults.evenGaps.slice(0, maxRows);
             
             const headers = ['Gap', 'Product P_g', 'Log(P_g)', 'Prime Count', 'First Primes'];
             const colWidths = [0.1, 0.2, 0.2, 0.15, 0.35];
@@ -3533,7 +3544,9 @@
         
         function renderGapDistTableData(ctx, startY, canvasWidth) {
             const precision = parseInt(document.getElementById('gapDistPrecision').value);
-            const gaps = analysisResults.evenGaps.slice(0, 10);
+            const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
+            const maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            const gaps = analysisResults.evenGaps.slice(0, maxRows);
             
             const headers = ['Gap', 'Count', '% of Total', 'Cumulative', 'Cumulative %'];
             const colW = (canvasWidth - 80) / headers.length;
@@ -3580,7 +3593,9 @@
         
         function renderPercentageTableData(ctx, startY, canvasWidth) {
             const precision = parseInt(document.getElementById('percentagePrecision').value);
-            const gaps = analysisResults.evenGaps.slice(0, 10);
+            const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
+            const maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            const gaps = analysisResults.evenGaps.slice(0, maxRows);
             
             const headers = ['Gap', 'Contribution %', 'Product P_g', 'Ratio', 'Log Contrib'];
             const colW = (canvasWidth - 80) / headers.length;
@@ -3668,7 +3683,9 @@
         
         function renderLogScaleTableData(ctx, startY, canvasWidth) {
             const precision = parseInt(document.getElementById('logScalePrecision').value);
-            const gaps = analysisResults.evenGaps.slice(0, 10);
+            const rowCountSetting = document.getElementById("globalExportRows")?.value || "15";
+            const maxRows = rowCountSetting === "all" ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
+            const gaps = analysisResults.evenGaps.slice(0, maxRows);
             
             const headers = ['Gap', 'Log(P_g)', 'P_g', 'Count', 'Avg/Prime'];
             const colW = (canvasWidth - 80) / headers.length;
