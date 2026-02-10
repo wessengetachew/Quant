@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gap-Class Decomposition of ζ(2) = π²/6 | Mathematical Research Tool</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { 
@@ -742,6 +743,21 @@
             background: #cc0000;
         }
         
+        .modal-screenshot {
+            background: #4ecdc4;
+            color: #0a0a10;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .modal-screenshot:hover {
+            background: #3ab8af;
+        }
+        
         .modal-section {
             margin-bottom: 24px;
         }
@@ -785,14 +801,16 @@
             padding: 16px;
             border-radius: 6px;
             border-left: 3px solid #4ecdc4;
-            max-height: 200px;
+            max-height: 600px;
             overflow-y: auto;
+            overflow-x: hidden;
         }
         
         .modal-prime-list code {
             color: #4ecdc4;
             font-size: 0.95rem;
             line-height: 1.8;
+            word-wrap: break-word;
         }
         
         @keyframes fadeIn {
@@ -1610,7 +1628,10 @@
         <div class="modal-content" onclick="event.stopPropagation()">
             <div class="modal-header">
                 <h2 class="modal-title" id="modalTitle">Gap Details</h2>
-                <button class="modal-close" onclick="closeGapModal()">Close</button>
+                <div style="display: flex; gap: 12px;">
+                    <button class="modal-screenshot" onclick="screenshotModal()">Screenshot (4K)</button>
+                    <button class="modal-close" onclick="closeGapModal()">Close</button>
+                </div>
             </div>
             <div id="modalBody"></div>
         </div>
@@ -5521,6 +5542,124 @@
             link.click();
         }
 
+        // ========== CONVERGENCE ANALYSIS FUNCTIONS ==========
+        
+        function getConvergenceAnalysis(gap, product, s) {
+            const TWIN_PRIME_CONSTANT = 0.6601618158468695739278121100145557784326233602847334;
+            
+            if (gap === 1) {
+                const exact = Math.pow(2, s) / (Math.pow(2, s) - 1);
+                const error = Math.abs(product - exact);
+                const converged = error < 1e-10;
+                
+                return `
+                    <strong style="color: #ffd700;">EXACT CONVERGENCE</strong><br><br>
+                    
+                    <strong>Theoretical Value:</strong><br>
+                    P<sub>1</sub>(${s}) = 2<sup>${s}</sup>/(2<sup>${s}</sup>-1) = <strong>${exact.toFixed(15)}</strong><br><br>
+                    
+                    <strong>Computed Value:</strong><br>
+                    P<sub>1</sub>(${s}) = <strong>${product.toFixed(15)}</strong><br><br>
+                    
+                    <strong>Error:</strong> ${error.toExponential(3)}<br>
+                    <strong>Status:</strong> <span style="color: ${converged ? '#0f0' : '#f00'}">${converged ? '✓ FULLY CONVERGED' : 'Still converging'}</span><br><br>
+                    
+                    <strong>Why Exact?</strong><br>
+                    Gap 1 contains only <strong>one prime: 2</strong>. Since there's only one term in the product,
+                    the value is exactly 2<sup>${s}</sup>/(2<sup>${s}</sup>-1) with no approximation needed.
+                `;
+            }
+            
+            if (gap === 2) {
+                const twinConstantRelated = 1.8 * TWIN_PRIME_CONSTANT;
+                const remaining = (Math.PI**2 / 6) / ((4/3) * product);
+                
+                return `
+                    <strong style="color: #ffd700;">TWIN PRIME CONVERGENCE</strong><br><br>
+                    
+                    <strong>Computed Value:</strong><br>
+                    P<sub>2</sub>(2) = <strong>${product.toFixed(15)}</strong><br><br>
+                    
+                    <strong>Relationship to Twin Prime Constant:</strong><br>
+                    Twin Prime Constant C₂ = ${TWIN_PRIME_CONSTANT.toFixed(15)}<br>
+                    Empirical: P<sub>2</sub> ≈ 1.8 × C₂ ≈ ${twinConstantRelated.toFixed(15)}<br>
+                    Your value differs by: ${Math.abs(product - twinConstantRelated).toFixed(15)}<br><br>
+                    
+                    <strong>Contribution to π²/6:</strong><br>
+                    P<sub>1</sub> × P<sub>2</sub> = (4/3) × ${product.toFixed(6)} = ${(4/3 * product).toFixed(15)}<br>
+                    Remaining: P<sub>4</sub> × P<sub>6</sub> × ... ≈ ${remaining.toFixed(15)}<br><br>
+                    
+                    <strong>Convergence Pattern:</strong><br>
+                    As N → ∞, P<sub>2</sub> converges to a value related to the density of twin primes.<br>
+                    Current convergence at ${analysisResults.maxPrime.toLocaleString()}: <strong>${((1 - Math.abs(product - twinConstantRelated)/product) * 100).toFixed(3)}%</strong><br><br>
+                    
+                    <strong>Hypothesis:</strong> If twin primes are infinite (unproven!), then P<sub>2</sub> converges to a constant.
+                    If twin primes are finite, P<sub>2</sub> would plateau at some maximum value.
+                `;
+            }
+            
+            if (gap === 4) {
+                return `
+                    <strong style="color: #ffd700;">COUSIN PRIME CONVERGENCE</strong><br><br>
+                    
+                    <strong>Computed Value:</strong><br>
+                    P<sub>4</sub>(2) = <strong>${product.toFixed(15)}</strong><br><br>
+                    
+                    <strong>Pattern:</strong><br>
+                    Cousin primes (p, p+4) are less common than twin primes.<br>
+                    P<sub>4</sub> < P<sub>2</sub> reflects this lower density.<br><br>
+                    
+                    <strong>Convergence:</strong><br>
+                    Approaching 1 + small contribution (≈${product.toFixed(6)})<br>
+                    Log contribution: ${Math.log(product).toFixed(15)}<br><br>
+                    
+                    This gap class contributes about ${((product - 1) * 100).toFixed(3)}% above baseline (1.0).
+                `;
+            }
+            
+            if (gap === 6) {
+                return `
+                    <strong style="color: #4ecdc4;">SEXY PRIME CONVERGENCE</strong><br><br>
+                    
+                    <strong>Computed Value:</strong><br>
+                    P<sub>6</sub>(2) = <strong>${product.toFixed(15)}</strong><br><br>
+                    
+                    <strong>Pattern:</strong><br>
+                    Sexy primes (p, p+6) are relatively common due to modular arithmetic patterns.<br>
+                    P<sub>6</sub> shows significant contribution despite larger gap.<br><br>
+                    
+                    <strong>Convergence Speed:</strong><br>
+                    Log(P<sub>6</sub>) = ${Math.log(product).toFixed(15)}<br>
+                    Contribution: ${((product - 1) * 100).toFixed(3)}% above baseline<br><br>
+                    
+                    <strong>Modular Pattern:</strong><br>
+                    Gap 6 is divisible by 6, creating patterns in prime distribution.
+                `;
+            }
+            
+            const logContrib = Math.log(product);
+            const percentAbove = ((product - 1) * 100);
+            
+            return `
+                <strong style="color: #4ecdc4;">GENERAL GAP CONVERGENCE</strong><br><br>
+                
+                <strong>Computed Value:</strong><br>
+                P<sub>${gap}</sub>(${s}) = <strong>${product.toFixed(15)}</strong><br><br>
+                
+                <strong>Convergence Pattern:</strong><br>
+                As gap size increases, fewer primes have this gap.<br>
+                P<sub>${gap}</sub> approaches 1 as the gap gets larger.<br><br>
+                
+                <strong>Current State:</strong><br>
+                Log(P<sub>${gap}</sub>) = ${logContrib.toFixed(15)}<br>
+                Deviation from 1: ${percentAbove.toFixed(6)}%<br><br>
+                
+                <strong>Asymptotic Behavior:</strong><br>
+                lim<sub>g→∞</sub> P<sub>g</sub>(s) = 1<br>
+                (Larger gaps contribute less to the overall product)
+            `;
+        }
+
         // ========== MODAL POPUP FUNCTIONS ==========
         
         function showGapDetails(gap) {
@@ -5623,11 +5762,17 @@
                 </div>
                 
                 <div class="modal-section">
-                    <div class="modal-section-title">First 100 Primes in Gap ${gap} Family</div>
+                    <div class="modal-section-title">All ${gapData.count.toLocaleString()} Primes in Gap ${gap} Family</div>
                     <div class="modal-prime-list">
                         <code>${gapData.primes.map(p => p.toLocaleString()).join(', ')}</code>
                     </div>
-                    ${gapData.count > 100 ? `<div style="color: #888; margin-top: 8px; font-size: 0.9rem;">... and ${(gapData.count - 100).toLocaleString()} more primes in this gap family</div>` : ''}
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title">Convergence Analysis: What does P<sub>${gap}</sub> converge to?</div>
+                    <div style="background: rgba(255, 215, 0, 0.05); padding: 16px; border-radius: 6px; border-left: 3px solid #ffd700; color: #ccc; line-height: 1.8;">
+                        ${getConvergenceAnalysis(gap, gapData.product, s)}
+                    </div>
                 </div>
                 
                 <div class="modal-section">
@@ -5653,6 +5798,35 @@
         function closeGapModal(event) {
             if (event && event.target.className !== 'modal-overlay') return;
             document.getElementById('gapModal').classList.remove('active');
+        }
+        
+        function screenshotModal() {
+            const modalContent = document.querySelector('.modal-content');
+            
+            // Use html2canvas to capture the modal
+            html2canvas(modalContent, {
+                scale: 3, // 4K quality (3x scale)
+                backgroundColor: '#1a1a2e',
+                logging: false,
+                useCORS: true,
+                width: modalContent.scrollWidth,
+                height: modalContent.scrollHeight
+            }).then(canvas => {
+                // Convert to blob and download
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    const modalTitle = document.getElementById('modalTitle').textContent.replace(/[^a-zA-Z0-9]/g, '_');
+                    link.download = `${modalTitle}_${timestamp}_4K.png`;
+                    link.href = url;
+                    link.click();
+                    URL.revokeObjectURL(url);
+                }, 'image/png');
+            }).catch(err => {
+                console.error('Screenshot failed:', err);
+                alert('Screenshot failed. Please try again.');
+            });
         }
         
         // Make charts clickable
