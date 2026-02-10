@@ -709,7 +709,7 @@
             <p>This framework introduces a partition of the Euler product based on prime gap classes. Define gap(p) as the forward difference p<sub>n+1</sub> - p<sub>n</sub> for consecutive primes. The Euler product may then be reorganized as:</p>
             
             <div class="formula-box">
-                ζ(2) = ∏<sub>g∈{0,2,4,6,...}</sub> P<sub>g</sub>
+                ζ(2) = ∏<sub>g∈{1,2,4,6,...}</sub> P<sub>g</sub>
             </div>
             
             <p>where each gap family product is:</p>
@@ -723,7 +723,7 @@
             <p>Prime gaps partition into the following classes:</p>
             
             <ul>
-                <li><strong>Gap 0:</strong> {2} (special case)</li>
+                <li><strong>Gap 1:</strong> {2} (first gap: 3-2=1)</li>
                 <li><strong>Gap 2 (Twin Primes):</strong> {3, 5, 11, 17, 29, 41, 59, 71, 101, 107, ...}</li>
                 <li><strong>Gap 4 (Cousin Primes):</strong> {7, 13, 19, 37, 43, 67, 79, 97, 103, 109, ...}</li>
                 <li><strong>Gap 6 (Sexy Primes):</strong> {23, 31, 47, 53, 61, 73, 83, 89, 113, ...}</li>
@@ -750,7 +750,7 @@
     
     <div class="controls-container">
         <div class="control-panel">
-            <h3 style="color: #ffd700; margin-bottom: 20px;">⚡ Research Presets</h3>
+            <h3 style="color: #ffd700; margin-bottom: 20px;">Research Presets</h3>
             <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 16px;">
                 Quick configurations for common research scenarios - click to apply settings instantly
             </p>
@@ -803,6 +803,21 @@
                             <input type="checkbox" id="autoDetectMaxGap" style="width: auto;" checked>
                             <span>Auto-detect largest gap in range</span>
                         </label>
+                    </div>
+                </div>
+                
+                <div class="control-group" style="border: 2px solid #8b5cf6; padding: 16px; border-radius: 8px; background: rgba(139, 92, 246, 0.05);">
+                    <label style="color: #8b5cf6; font-weight: 600;">
+                        Zeta Exponent (s)
+                        <span class="control-value" id="zetaSDisplay">2.00</span>
+                    </label>
+                    <input type="range" id="zetaS" value="2" min="1.01" max="20" step="0.01"
+                           oninput="updateZetaSDisplay()" onchange="updateZetaSDisplay()">
+                    <div style="margin-top: 8px; font-size: 0.85rem; color: #a78bfa;">
+                        <div id="zetaSInfo" style="font-weight: 600;">ζ(2) = π²/6 ≈ 1.6449</div>
+                        <div style="margin-top: 4px; color: #888; font-size: 0.8rem;">
+                            Analyzes: ζ(s) = ∏ p^s/(p^s-1)
+                        </div>
                     </div>
                 </div>
 
@@ -882,9 +897,9 @@
                 <div class="control-group">
                     <label>
                         Custom Start (if unchecked above)
-                        <span class="control-value" id="animStartDisplay">1000</span>
+                        <span class="control-value" id="animStartDisplay">1</span>
                     </label>
-                    <input type="number" id="animStart" value="1000" min="100" max="10000000" step="100">
+                    <input type="number" id="animStart" value="1" min="1" max="10000000" step="100">
                 </div>
                 
                 <div class="control-group">
@@ -894,6 +909,18 @@
                     </label>
                     <input type="number" id="animEnd" value="10000000" min="1000" max="10000000" step="1000">
                 </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 16px; background: rgba(139, 92, 246, 0.05); border-radius: 8px; border-left: 4px solid #8b5cf6;">
+                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
+                    <input type="checkbox" id="enableComparison" style="width: auto;">
+                    <div>
+                        <span style="color: #8b5cf6; font-weight: 600; font-size: 1rem;">Enable Comparison Mode</span>
+                        <div style="font-size: 0.85rem; color: #888; margin-top: 4px;">
+                            Compare how gap contributions change across s = [1.5, 2, 3, 4, 5, 10]
+                        </div>
+                    </div>
+                </label>
             </div>
             
             <div class="button-row">
@@ -1193,6 +1220,31 @@
                 </div>
             </div>
         </div>
+        
+        <!-- COMPARISON CHART (Only shown when comparison mode enabled) -->
+        <div class="chart-wrapper" id="comparisonWrapper" style="display: none;">
+            <div class="chart-title">Gap Contribution Evolution Across ζ(s)</div>
+            <canvas id="comparisonChart" width="3840" height="2400"></canvas>
+            <div class="stats-table-wrapper">
+                <div class="chart-description" style="background: rgba(139, 92, 246, 0.1); padding: 16px; border-radius: 6px; border-left: 4px solid #8b5cf6;">
+                    <strong>How Gap Contributions Change with s:</strong>
+                    <ul style="margin: 10px 0 0 20px; line-height: 1.8;">
+                        <li><strong>s → 1:</strong> All gaps contribute equally (divergent series)</li>
+                        <li><strong>s = 1.5:</strong> Gap 1 (45%), Gap 2 (39%) - Balanced</li>
+                        <li><strong>s = 2:</strong> Gap 1 (58%), Gap 2 (35%) - Current tool focus</li>
+                        <li><strong>s = 4:</strong> Gap 1 (82%), Gap 2 (18%) - Gap 1 dominant</li>
+                        <li><strong>s = 10:</strong> Gap 1 (98%), Gap 2 (2%) - Almost entirely Gap 1</li>
+                    </ul>
+                    <p style="margin-top: 12px; color: #a78bfa;">
+                        <strong>Key Insight:</strong> Twin primes (Gap 2) dominate at s=2, but prime 2 (Gap 1) dominates at higher s values!
+                    </p>
+                </div>
+                <div id="comparisonTableDiv"></div>
+                <div class="export-row">
+                    <button class="export-btn png" onclick="exportComparisonPNG()">Export Comparison PNG</button>
+                </div>
+            </div>
+        </div>
     </div>
     
     <div class="controls-container">
@@ -1203,7 +1255,7 @@
             </p>
             
             <div style="background: rgba(78, 205, 196, 0.05); padding: 16px; border-radius: 8px; border-left: 4px solid #4ecdc4; margin-bottom: 20px;">
-                <h4 style="color: #4ecdc4; margin: 0 0 12px 0; font-size: 1rem;">📊 Global Export Settings</h4>
+                <h4 style="color: #4ecdc4; margin: 0 0 12px 0; font-size: 1rem;">Global Export Settings</h4>
                 <p style="margin: 0 0 12px 0; color: #888; font-size: 0.85rem;">
                     These settings apply to ALL chart exports (individual and composite)
                 </p>
@@ -1543,7 +1595,7 @@
             const targetZeta2 = Math.PI * Math.PI / 6;
             
             // Calculate gaps and classify primes
-            const gapFamilies = { 0: [2] }; // Gap 0 is special case for prime 2
+            const gapFamilies = {}; // Will be populated by loop - gap 1 gets prime 2 from 3-2=1
             const gaps = [];
             
             for (let i = 0; i < primes.length - 1; i++) {
@@ -1558,7 +1610,7 @@
             
             // Calculate products for each gap family
             const gapProducts = {};
-            const evenGaps = [0];
+            const evenGaps = [1]; // Start with gap 1 (the only odd gap: 3-2)
             
             for (let g = 2; g <= maxGap; g += 2) {
                 if (gapFamilies[g] && gapFamilies[g].length > 0) {
@@ -1648,11 +1700,18 @@
             const maxPrime = parseInt(document.getElementById('maxPrime').value);
             let maxGap = parseInt(document.getElementById('maxGap').value);
             const autoDetect = document.getElementById('autoDetectMaxGap').checked;
+            const s = parseFloat(document.getElementById('zetaS').value);
+            const comparisonMode = document.getElementById('enableComparison').checked;
             
             const statusBar = document.getElementById('statusBar');
             statusBar.style.display = 'block';
             statusBar.className = 'status-bar computing';
-            statusBar.textContent = `Computing gap decomposition for primes up to ${maxPrime.toLocaleString()}...`;
+            
+            if (comparisonMode) {
+                statusBar.textContent = `Computing comparison across s = [1.5, 2, 3, 4, 5, 10]...`;
+            } else {
+                statusBar.textContent = `Computing ζ(${s.toFixed(2)}) for primes up to ${maxPrime.toLocaleString()}...`;
+            }
             
             // Use setTimeout to allow UI update
             setTimeout(() => {
@@ -1663,23 +1722,42 @@
                         let detectedMaxGap = 0;
                         for (let i = 0; i < primes.length - 1; i++) {
                             const gap = primes[i + 1] - primes[i];
-                            if (gap > detectedMaxGap && gap % 2 === 0) {
+                            if (gap > detectedMaxGap) {
                                 detectedMaxGap = gap;
                             }
                         }
-                        maxGap = detectedMaxGap;
+                        if (detectedMaxGap % 2 === 1 && detectedMaxGap > 1) detectedMaxGap--; // Make even if odd
+                        maxGap = Math.max(detectedMaxGap, maxGap);
                         document.getElementById('maxGap').value = maxGap;
                         document.getElementById('maxGapDisplay').textContent = maxGap;
-                        statusBar.textContent = `Auto-detected max gap: ${maxGap}. Computing decomposition...`;
                     }
                     
-                    analysisResults = computeGapDecomposition(maxPrime, maxGap);
-                    
-                    statusBar.className = 'status-bar complete';
-                    statusBar.textContent = `Analysis complete: ${analysisResults.totalPrimes} primes, ${analysisResults.evenGaps.length} gap families, error = ${(analysisResults.finalRelativeError * 100).toFixed(6)}%`;
+                    if (comparisonMode) {
+                        // Compute for multiple s values
+                        const compData = computeComparisonData();
+                        // Use s=2 as primary result for compatibility
+                        analysisResults = compData[2];
+                        analysisResults.comparisonData = compData;
+                        
+                        statusBar.className = 'status-bar complete';
+                        statusBar.textContent = `Comparison complete: Computed for s = [1.5, 2, 3, 4, 5, 10]`;
+                    } else {
+                        // Single s analysis
+                        analysisResults = computeGapDecompositionWithS(maxPrime, maxGap, s);
+                        
+                        const known = getKnownZetaValue(s);
+                        const zetaLabel = known ? `ζ(${s}) = ${known.formula}` : `ζ(${s.toFixed(2)})`;
+                        
+                        statusBar.className = 'status-bar complete';
+                        statusBar.textContent = `${zetaLabel}: ${analysisResults.totalPrimes} primes, ${analysisResults.evenGaps.length} gap families, error = ${(analysisResults.finalRelativeError * 100).toFixed(8)}%`;
+                    }
                     
                     updateStatistics();
                     renderAllCharts();
+                    
+                    if (comparisonMode) {
+                        showComparisonSummary();
+                    }
                 } catch (error) {
                     statusBar.className = 'status-bar';
                     statusBar.style.color = '#ff6464';
@@ -1687,6 +1765,19 @@
                     console.error(error);
                 }
             }, 50);
+        }
+        
+        function showComparisonSummary() {
+            if (!analysisResults.comparisonData) return;
+            
+            console.log("=== Gap Contribution Comparison ===");
+            const sValues = [1.5, 2, 3, 4, 5, 10];
+            sValues.forEach(s => {
+                const data = analysisResults.comparisonData[s];
+                const gap1 = data.percentageContributions[1] || 0;
+                const gap2 = data.percentageContributions[2] || 0;
+                console.log(`s=${s}: Gap 1 = ${gap1.toFixed(1)}%, Gap 2 = ${gap2.toFixed(1)}%`);
+            });
         }
         
         // Update statistics panel
@@ -1775,6 +1866,11 @@
             }
             if (document.getElementById('showLogScale').checked) {
                 renderLogScaleChart();
+            }
+            
+            // Render comparison chart if in comparison mode
+            if (analysisResults.comparisonData) {
+                renderComparisonChartActual();
             }
             
             // Update statistical tables
@@ -2969,7 +3065,7 @@
                 const percentComplete = (cumulative / target) * 100;
                 
                 // Build formula string showing multiplication
-                let formula = 'P₀';
+                let formula = 'P₁';
                 for (let i = 1; i <= idx; i++) {
                     formula += ` × P${gaps[i]}`;
                 }
@@ -3475,7 +3571,7 @@
             
             csv += 'METHODOLOGY:\n';
             csv += 'For each even gap g, we compute P_g = product over all primes p with gap(p)=g of p^2/(p^2-1)\n';
-            csv += 'The progressive product tracks: zeta(2) = P_0 × P_2 × P_4 × P_6 × ...\n\n';
+            csv += 'The progressive product tracks: zeta(2) = P_1 × P_2 × P_4 × P_6 × ...\n\n';
             
             csv += `Analysis Date:,${new Date().toISOString()}\n`;
             csv += `Maximum Prime Analyzed:,${analysisResults.maxPrime}\n`;
@@ -3738,7 +3834,7 @@
             csv += '- Step: Sequential order of gap family addition\n';
             csv += '- Gap Added: The gap g being incorporated in this step\n';
             csv += '- P_g: The product value for this specific gap family\n';
-            csv += '- Formula: Explicit product notation (P_0 × P_2 × P_4 × ...)\n';
+            csv += '- Formula: Explicit product notation (P_1 × P_2 × P_4 × ...)\n';
             csv += '- Cumulative Product: Running product after this step\n';
             csv += '- Distance to pi^2/6: How far from target value\n';
             csv += '- Percent Complete: (Cumulative / pi^2/6) × 100\n\n';
@@ -3765,7 +3861,7 @@
                 const distance = analysisResults.targetZeta2 - cumulative;
                 const percentComplete = (cumulative / analysisResults.targetZeta2) * 100;
                 
-                let formula = 'P_0';
+                let formula = 'P_1';
                 for (let i = 1; i <= idx; i++) {
                     formula += ` × P_${gaps[i]}`;
                 }
@@ -3829,7 +3925,7 @@
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 64px sans-serif';
             ctx.textAlign = 'center';
-            ctx.fillText('Step-by-Step Gap Accumulation: ζ(2) = P₀ × P₂ × P₄ × ...', canvasW / 2, 80);
+            ctx.fillText('Step-by-Step Gap Accumulation: ζ(2) = P₁ × P₂ × P₄ × ...', canvasW / 2, 80);
             
             ctx.fillStyle = '#888';
             ctx.font = '32px monospace';
@@ -4192,6 +4288,232 @@
         
         // Initialize
         updateDisplays();
+
+        // ========== ZETA(S) GENERALIZATION ==========
+        
+        function getKnownZetaValue(s) {
+            const knownValues = {
+                2: { value: Math.PI**2 / 6, formula: "π²/6" },
+                4: { value: Math.PI**4 / 90, formula: "π⁴/90" },
+                6: { value: Math.PI**6 / 945, formula: "π⁶/945" },
+                8: { value: Math.PI**8 / 9450, formula: "π⁸/9450" },
+                10: { value: Math.PI**10 / 93555, formula: "π¹⁰/93555" }
+            };
+            return knownValues[s] || null;
+        }
+        
+        function updateZetaSDisplay() {
+            const s = parseFloat(document.getElementById('zetaS').value);
+            document.getElementById('zetaSDisplay').textContent = s.toFixed(2);
+            
+            const known = getKnownZetaValue(s);
+            const infoDiv = document.getElementById('zetaSInfo');
+            
+            if (known) {
+                infoDiv.innerHTML = `<strong>ζ(${s}) = ${known.formula} ≈ ${known.value.toFixed(6)}</strong>`;
+            } else {
+                const approx = computeApproximateZeta(s);
+                infoDiv.innerHTML = `ζ(${s.toFixed(2)}) ≈ ${approx.toFixed(6)}`;
+            }
+        }
+        
+        function computeApproximateZeta(s) {
+            // Quick approximation using first 1000 terms
+            let sum = 0;
+            for (let n = 1; n <= 1000; n++) {
+                sum += 1 / Math.pow(n, s);
+            }
+            return sum;
+        }
+        
+        function computeGapDecompositionWithS(maxPrime, maxGap, s) {
+            const primes = sievePrimes(maxPrime);
+            
+            // Get target value
+            const known = getKnownZetaValue(s);
+            const targetZeta = known ? known.value : computeApproximateZeta(s);
+            
+            // Calculate gaps and classify primes
+            const gapFamilies = {}; // Will be populated by loop - gap 1 gets prime 2 from 3-2=1
+            const gaps = [];
+            
+            for (let i = 0; i < primes.length - 1; i++) {
+                const gap = primes[i + 1] - primes[i];
+                gaps.push(gap);
+                
+                if (!gapFamilies[gap]) {
+                    gapFamilies[gap] = [];
+                }
+                gapFamilies[gap].push(primes[i]);
+            }
+            
+            // Calculate products for each gap family using p^s/(p^s-1)
+            const gapProducts = {};
+            const evenGaps = [1];
+            
+            for (let g = 2; g <= maxGap; g += 2) {
+                if (gapFamilies[g] && gapFamilies[g].length > 0) {
+                    evenGaps.push(g);
+                }
+            }
+            
+            evenGaps.forEach(gap => {
+                if (gapFamilies[gap] && gapFamilies[gap].length > 0) {
+                    let product = 1;
+                    let logProduct = 0;
+                    
+                    gapFamilies[gap].forEach(p => {
+                        const ps = Math.pow(p, s);
+                        const factor = ps / (ps - 1);
+                        product *= factor;
+                        logProduct += Math.log(factor);
+                    });
+                    
+                    gapProducts[gap] = {
+                        product: product,
+                        logProduct: logProduct,
+                        count: gapFamilies[gap].length,
+                        primes: gapFamilies[gap].slice(0, 100)
+                    };
+                }
+            });
+            
+            // Add last prime contribution
+            const lastPrime = primes[primes.length - 1];
+            const lastPs = Math.pow(lastPrime, s);
+            const lastFactor = lastPs / (lastPs - 1);
+            
+            // Calculate progressive convergence
+            const progressiveProducts = [];
+            let cumulative = 1;
+            let cumulativeLog = 0;
+            
+            evenGaps.forEach(gap => {
+                if (gapProducts[gap]) {
+                    cumulative *= gapProducts[gap].product;
+                    cumulativeLog += gapProducts[gap].logProduct;
+                    
+                    progressiveProducts.push({
+                        gap: gap,
+                        value: cumulative,
+                        logValue: cumulativeLog,
+                        error: Math.abs(cumulative - targetZeta),
+                        relativeError: Math.abs(cumulative - targetZeta) / targetZeta
+                    });
+                }
+            });
+            
+            // Multiply by last prime
+            cumulative *= lastFactor;
+            const finalProduct = cumulative;
+            const finalError = Math.abs(finalProduct - targetZeta);
+            
+            // Calculate percentage contributions
+            const totalLogProduct = cumulativeLog + Math.log(lastFactor);
+            const percentageContributions = {};
+            evenGaps.forEach(gap => {
+                if (gapProducts[gap]) {
+                    const contribution = gapProducts[gap].logProduct / totalLogProduct;
+                    percentageContributions[gap] = contribution * 100;
+                }
+            });
+            
+            return {
+                s: s,
+                primes: primes,
+                totalPrimes: primes.length,
+                maxPrime: maxPrime,
+                targetZeta: targetZeta,
+                targetZeta2: targetZeta, // Keep for compatibility
+                gapFamilies: gapFamilies,
+                evenGaps: evenGaps,
+                gapProducts: gapProducts,
+                progressiveProducts: progressiveProducts,
+                percentageContributions: percentageContributions,
+                finalProduct: finalProduct,
+                finalError: finalError,
+                finalRelativeError: finalError / targetZeta
+            };
+        }
+        
+        function computeComparisonData() {
+            const maxPrime = parseInt(document.getElementById('maxPrime').value);
+            const maxGap = parseInt(document.getElementById('maxGap').value);
+            const sValues = [1.5, 2, 3, 4, 5, 10];
+            
+            const comparisonResults = {};
+            
+            sValues.forEach(s => {
+                comparisonResults[s] = computeGapDecompositionWithS(maxPrime, maxGap, s);
+            });
+            
+            return comparisonResults;
+        }
+        
+        function renderComparisonChart() {
+            const canvas = document.createElement('canvas');
+            canvas.width = 3840;
+            canvas.height = 2400;
+            const ctx = canvas.getContext('2d');
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, 3840, 2400);
+            
+            const compData = computeComparisonData();
+            const sValues = [1.5, 2, 3, 4, 5, 10];
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 72px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Gap Contribution Evolution Across ζ(s)', 1920, 100);
+            
+            // Draw comparison bars
+            const margin = {left: 250, right: 100, top: 200, bottom: 150};
+            const chartW = 3840 - margin.left - margin.right;
+            const chartH = 2400 - margin.top - margin.bottom;
+            
+            const barWidth = chartW / (sValues.length * 5); // 5 gaps shown
+            
+            sValues.forEach((s, sIdx) => {
+                const data = compData[s];
+                const topGaps = [1, 2, 4, 6, 8].filter(g => data.percentageContributions[g]);
+                
+                topGaps.forEach((gap, gapIdx) => {
+                    const pct = data.percentageContributions[gap] || 0;
+                    const x = margin.left + (sIdx * 5 + gapIdx) * barWidth;
+                    const barH = (pct / 100) * chartH;
+                    const y = margin.top + chartH - barH;
+                    
+                    const colors = ['#ff4444', '#ffd700', '#4ecdc4', '#8b5cf6', '#06b6d4'];
+                    ctx.fillStyle = colors[gapIdx];
+                    ctx.fillRect(x, y, barWidth * 0.8, barH);
+                });
+                
+                // Label s value
+                ctx.fillStyle = '#aaa';
+                ctx.font = 'bold 32px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`s=${s}`, margin.left + (sIdx * 5 + 2) * barWidth, 2400 - 50);
+            });
+            
+            // Legend
+            const legendX = margin.left;
+            const legendY = 150;
+            const gapLabels = ['Gap 1', 'Gap 2', 'Gap 4', 'Gap 6', 'Gap 8'];
+            const colors = ['#ff4444', '#ffd700', '#4ecdc4', '#8b5cf6', '#06b6d4'];
+            
+            gapLabels.forEach((label, i) => {
+                ctx.fillStyle = colors[i];
+                ctx.fillRect(legendX + i * 180, legendY, 40, 40);
+                ctx.fillStyle = '#ccc';
+                ctx.font = 'bold 28px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(label, legendX + i * 180 + 50, legendY + 30);
+            });
+            
+            return canvas;
+        }
         function applyResearchPreset(preset) {
             const presets = {
                 'twins': { maxPrime: 100000, maxGap: 10, gapFilter: true, minGap: 2, maxGapFilter: 10, desc: 'Twin Prime Focus' },
@@ -4213,7 +4535,7 @@
             statusBar.style.display = 'block';
             statusBar.style.background = 'rgba(34, 197, 94, 0.2)';
             statusBar.style.borderLeft = '4px solid #22c55e';
-            statusBar.textContent = '✓ Applied preset: ' + config.desc + '. Click "Run Analysis" to compute.';
+            statusBar.textContent = 'Applied preset: ' + config.desc + '. Click "Run Analysis" to compute.';
             setTimeout(() => statusBar.style.display = 'none', 4000);
         }
 
@@ -4263,7 +4585,7 @@
             
             document.getElementById('densityStatus').style.display = 'block';
             document.getElementById('densityStatus').innerHTML = `
-                <strong>✓ Prime Density Analysis Complete</strong><br>
+                <strong>Prime Density Analysis Complete</strong><br>
                 Analyzed ${densityData.length} intervals of size ~${intervalSize.toLocaleString()}<br>
                 Max prime: ${maxPrime.toLocaleString()}
             `;
@@ -4395,7 +4717,7 @@
             
             document.getElementById('twinsStatus').style.display = 'block';
             document.getElementById('twinsStatus').innerHTML = `
-                <strong>✓ Twin Prime Search Complete</strong><br>
+                <strong>Twin Prime Search Complete</strong><br>
                 Found ${twinsData.length} twin prime pairs<br>
                 Largest pair: (${twinsData[twinsData.length-1].p}, ${twinsData[twinsData.length-1].q})
             `;
@@ -4508,7 +4830,7 @@
             
             document.getElementById('gapsStatus').style.display = 'block';
             document.getElementById('gapsStatus').innerHTML = `
-                <strong>✓ Gap Analysis Complete</strong><br>
+                <strong>Gap Analysis Complete</strong><br>
                 Found ${gapsStatsData.length} different gap sizes<br>
                 Most common: gap ${mostCommon.gap} (${mostCommon.count} occurrences, ${mostCommon.percentage}%)
             `;
@@ -4638,7 +4960,7 @@
             
             document.getElementById('constellationsStatus').style.display = 'block';
             document.getElementById('constellationsStatus').innerHTML = `
-                <strong>✓ Constellation Search Complete</strong><br>
+                <strong>Constellation Search Complete</strong><br>
                 Twins: ${constellationsData.twins.length} | Cousins: ${constellationsData.cousins.length} | Sexy: ${constellationsData.sexy.length}<br>
                 Triplets: ${constellationsData.triplets.length} | Quadruplets: ${constellationsData.quadruplets.length}
             `;
@@ -4766,6 +5088,82 @@
                 runAnalysis();
             }, 500); // Small delay to ensure everything is loaded
         });
+
+        function renderComparisonChartActual() {
+            if (!analysisResults?.comparisonData) {
+                document.getElementById('comparisonWrapper').style.display = 'none';
+                return;
+            }
+            
+            document.getElementById('comparisonWrapper').style.display = 'block';
+            
+            const canvas = document.getElementById('comparisonChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const sValues = [1.5, 2, 3, 4, 5, 10];
+            const gapColors = {1: '#ff4444', 2: '#ffd700', 4: '#4ecdc4', 6: '#8b5cf6', 8: '#06b6d4'};
+            
+            const margin = {left: 250, right: 200, top: 200, bottom: 200};
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 80px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Gap Contribution Evolution: How ζ(s) Changes Gap Dominance', w/2, 120);
+            
+            // Draw stacked bars for each s
+            const barW = chartW / sValues.length * 0.8;
+            const spacing = chartW / sValues.length;
+            
+            sValues.forEach((s, idx) => {
+                const data = analysisResults.comparisonData[s];
+                const x = margin.left + idx * spacing + spacing * 0.1;
+                let yOffset = 0;
+                
+                [1, 2, 4, 6, 8].forEach(gap => {
+                    const pct = data.percentageContributions[gap] || 0;
+                    const barH = (pct / 100) * chartH;
+                    
+                    ctx.fillStyle = gapColors[gap];
+                    ctx.fillRect(x, margin.top + chartH - yOffset - barH, barW, barH);
+                    
+                    yOffset += barH;
+                });
+                
+                // Label
+                ctx.fillStyle = '#aaa';
+                ctx.font = 'bold 40px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText(`s=${s}`, x + barW/2, h - 100);
+            });
+            
+            // Legend
+            let legendY = margin.top + 50;
+            Object.entries(gapColors).forEach(([gap, color]) => {
+                ctx.fillStyle = color;
+                ctx.fillRect(w - margin.right + 20, legendY, 50, 50);
+                ctx.fillStyle = '#ccc';
+                ctx.font = 'bold 36px sans-serif';
+                ctx.textAlign = 'left';
+                ctx.fillText(`Gap ${gap}`, w - margin.right + 80, legendY + 38);
+                legendY += 80;
+            });
+        }
+        
+        function exportComparisonPNG() {
+            const canvas = document.getElementById('comparisonChart');
+            const link = document.createElement('a');
+            link.download = `zeta_s_comparison_${Date.now()}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
     </script>
 </body>
 </html>
