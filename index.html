@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -679,6 +679,136 @@
             height: 1px;
             background: #3a3a5a;
             margin: 24px 0;
+        }
+        /* Modal Popup Styles */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            backdrop-filter: blur(4px);
+        }
+        
+        .modal-overlay.active {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            animation: fadeIn 0.2s;
+        }
+        
+        .modal-content {
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            border: 2px solid #ffd700;
+            border-radius: 12px;
+            padding: 32px;
+            max-width: 900px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5);
+            animation: slideIn 0.3s;
+        }
+        
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 24px;
+            padding-bottom: 16px;
+            border-bottom: 2px solid #ffd700;
+        }
+        
+        .modal-title {
+            color: #ffd700;
+            font-size: 1.8rem;
+            font-weight: bold;
+        }
+        
+        .modal-close {
+            background: #ff4444;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: bold;
+            font-size: 1.1rem;
+        }
+        
+        .modal-close:hover {
+            background: #cc0000;
+        }
+        
+        .modal-section {
+            margin-bottom: 24px;
+        }
+        
+        .modal-section-title {
+            color: #4ecdc4;
+            font-size: 1.3rem;
+            font-weight: bold;
+            margin-bottom: 12px;
+        }
+        
+        .modal-stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        
+        .modal-stat-item {
+            background: rgba(255, 215, 0, 0.05);
+            padding: 12px;
+            border-radius: 6px;
+            border-left: 3px solid #ffd700;
+        }
+        
+        .modal-stat-label {
+            color: #aaa;
+            font-size: 0.9rem;
+            margin-bottom: 4px;
+        }
+        
+        .modal-stat-value {
+            color: #fff;
+            font-size: 1.3rem;
+            font-weight: bold;
+            font-family: 'Courier New', monospace;
+        }
+        
+        .modal-prime-list {
+            background: rgba(78, 205, 196, 0.05);
+            padding: 16px;
+            border-radius: 6px;
+            border-left: 3px solid #4ecdc4;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        
+        .modal-prime-list code {
+            color: #4ecdc4;
+            font-size: 0.95rem;
+            line-height: 1.8;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+        
+        @keyframes slideIn {
+            from {
+                transform: translateY(-50px);
+                opacity: 0;
+            }
+            to {
+                transform: translateY(0);
+                opacity: 1;
+            }
         }
     </style>
 </head>
@@ -1474,6 +1604,17 @@
     
     
     <canvas id="compositeCanvas" style="display: none;"></canvas>
+    
+    <!-- Modal Popup for Gap Details -->
+    <div class="modal-overlay" id="gapModal" onclick="closeGapModal(event)">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h2 class="modal-title" id="modalTitle">Gap Details</h2>
+                <button class="modal-close" onclick="closeGapModal()">Close</button>
+            </div>
+            <div id="modalBody"></div>
+        </div>
+    </div>
     
     </div>
     <!-- END TAB: Main -->
@@ -5198,6 +5339,189 @@
             link.download = `zeta_s_comparison_${Date.now()}.png`;
             link.href = canvas.toDataURL('image/png');
             link.click();
+        }
+
+        // ========== MODAL POPUP FUNCTIONS ==========
+        
+        function showGapDetails(gap) {
+            if (!analysisResults) return;
+            
+            const modal = document.getElementById('gapModal');
+            const title = document.getElementById('modalTitle');
+            const body = document.getElementById('modalBody');
+            
+            const gapData = analysisResults.gapProducts[gap];
+            if (!gapData) {
+                alert(`No data available for gap ${gap}`);
+                return;
+            }
+            
+            const s = analysisResults.s || 2;
+            const known = getKnownZetaValue(s);
+            const zetaLabel = known ? `ζ(${s}) = ${known.formula}` : `ζ(${s.toFixed(2)})`;
+            
+            // Calculate additional statistics
+            const pctContribution = analysisResults.percentageContributions[gap] || 0;
+            const avgPrimeInGap = gapData.primes.reduce((a, b) => a + b, 0) / gapData.primes.length;
+            
+            // Find constellation type
+            let gapType = '';
+            if (gap === 1) gapType = 'Only Odd Gap (3-2=1)';
+            else if (gap === 2) gapType = 'Twin Primes (p, p+2)';
+            else if (gap === 4) gapType = 'Cousin Primes (p, p+4)';
+            else if (gap === 6) gapType = 'Sexy Primes (p, p+6)';
+            else if (gap % 6 === 0) gapType = 'Divisible by 6';
+            else gapType = 'General Gap';
+            
+            title.textContent = `Gap ${gap} - Detailed Analysis`;
+            
+            body.innerHTML = `
+                <div class="modal-section">
+                    <div class="modal-section-title">Basic Information</div>
+                    <div class="modal-stat-grid">
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Gap Size</div>
+                            <div class="modal-stat-value">${gap}</div>
+                        </div>
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Constellation Type</div>
+                            <div class="modal-stat-value" style="font-size: 1rem;">${gapType}</div>
+                        </div>
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Prime Count in Gap Family</div>
+                            <div class="modal-stat-value">${gapData.count.toLocaleString()}</div>
+                        </div>
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Current s Value</div>
+                            <div class="modal-stat-value">s = ${s.toFixed(2)}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title">Gap Product: P<sub>${gap}</sub>(s)</div>
+                    <div class="modal-stat-grid">
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Product Value P<sub>${gap}</sub></div>
+                            <div class="modal-stat-value">${gapData.product.toFixed(12)}</div>
+                        </div>
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Log Product (log P<sub>${gap}</sub>)</div>
+                            <div class="modal-stat-value">${gapData.logProduct.toFixed(12)}</div>
+                        </div>
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Contribution to log(${zetaLabel})</div>
+                            <div class="modal-stat-value">${pctContribution.toFixed(6)}%</div>
+                        </div>
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Formula</div>
+                            <div class="modal-stat-value" style="font-size: 0.9rem;">∏<sub>p∈Gap${gap}</sub> p<sup>${s.toFixed(1)}</sup>/(p<sup>${s.toFixed(1)}</sup>-1)</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title">Statistical Properties</div>
+                    <div class="modal-stat-grid">
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Average Prime in Gap</div>
+                            <div class="modal-stat-value">${avgPrimeInGap.toFixed(2)}</div>
+                        </div>
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Smallest Prime</div>
+                            <div class="modal-stat-value">${Math.min(...gapData.primes).toLocaleString()}</div>
+                        </div>
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Largest Prime (shown)</div>
+                            <div class="modal-stat-value">${Math.max(...gapData.primes).toLocaleString()}</div>
+                        </div>
+                        <div class="modal-stat-item">
+                            <div class="modal-stat-label">Density (primes per 1000)</div>
+                            <div class="modal-stat-value">${((gapData.count / analysisResults.maxPrime) * 1000).toFixed(3)}</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title">First 100 Primes in Gap ${gap} Family</div>
+                    <div class="modal-prime-list">
+                        <code>${gapData.primes.map(p => p.toLocaleString()).join(', ')}</code>
+                    </div>
+                    ${gapData.count > 100 ? `<div style="color: #888; margin-top: 8px; font-size: 0.9rem;">... and ${(gapData.count - 100).toLocaleString()} more primes in this gap family</div>` : ''}
+                </div>
+                
+                <div class="modal-section">
+                    <div class="modal-section-title">Mathematical Context</div>
+                    <div style="background: rgba(139, 92, 246, 0.05); padding: 16px; border-radius: 6px; border-left: 3px solid #8b5cf6; color: #ccc; line-height: 1.8;">
+                        <strong>Gap Decomposition Theorem:</strong><br>
+                        ζ(s) = ∏<sub>g∈{1,2,4,6,...}</sub> P<sub>g</sub>(s)<br><br>
+                        
+                        For this gap:<br>
+                        P<sub>${gap}</sub>(${s.toFixed(2)}) = ${gapData.product.toFixed(6)}<br>
+                        Contributing ${pctContribution.toFixed(2)}% to the logarithmic product.<br><br>
+                        
+                        ${gap === 1 ? '<strong style="color: #ffd700;">Special Note:</strong> Gap 1 contains only prime 2, the only even prime and the only odd gap (3-2=1).' : ''}
+                        ${gap === 2 ? '<strong style="color: #ffd700;">Twin Prime Note:</strong> These are primes p where p+2 is also prime. They dominate ζ(2) decomposition!' : ''}
+                        ${gap === 6 ? '<strong style="color: #4ecdc4;">Sexy Prime Note:</strong> These are primes p where p+6 is also prime, named "sexy" from Latin "sex" (six).' : ''}
+                    </div>
+                </div>
+            `;
+            
+            modal.classList.add('active');
+        }
+        
+        function closeGapModal(event) {
+            if (event && event.target.className !== 'modal-overlay') return;
+            document.getElementById('gapModal').classList.remove('active');
+        }
+        
+        // Make charts clickable
+        function addChartClickHandlers() {
+            const chartIds = ['gapContribChart', 'gapDistChart', 'percentageChart', 'errorChart', 'logScaleChart'];
+            
+            chartIds.forEach(chartId => {
+                const canvas = document.getElementById(chartId);
+                if (!canvas) return;
+                
+                canvas.style.cursor = 'pointer';
+                canvas.onclick = (e) => handleChartClick(e, chartId);
+            });
+        }
+        
+        function handleChartClick(event, canvasId) {
+            if (!analysisResults) return;
+            
+            const canvas = event.target;
+            const rect = canvas.getBoundingClientRect();
+            const x = event.clientX - rect.left;
+            const y = event.clientY - rect.top;
+            
+            // Scale to canvas coordinates
+            const scaleX = canvas.width / rect.width;
+            const scaleY = canvas.height / rect.height;
+            const canvasX = x * scaleX;
+            const canvasY = y * scaleY;
+            
+            // Determine which gap was clicked based on chart type
+            const gaps = getFilteredGaps();
+            const margin = {left: 250, right: 150, top: 200, bottom: 150};
+            const chartW = canvas.width - margin.left - margin.right;
+            const chartH = canvas.height - margin.top - margin.bottom;
+            
+            // Check if click is in chart area
+            if (canvasX < margin.left || canvasX > canvas.width - margin.right ||
+                canvasY < margin.top || canvasY > canvas.height - margin.bottom) {
+                return;
+            }
+            
+            // Determine clicked gap (assuming vertical bar chart layout)
+            const barWidth = chartW / gaps.length;
+            const clickedIndex = Math.floor((canvasX - margin.left) / barWidth);
+            
+            if (clickedIndex >= 0 && clickedIndex < gaps.length) {
+                const clickedGap = gaps[clickedIndex];
+                showGapDetails(clickedGap);
+            }
         }
     </script>
 </body>
