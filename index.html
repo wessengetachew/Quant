@@ -903,6 +903,10 @@
                 Quick configurations for common research scenarios - click to apply settings instantly
             </p>
             <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 30px;">
+                <button onclick="applyResearchPreset('complete')" class="preset-btn" style="background: #ffd700; color: #000; padding: 10px;">
+                    <strong>⭐ Complete Analysis</strong><br>
+                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 10M, All Gaps</span>
+                </button>
                 <button onclick="applyResearchPreset('twins')" class="preset-btn" style="background: #dc2626; padding: 10px;">
                     <strong>Twin Prime Focus</strong><br>
                     <span style="font-size: 0.85em; opacity: 0.9;">Primes: 100K, Gaps: 2-10</span>
@@ -3546,11 +3550,11 @@
             ctx.font = 'bold 32px monospace';
             const targetData = [
                 'Target',
-                '∞',
+                '=',
                 zetaLabel,
                 analysisResults.targetZeta2.toFixed(precision),
                 '0.0',
-                '100.0'
+                '0.0'
             ];
             
             targetData.forEach((cell, colIdx) => {
@@ -3628,7 +3632,13 @@
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
-            const targetData = ['Target', '∞', '1.0', analysisResults.targetZeta2.toFixed(precision), 'ALL'];
+            const totalProduct = analysisResults.finalProduct;
+            const totalLogProduct = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.logProduct || 0), 0);
+            const totalPrimes = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
+            const s = analysisResults.s || 2;
+            const known = getKnownZetaValue(s);
+            const zetaLabel = known ? known.formula : `ζ(${s.toFixed(1)})`;
+            const targetData = ['Target', zetaLabel, totalLogProduct.toFixed(precision), totalPrimes.toLocaleString(), 'ALL'];
             
             xPos = 0; // Reuse existing xPos variable
             targetData.forEach((cell, colIdx) => {
@@ -3702,7 +3712,9 @@
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
-            const targetData = ['Total', analysisResults.totalPrimes.toLocaleString(), '100.0%', analysisResults.totalPrimes.toLocaleString(), '100.0%'];
+            const displayedTotal = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
+            const displayedPercentage = (displayedTotal / analysisResults.totalPrimes * 100).toFixed(precision);
+            const targetData = ['Total', displayedTotal.toLocaleString(), displayedPercentage + '%', displayedTotal.toLocaleString(), displayedPercentage + '%'];
             
             targetData.forEach((cell, colIdx) => {
                 ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
@@ -4893,6 +4905,7 @@
         }
         function applyResearchPreset(preset) {
             const presets = {
+                'complete': { maxPrime: 10000000, maxGap: 500, gapFilter: false, minGap: 1, maxGapFilter: 500, desc: 'Complete Analysis - 10 Million Primes' },
                 'twins': { maxPrime: 100000, maxGap: 10, gapFilter: true, minGap: 2, maxGapFilter: 10, desc: 'Twin Prime Focus' },
                 'goldbach': { maxPrime: 500000, maxGap: 30, gapFilter: false, minGap: 2, maxGapFilter: 30, desc: 'Goldbach Range' },
                 'topology': { maxPrime: 1000000, maxGap: 150, gapFilter: true, minGap: 30, maxGapFilter: 90, desc: 'Large Gap Topology' },
