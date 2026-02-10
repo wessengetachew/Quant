@@ -1,4 +1,4 @@
-
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -1620,6 +1620,7 @@
     <!-- END TAB: Main -->
 
     <script>
+        // Gap Decomposition Analyzer v2.1 - Fixed xPos scope issue
         // Global variables
         let analysisResults = null;
         let animationId = null;
@@ -3505,10 +3506,40 @@
                 });
             });
             
-            // Return actual height used
+            // Add TARGET row
+            const targetY = startY + 60 + data.length * 50;
+            
+            // Target row background (gold border)
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            
+            // Target row data
+            const s = analysisResults.s || 2;
+            const known = getKnownZetaValue(s);
+            const zetaLabel = known ? known.formula : `ζ(${s.toFixed(1)})`;
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px monospace';
+            const targetData = [
+                'Target',
+                '∞',
+                zetaLabel,
+                analysisResults.targetZeta2.toFixed(precision),
+                '0.0',
+                '100.0'
+            ];
+            
+            targetData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            });
+            
+            // Return actual height used (including target row)
             const tableHeaderH = 60;
             const rowHeight = 50;
-            return tableHeaderH + (data.length * rowHeight);
+            return tableHeaderH + (data.length * rowHeight) + rowHeight; // +1 for target row
         }
         
         function renderGapContribTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3566,7 +3597,28 @@
                 });
             });
             
-            return 60 + (gaps.length * 50); // Header + rows
+            // Add TARGET row
+            const targetY = startY + 60 + gaps.length * 50;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px monospace';
+            const targetData = ['Target', '∞', '1.0', analysisResults.targetZeta2.toFixed(precision), 'ALL'];
+            
+            xPos = 0; // Reuse existing xPos variable
+            targetData.forEach((cell, colIdx) => {
+                const w = (canvasWidth - 80) * colWidths[colIdx];
+                ctx.textAlign = colIdx === 4 ? 'left' : 'center';
+                const textX = colIdx === 4 ? 40 + xPos + 10 : 40 + xPos + w / 2;
+                ctx.fillText(cell, textX, targetY + 35);
+                xPos += w;
+            });
+            
+            return 60 + (gaps.length * 50) + 50; // Header + rows + target
         }
         
         function renderGapDistTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3619,7 +3671,23 @@
                 });
             });
             
-            return 60 + (gaps.length * 50); // Header + rows
+            // Add TARGET row
+            const targetY = startY + 60 + gaps.length * 50;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px monospace';
+            const targetData = ['Total', analysisResults.totalPrimes.toLocaleString(), '100.0%', analysisResults.totalPrimes.toLocaleString(), '100.0%'];
+            
+            targetData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            });
+            
+            return 60 + (gaps.length * 50) + 50; // Header + rows + target
         }
         
         function renderPercentageTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3670,7 +3738,24 @@
                 });
             });
             
-            return 60 + (gaps.length * 50);
+            // Add TARGET row  
+            const targetY = startY + 60 + gaps.length * 50;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px monospace';
+            const totalLogProduct = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.logProduct || 0), 0);
+            const targetData = ['Total', '100.0%', analysisResults.targetZeta2.toFixed(precision), '1.0', totalLogProduct.toFixed(precision)];
+            
+            targetData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            });
+            
+            return 60 + (gaps.length * 50) + 50;
         }
         
         function renderErrorTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3719,7 +3804,23 @@
                 });
             });
             
-            return 60 + (data.length * 50);
+            // Add TARGET row
+            const targetY = startY + 60 + data.length * 50;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px monospace';
+            const targetData = ['Target', analysisResults.targetZeta2.toFixed(precision), '0.0', '0.0%', '—'];
+            
+            targetData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            });
+            
+            return 60 + (data.length * 50) + 50;
         }
         
         function renderLogScaleTableData(ctx, startY, canvasWidth, maxRows) {
@@ -3769,7 +3870,24 @@
                 });
             });
             
-            return 60 + (gaps.length * 50);
+            // Add TARGET row
+            const targetY = startY + 60 + gaps.length * 50;
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(40, targetY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, targetY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px monospace';
+            const totalLog = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.logProduct || 0), 0);
+            const targetData = ['Total', totalLog.toFixed(precision), analysisResults.targetZeta2.toFixed(precision), analysisResults.totalPrimes.toLocaleString(), '—'];
+            
+            targetData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
+            });
+            
+            return 60 + (gaps.length * 50) + 50;
         }
         
         function generateConvergenceCSV() {
