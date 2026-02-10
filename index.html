@@ -3545,16 +3545,17 @@
             const s = analysisResults.s || 2;
             const known = getKnownZetaValue(s);
             const zetaLabel = known ? known.formula : `ζ(${s.toFixed(1)})`;
+            const targetLogValue = Math.log(analysisResults.targetZeta2);
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
             const targetData = [
                 'Target',
-                '=',
-                zetaLabel,
+                analysisResults.targetZeta2.toFixed(precision),
+                targetLogValue.toFixed(precision),
                 analysisResults.targetZeta2.toFixed(precision),
                 '0.0',
-                '0.0'
+                '0.0%'
             ];
             
             targetData.forEach((cell, colIdx) => {
@@ -3632,13 +3633,10 @@
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
-            const totalProduct = analysisResults.finalProduct;
             const totalLogProduct = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.logProduct || 0), 0);
+            const totalProduct = Math.exp(totalLogProduct);
             const totalPrimes = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
-            const s = analysisResults.s || 2;
-            const known = getKnownZetaValue(s);
-            const zetaLabel = known ? known.formula : `ζ(${s.toFixed(1)})`;
-            const targetData = ['Target', zetaLabel, totalLogProduct.toFixed(precision), totalPrimes.toLocaleString(), 'ALL'];
+            const targetData = ['Target', totalProduct.toFixed(precision), totalLogProduct.toFixed(precision), totalPrimes.toLocaleString(), 'ALL'];
             
             xPos = 0; // Reuse existing xPos variable
             targetData.forEach((cell, colIdx) => {
@@ -3782,7 +3780,10 @@
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
             const totalLogProduct = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.logProduct || 0), 0);
-            const targetData = ['Total', '100.0%', analysisResults.targetZeta2.toFixed(precision), '1.0', totalLogProduct.toFixed(precision)];
+            const totalPercentage = gaps.reduce((sum, gap) => sum + (analysisResults.percentageContributions[gap] || 0), 0);
+            const totalProduct = Math.exp(totalLogProduct);
+            const totalRatio = totalProduct / analysisResults.targetZeta2;
+            const targetData = ['Total', totalPercentage.toFixed(precision) + '%', totalProduct.toFixed(precision), totalRatio.toFixed(precision), totalLogProduct.toFixed(precision)];
             
             targetData.forEach((cell, colIdx) => {
                 ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
@@ -3914,7 +3915,10 @@
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
             const totalLog = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.logProduct || 0), 0);
-            const targetData = ['Total', totalLog.toFixed(precision), analysisResults.targetZeta2.toFixed(precision), analysisResults.totalPrimes.toLocaleString(), '—'];
+            const totalCount = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
+            const totalProduct = Math.exp(totalLog);
+            const avgLogPerPrime = totalCount > 0 ? (totalLog / totalCount).toFixed(precision) : '—';
+            const targetData = ['Total', totalLog.toFixed(precision), totalProduct.toFixed(precision), totalCount.toLocaleString(), avgLogPerPrime];
             
             targetData.forEach((cell, colIdx) => {
                 ctx.fillText(cell, 40 + colIdx * colW + colW / 2, targetY + 35);
@@ -4367,13 +4371,20 @@
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 36px monospace';
             
+            // Show the actual state at the last displayed gap (not theoretical infinity)
+            const lastGap = gaps[gaps.length - 1];
+            const lastData = analysisResults.gapProducts[lastGap];
+            const lastCumulative = analysisResults.progressiveProducts[gaps.length - 1].value;
+            const lastDistance = analysisResults.targetZeta2 - lastCumulative;
+            const lastPercentComplete = (lastCumulative / analysisResults.targetZeta2) * 100;
+            
             const targetData = [
-                'Target',
-                '∞',
-                '1.0',
-                analysisResults.targetZeta2.toFixed(precision),
-                '0.' + '0'.repeat(precision),
-                '100.' + '0'.repeat(precision) + '%'
+                'Total',
+                lastGap.toString(),
+                lastData.product.toFixed(precision),
+                lastCumulative.toFixed(precision),
+                lastDistance.toFixed(precision),
+                lastPercentComplete.toFixed(precision) + '%'
             ];
             
             xPos = padding;
