@@ -1551,7 +1551,7 @@
         </div>
 
         <!-- Analysis Statistics (Fixed toggle) -->
-        <div id="statsPanel" class="dropdown-section" style="display: none; border: 2px solid #22c55e;">
+        <div id="statsPanel" class="dropdown-section active" style="display: none; border: 2px solid #22c55e;">
             <div class="dropdown-header" onclick="toggleSection(this)" style="background: rgba(34, 197, 94, 0.1);">
                 <h3 style="color: #22c55e;">Analysis Statistics</h3>
                 <span class="dropdown-icon" style="color: #22c55e;">▼</span>
@@ -2040,7 +2040,8 @@
             <div class="modal-header">
                 <h2 class="modal-title" id="modalTitle">Gap Details</h2>
                 <div style="display: flex; gap: 12px;">
-                    <button class="modal-screenshot" onclick="screenshotModal()">Screenshot (4K)</button>
+                    <button class="modal-screenshot" onclick="screenshotModalPart1()" style="font-size: 0.85rem; padding: 8px 12px;">Part 1 (4K)</button>
+                    <button class="modal-screenshot" onclick="screenshotModalPart2()" style="font-size: 0.85rem; padding: 8px 12px;">Part 2 (4K)</button>
                     <button class="modal-close" onclick="closeGapModal()">Close</button>
                 </div>
             </div>
@@ -3551,7 +3552,9 @@
             
             displayData.forEach(row => {
                 html += `
-                    <tr>
+                    <tr class="gap-row" data-gap="${row.gap}" style="cursor: pointer; transition: background 0.2s;" 
+                        onmouseover="this.style.background='rgba(78, 205, 196, 0.1)'" 
+                        onmouseout="this.style.background=''">
                         <td>${row.gap}</td>
                         <td>${row.value.toFixed(precision)}</td>
                         <td>${row.logValue.toFixed(precision)}</td>
@@ -3607,7 +3610,9 @@
                 const data = analysisResults.gapProducts[gap];
                 const primeList = data.primes.slice(0, 10).join(', ');
                 html += `
-                    <tr>
+                    <tr class="gap-row" data-gap="${gap}" style="cursor: pointer; transition: background 0.2s;" 
+                        onmouseover="this.style.background='rgba(78, 205, 196, 0.1)'" 
+                        onmouseout="this.style.background=''">
                         <td>${gap}</td>
                         <td>${data.product.toFixed(precision)}</td>
                         <td>${data.logProduct.toFixed(precision)}</td>
@@ -3668,7 +3673,9 @@
                 const cumulativePercentage = (cumulative / totalPrimes) * 100;
                 
                 html += `
-                    <tr>
+                    <tr class="gap-row" data-gap="${gap}" style="cursor: pointer; transition: background 0.2s;" 
+                        onmouseover="this.style.background='rgba(78, 205, 196, 0.1)'" 
+                        onmouseout="this.style.background=''">
                         <td>${gap}</td>
                         <td>${data.count}</td>
                         <td>${percentage.toFixed(precision)}%</td>
@@ -3725,7 +3732,9 @@
                 const ratio = data.product / analysisResults.targetZeta2;
                 
                 html += `
-                    <tr>
+                    <tr class="gap-row" data-gap="${gap}" style="cursor: pointer; transition: background 0.2s;" 
+                        onmouseover="this.style.background='rgba(78, 205, 196, 0.1)'" 
+                        onmouseout="this.style.background=''">
                         <td>${gap}</td>
                         <td>${percentage.toFixed(precision)}%</td>
                         <td>${data.product.toFixed(precision)}</td>
@@ -3776,7 +3785,9 @@
                 const errorReduction = idx > 0 ? ((prevError - row.relativeError) / prevError * 100) : 0;
                 
                 html += `
-                    <tr>
+                    <tr class="gap-row" data-gap="${row.gap}" style="cursor: pointer; transition: background 0.2s;" 
+                        onmouseover="this.style.background='rgba(78, 205, 196, 0.1)'" 
+                        onmouseout="this.style.background=''">
                         <td>${row.gap}</td>
                         <td>${row.value.toFixed(precision)}</td>
                         <td>${row.error.toExponential(precision)}</td>
@@ -3833,7 +3844,9 @@
                 const avgLogPerPrime = data.logProduct / data.count;
                 
                 html += `
-                    <tr>
+                    <tr class="gap-row" data-gap="${gap}" style="cursor: pointer; transition: background 0.2s;" 
+                        onmouseover="this.style.background='rgba(78, 205, 196, 0.1)'" 
+                        onmouseout="this.style.background=''">
                         <td>${gap}</td>
                         <td>${data.logProduct.toFixed(precision)}</td>
                         <td>${data.product.toFixed(precision)}</td>
@@ -3900,7 +3913,9 @@
                 }
                 
                 html += `
-                    <tr>
+                    <tr class="gap-row" data-gap="${gap}" style="cursor: pointer; transition: background 0.2s;" 
+                        onmouseover="this.style.background='rgba(78, 205, 196, 0.1)'" 
+                        onmouseout="this.style.background=''">
                         <td>${idx + 1}</td>
                         <td>${gap}</td>
                         <td>${data.product.toFixed(precision)}</td>
@@ -6690,7 +6705,13 @@
         }
         
         function showGapDetails(gap) {
+            console.log('showGapDetails called with gap:', gap, 'type:', typeof gap);
+            
             if (!analysisResults) return;
+            
+            // Ensure gap is a number (might come as string from onclick attribute)
+            gap = parseInt(gap);
+            console.log('After parseInt, gap:', gap);
             
             // First, expand inline detail sections
             expandInlineGapDetail(gap);
@@ -6700,8 +6721,12 @@
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
             
+            console.log('Looking for gapData with key:', gap);
+            console.log('Available keys in gapProducts:', Object.keys(analysisResults.gapProducts));
+            
             const gapData = analysisResults.gapProducts[gap];
             if (!gapData) {
+                console.error('No gapData found for gap:', gap);
                 alert(`No data available for gap ${gap}`);
                 return;
             }
@@ -6726,6 +6751,7 @@
             title.textContent = `Gap ${gap} - Detailed Analysis`;
             
             body.innerHTML = `
+                <div id="modalPart1">
                 <div class="modal-section">
                     <div class="modal-section-title">Basic Information</div>
                     <div class="modal-stat-grid">
@@ -6806,7 +6832,9 @@
                         Showing all ${gapData.count.toLocaleString()} primes. Scroll to see more.
                     </div>
                 </div>
+                </div>
                 
+                <div id="modalPart2">
                 <div class="modal-section">
                     <div class="modal-section-title">Convergence Analysis: What does P<sub>${gap}</sub> converge to?</div>
                     <div style="background: rgba(255, 215, 0, 0.05); padding: 16px; border-radius: 6px; border-left: 3px solid #ffd700; color: #ccc; line-height: 1.8;">
@@ -6829,6 +6857,7 @@
                         ${gap === 6 ? '<strong style="color: #4ecdc4;">Sexy Prime Note:</strong> These are primes p where p+6 is also prime, named "sexy" from Latin "sex" (six).' : ''}
                     </div>
                 </div>
+                </div>
             `;
             
             modal.classList.add('active');
@@ -6839,25 +6868,106 @@
             document.getElementById('gapModal').classList.remove('active');
         }
         
-        function screenshotModal() {
-            const modalContent = document.querySelector('.modal-content');
+        function screenshotModalPart1() {
+            const modalHeader = document.querySelector('.modal-header');
+            const modalPart1 = document.getElementById('modalPart1');
             
-            // Use html2canvas to capture the modal
-            html2canvas(modalContent, {
+            if (!modalPart1) {
+                alert('Modal content not found');
+                return;
+            }
+            
+            // Clone header and part 1
+            const headerClone = modalHeader.cloneNode(true);
+            const part1Clone = modalPart1.cloneNode(true);
+            
+            // Find the prime list container and preserve its current scroll state/visible content
+            const originalPrimeList = modalPart1.querySelector('.modal-prime-list');
+            const clonedPrimeList = part1Clone.querySelector('.modal-prime-list');
+            
+            if (originalPrimeList && clonedPrimeList) {
+                // Set max-height to match what's visible (not expanded)
+                const visibleHeight = originalPrimeList.clientHeight;
+                clonedPrimeList.style.maxHeight = visibleHeight + 'px';
+                clonedPrimeList.style.overflow = 'hidden';
+                
+                // Preserve scroll position
+                clonedPrimeList.scrollTop = originalPrimeList.scrollTop;
+            }
+            
+            // Create a temporary container with header and part 1
+            const tempContainer = document.createElement('div');
+            tempContainer.style.cssText = 'position: absolute; left: -9999px; background: #1a1a2e; padding: 24px; max-width: 1200px;';
+            
+            tempContainer.appendChild(headerClone);
+            tempContainer.appendChild(part1Clone);
+            document.body.appendChild(tempContainer);
+            
+            // Use html2canvas to capture
+            html2canvas(tempContainer, {
                 scale: 3, // 4K quality (3x scale)
                 backgroundColor: '#1a1a2e',
                 logging: false,
                 useCORS: true,
-                width: modalContent.scrollWidth,
-                height: modalContent.scrollHeight
+                width: tempContainer.scrollWidth,
+                height: tempContainer.scrollHeight
             }).then(canvas => {
+                // Remove temp container
+                document.body.removeChild(tempContainer);
+                
                 // Convert to blob and download
                 canvas.toBlob(blob => {
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
                     const modalTitle = document.getElementById('modalTitle').textContent.replace(/[^a-zA-Z0-9]/g, '_');
-                    link.download = `${modalTitle}_${timestamp}_4K.png`;
+                    link.download = `${modalTitle}_Part1_${timestamp}_4K.png`;
+                    link.href = url;
+                    link.click();
+                });
+            });
+        }
+        
+        function screenshotModalPart2() {
+            const modalHeader = document.querySelector('.modal-header');
+            const modalPart2 = document.getElementById('modalPart2');
+            
+            if (!modalPart2) {
+                alert('Modal content not found');
+                return;
+            }
+            
+            // Create a temporary container with header and part 2
+            const tempContainer = document.createElement('div');
+            tempContainer.style.cssText = 'position: absolute; left: -9999px; background: #1a1a2e; padding: 24px;';
+            
+            // Clone header and part 2
+            const headerClone = modalHeader.cloneNode(true);
+            const part2Clone = modalPart2.cloneNode(true);
+            
+            tempContainer.appendChild(headerClone);
+            tempContainer.appendChild(part2Clone);
+            document.body.appendChild(tempContainer);
+            
+            // Use html2canvas to capture
+            html2canvas(tempContainer, {
+                scale: 3, // 4K quality (3x scale)
+                backgroundColor: '#1a1a2e',
+                logging: false,
+                useCORS: true,
+                width: tempContainer.scrollWidth,
+                height: tempContainer.scrollHeight
+            }).then(canvas => {
+                // Remove temp container
+                document.body.removeChild(tempContainer);
+                
+                // Convert to blob and download
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    const modalTitle = document.getElementById('modalTitle').textContent.replace(/[^a-zA-Z0-9]/g, '_');
+                    link.download = `${modalTitle}_Part2_${timestamp}_4K.png`;
                     link.href = url;
                     link.click();
                 });
@@ -6964,12 +7074,21 @@
                 return;
             }
             
-            // Determine clicked gap (assuming vertical bar chart layout)
-            const barWidth = chartW / gaps.length;
-            const clickedIndex = Math.floor((canvasX - margin.left) / barWidth);
+            // Account for bar spacing - bars use 80% of available width
+            const totalBarArea = chartW / gaps.length;
+            const barWidth = totalBarArea * 0.8;
+            const gapWidth = totalBarArea * 0.2;
             
-            if (clickedIndex >= 0 && clickedIndex < gaps.length) {
-                const clickedGap = gaps[clickedIndex];
+            // Determine clicked gap with spacing consideration
+            const relativeX = canvasX - margin.left;
+            const clickedIndex = Math.floor(relativeX / totalBarArea);
+            
+            // Verify click is actually on a bar (not in the gap between bars)
+            const barStartX = clickedIndex * totalBarArea;
+            const clickXInBar = relativeX - barStartX;
+            
+            if (clickedIndex >= 0 && clickedIndex < gaps.length && clickXInBar <= barWidth) {
+                const clickedGap = parseInt(gaps[clickedIndex]);
                 showGapDetails(clickedGap);
             }
         }
@@ -7107,6 +7226,16 @@
             // Restore original results
             analysisResults = originalResults;
         }
+        
+        // Event delegation for gap row clicks
+        document.addEventListener('click', function(e) {
+            const row = e.target.closest('.gap-row');
+            if (row && row.dataset.gap) {
+                const gap = parseInt(row.dataset.gap);
+                console.log('Row clicked, gap:', gap);
+                showGapDetails(gap);
+            }
+        });
     </script>
 </body>
 </html>
