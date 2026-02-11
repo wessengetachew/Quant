@@ -1036,20 +1036,6 @@
                     </label>
                     <input type="number" id="maxPrime" value="10000000" min="1000" max="10000000" step="1000">
                 </div>
-                
-                <div class="control-group">
-                    <label>
-                        Maximum Gap to Analyze
-                        <span class="control-value" id="maxGapDisplay">50</span>
-                    </label>
-                    <input type="number" id="maxGap" value="50" min="2" max="1000" step="2">
-                    <div style="margin-top: 8px;">
-                        <label style="display: flex; align-items: center; gap: 8px; font-size: 0.85rem;">
-                            <input type="checkbox" id="autoDetectMaxGap" style="width: auto;" checked>
-                            <span>Auto-detect largest gap in range</span>
-                        </label>
-                    </div>
-                </div>
             </div>
             
             <div class="button-row" style="margin-top: 20px;">
@@ -1945,7 +1931,7 @@
         }
         
         // Core analysis function
-        function computeGapDecomposition(maxPrime, maxGap) {
+        function computeGapDecomposition(maxPrime) {
             const primes = sievePrimes(maxPrime);
             const targetZeta2 = Math.PI * Math.PI / 6;
             
@@ -1965,13 +1951,10 @@
             
             // Calculate products for each gap family
             const gapProducts = {};
-            const evenGaps = [1]; // Start with gap 1 (the only odd gap: 3-2)
             
-            for (let g = 2; g <= maxGap; g += 2) {
-                if (gapFamilies[g] && gapFamilies[g].length > 0) {
-                    evenGaps.push(g);
-                }
-            }
+            // Find all unique gaps that actually exist in the data
+            const uniqueGaps = new Set(gaps);
+            const evenGaps = Array.from(uniqueGaps).sort((a, b) => a - b);
             
             evenGaps.forEach(gap => {
                 if (gapFamilies[gap] && gapFamilies[gap].length > 0) {
@@ -2013,6 +1996,11 @@
                 }
             });
             
+            // Calculate total primes actually included in analysis (those with gaps <= maxGap)
+            const totalPrimesInAnalysis = evenGaps.reduce((sum, gap) => {
+                return sum + (gapProducts[gap]?.count || 0);
+            }, 0);
+            
             // Calculate percentage contributions
             const percentageContributions = {};
             evenGaps.forEach(gap => {
@@ -2024,8 +2012,10 @@
             
             return {
                 primes: primes,
-                totalPrimes: primes.length,
+                totalPrimes: totalPrimesInAnalysis,  // Only count primes with gaps <= maxGap
+                allPrimesFound: primes.length,        // Total primes found in range
                 maxPrime: maxPrime,
+                maxGapFound: evenGaps.length > 0 ? Math.max(...evenGaps) : 0,  // Largest gap found
                 targetZeta2: targetZeta2,
                 gapFamilies: gapFamilies,
                 gapProducts: gapProducts,
@@ -2034,7 +2024,8 @@
                 percentageContributions: percentageContributions,
                 finalProduct: cumulative,
                 finalError: Math.abs(cumulative - targetZeta2),
-                finalRelativeError: Math.abs(cumulative - targetZeta2) / targetZeta2
+                finalRelativeError: Math.abs(cumulative - targetZeta2) / targetZeta2,
+                s: s
             };
         }
         
@@ -2042,8 +2033,6 @@
         function updateDisplays() {
             document.getElementById('maxPrimeDisplay').textContent = 
                 parseInt(document.getElementById('maxPrime').value).toLocaleString();
-            document.getElementById('maxGapDisplay').textContent = 
-                document.getElementById('maxGap').value;
             document.getElementById('animStartDisplay').textContent = 
                 parseInt(document.getElementById('animStart').value).toLocaleString();
             document.getElementById('animEndDisplay').textContent = 
@@ -2053,8 +2042,6 @@
         // Run analysis
         function runAnalysis() {
             const maxPrime = parseInt(document.getElementById('maxPrime').value);
-            let maxGap = parseInt(document.getElementById('maxGap').value);
-            const autoDetect = document.getElementById('autoDetectMaxGap').checked;
             const s = parseFloat(document.getElementById('zetaS').value);
             const comparisonMode = document.getElementById('enableComparison').checked;
             
@@ -2071,22 +2058,6 @@
             // Use setTimeout to allow UI update
             setTimeout(() => {
                 try {
-                    // First pass to detect max gap if needed
-                    if (autoDetect) {
-                        const primes = sievePrimes(maxPrime);
-                        let detectedMaxGap = 0;
-                        for (let i = 0; i < primes.length - 1; i++) {
-                            const gap = primes[i + 1] - primes[i];
-                            if (gap > detectedMaxGap) {
-                                detectedMaxGap = gap;
-                            }
-                        }
-                        if (detectedMaxGap % 2 === 1 && detectedMaxGap > 1) detectedMaxGap--; // Make even if odd
-                        maxGap = Math.max(detectedMaxGap, maxGap);
-                        document.getElementById('maxGap').value = maxGap;
-                        document.getElementById('maxGapDisplay').textContent = maxGap;
-                    }
-                    
                     if (comparisonMode) {
                         // Compute for multiple s values
                         const compData = computeComparisonData();
@@ -2098,13 +2069,14 @@
                         statusBar.textContent = `Comparison complete: Computed for s = [1.5, 2, 3, 4, 5, 10]`;
                     } else {
                         // Single s analysis
-                        analysisResults = computeGapDecompositionWithS(maxPrime, maxGap, s);
+                        analysisResults = computeGapDecompositionWithS(maxPrime, s);
                         
                         const known = getKnownZetaValue(s);
                         const zetaLabel = known ? `ζ(${s}) = ${known.formula}` : `ζ(${s.toFixed(2)})`;
+                        const maxGapFound = Math.max(...analysisResults.evenGaps);
                         
                         statusBar.className = 'status-bar complete';
-                        statusBar.textContent = `${zetaLabel}: ${analysisResults.totalPrimes} primes, ${analysisResults.evenGaps.length} gap families, error = ${(analysisResults.finalRelativeError * 100).toFixed(8)}%`;
+                        statusBar.textContent = `${zetaLabel}: ${analysisResults.totalPrimes.toLocaleString()} primes, ${analysisResults.evenGaps.length} gap families (max gap: ${maxGapFound}), error = ${(analysisResults.finalRelativeError * 100).toFixed(8)}%`;
                     }
                     
                     updateStatistics();
@@ -3011,7 +2983,6 @@
         
         // Event listeners
         document.getElementById('maxPrime').addEventListener('input', updateDisplays);
-        document.getElementById('maxGap').addEventListener('input', updateDisplays);
         document.getElementById('animStart').addEventListener('input', updateDisplays);
         document.getElementById('animEnd').addEventListener('input', updateDisplays);
         
@@ -3818,32 +3789,8 @@
                 });
             });
             
-            // Add LIMIT row (theoretical limits as gap→∞)
-            const limitY = startY + 60 + gaps.length * 50;
-            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
-            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
-            ctx.strokeStyle = '#8b5cf6';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
-            
-            ctx.fillStyle = '#8b5cf6';
-            ctx.font = 'bold 32px monospace';
-            const s = analysisResults.s || 2;
-            const known = getKnownZetaValue(s);
-            const zetaLabel = known ? known.formula : `ζ(${s.toFixed(1)})`;
-            const limitData = ['Limit', '1.0', '0.0', '0', '—'];
-            
-            xPos = 0;
-            limitData.forEach((cell, colIdx) => {
-                const w = (canvasWidth - 80) * colWidths[colIdx];
-                ctx.textAlign = colIdx === 4 ? 'left' : 'center';
-                const textX = colIdx === 4 ? 40 + xPos + 10 : 40 + xPos + w / 2;
-                ctx.fillText(cell, textX, limitY + 35);
-                xPos += w;
-            });
-            
-            // Add DISPLAYED row (cumulative totals for shown gaps)
-            const displayedY = limitY + 50;
+            // Add DISPLAYED row (cumulative totals for shown gaps only)
+            const displayedY = startY + 60 + gaps.length * 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
             ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
@@ -3854,15 +3801,47 @@
             ctx.font = 'bold 32px monospace';
             const totalLogProduct = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.logProduct || 0), 0);
             const totalProduct = Math.exp(totalLogProduct);
-            const totalPrimes = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
-            const displayedData = ['Displayed', totalProduct.toFixed(precision), totalLogProduct.toFixed(precision), totalPrimes.toLocaleString(), 'Shown'];
+            const totalPrimesDisplayed = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
             
-            xPos = 0;
+            ctx.textAlign = 'left';
+            ctx.fillText('Displayed', 50, displayedY + 35);
+            
+            const displayedData = [totalProduct.toFixed(precision), totalLogProduct.toFixed(precision), totalPrimesDisplayed.toLocaleString(), 'Shown'];
+            
+            xPos = colWidths[0] * (canvasWidth - 80);
             displayedData.forEach((cell, colIdx) => {
-                const w = (canvasWidth - 80) * colWidths[colIdx];
-                ctx.textAlign = colIdx === 4 ? 'left' : 'center';
-                const textX = colIdx === 4 ? 40 + xPos + 10 : 40 + xPos + w / 2;
+                const w = (canvasWidth - 80) * colWidths[colIdx + 1];
+                ctx.textAlign = colIdx === 3 ? 'left' : 'center';
+                const textX = colIdx === 3 ? 40 + xPos + 10 : 40 + xPos + w / 2;
                 ctx.fillText(cell, textX, displayedY + 35);
+                xPos += w;
+            });
+            
+            // Add LIMIT row (theoretical limits as gap→∞)
+            const limitY = displayedY + 50;
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.font = 'bold 32px monospace';
+            
+            ctx.textAlign = 'left';
+            ctx.fillText('Limit', 50, limitY + 35);
+            
+            const s = analysisResults.s || 2;
+            const known = getKnownZetaValue(s);
+            const zetaLabel = known ? known.formula : `ζ(${s.toFixed(1)})`;
+            const limitData = ['1.0', '0.0', analysisResults.totalPrimes.toLocaleString(), '—'];
+            
+            xPos = colWidths[0] * (canvasWidth - 80);
+            limitData.forEach((cell, colIdx) => {
+                const w = (canvasWidth - 80) * colWidths[colIdx + 1];
+                ctx.textAlign = colIdx === 3 ? 'left' : 'center';
+                const textX = colIdx === 3 ? 40 + xPos + 10 : 40 + xPos + w / 2;
+                ctx.fillText(cell, textX, limitY + 35);
                 xPos += w;
             });
             
@@ -3919,24 +3898,8 @@
                 });
             });
             
-            // Add LIMIT row (theoretical limits)
-            const limitY = startY + 60 + gaps.length * 50;
-            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
-            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
-            ctx.strokeStyle = '#8b5cf6';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
-            
-            ctx.fillStyle = '#8b5cf6';
-            ctx.font = 'bold 32px monospace';
-            const limitData = ['Limit', '0', '0.0%', '∞', '100.0%'];
-            
-            limitData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, limitY + 35);
-            });
-            
-            // Add DISPLAYED row (totals for shown gaps)
-            const displayedY = limitY + 50;
+            // Add DISPLAYED row (totals for shown gaps only)
+            const displayedY = startY + 60 + gaps.length * 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
             ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
@@ -3945,12 +3908,36 @@
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText('Displayed', 50, displayedY + 35);
+            
+            ctx.textAlign = 'center';
             const displayedTotal = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
             const displayedPercentage = (displayedTotal / analysisResults.totalPrimes * 100).toFixed(precision);
-            const displayedData = ['Displayed', displayedTotal.toLocaleString(), displayedPercentage + '%', displayedTotal.toLocaleString(), displayedPercentage + '%'];
+            const displayedData = [displayedTotal.toLocaleString(), displayedPercentage + '%', displayedTotal.toLocaleString(), displayedPercentage + '%'];
             
             displayedData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, displayedY + 35);
+                ctx.fillText(cell, 40 + (colIdx + 1) * colW + colW / 2, displayedY + 35);
+            });
+            
+            // Add LIMIT row (all primes analyzed)
+            const limitY = displayedY + 50;
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.font = 'bold 32px monospace';
+            ctx.textAlign = 'left';
+            ctx.fillText('Limit', 50, limitY + 35);
+            
+            ctx.textAlign = 'center';
+            const limitData = [analysisResults.totalPrimes.toLocaleString(), '100.0%', analysisResults.totalPrimes.toLocaleString(), '100.0%'];
+            
+            limitData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + (colIdx + 1) * colW + colW / 2, limitY + 35);
             });
             
             return 60 + (gaps.length * 50) + 100; // Header + rows + 2 summary rows
@@ -4004,24 +3991,8 @@
                 });
             });
             
-            // Add LIMIT row (theoretical limits)
-            const limitY = startY + 60 + gaps.length * 50;
-            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
-            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
-            ctx.strokeStyle = '#8b5cf6';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
-            
-            ctx.fillStyle = '#8b5cf6';
-            ctx.font = 'bold 32px monospace';
-            const limitData = ['Limit', '0.0%', '1.0', '—', '0.0'];
-            
-            limitData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, limitY + 35);
-            });
-            
-            // Add DISPLAYED row (totals for shown gaps)
-            const displayedY = limitY + 50;
+            // Add DISPLAYED row (totals for shown gaps only)
+            const displayedY = startY + 60 + gaps.length * 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
             ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
@@ -4034,10 +4005,36 @@
             const totalPercentage = gaps.reduce((sum, gap) => sum + (analysisResults.percentageContributions[gap] || 0), 0);
             const totalProduct = Math.exp(totalLogProduct);
             const totalRatio = totalProduct / analysisResults.targetZeta2;
-            const displayedData = ['Displayed', totalPercentage.toFixed(precision) + '%', totalProduct.toFixed(precision), totalRatio.toFixed(precision), totalLogProduct.toFixed(precision)];
+            
+            ctx.textAlign = 'left';
+            ctx.fillText('Displayed', 50, displayedY + 35);
+            
+            ctx.textAlign = 'center';
+            const displayedData = [totalPercentage.toFixed(precision) + '%', totalProduct.toFixed(precision), totalRatio.toFixed(precision), totalLogProduct.toFixed(precision)];
             
             displayedData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, displayedY + 35);
+                ctx.fillText(cell, 40 + (colIdx + 1) * colW + colW / 2, displayedY + 35);
+            });
+            
+            // Add LIMIT row (theoretical limits)
+            const limitY = displayedY + 50;
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.font = 'bold 32px monospace';
+            
+            ctx.textAlign = 'left';
+            ctx.fillText('Limit', 50, limitY + 35);
+            
+            ctx.textAlign = 'center';
+            const limitData = ['100.0%', analysisResults.targetZeta2.toFixed(precision), '1.0', '—'];
+            
+            limitData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + (colIdx + 1) * colW + colW / 2, limitY + 35);
             });
             
             return 60 + (gaps.length * 50) + 100;
@@ -4101,8 +4098,12 @@
             const lastLogError = Math.log10(lastRow.relativeError);
             ctx.fillStyle = '#4ecdc4';
             ctx.font = 'bold 32px monospace';
+            
+            ctx.textAlign = 'left';
+            ctx.fillText('Displayed', 50, displayedY + 35);
+            
+            ctx.textAlign = 'center';
             const displayedData = [
-                'Displayed',
                 lastRow.value.toFixed(precision),
                 lastRow.error.toExponential(precision),
                 (lastRow.relativeError * 100).toFixed(precision) + '%',
@@ -4110,7 +4111,7 @@
             ];
             
             displayedData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, displayedY + 35);
+                ctx.fillText(cell, 40 + (colIdx + 1) * colW + colW / 2, displayedY + 35);
             });
             
             // Add LIMIT row (theoretical target)
@@ -4123,10 +4124,15 @@
             
             ctx.fillStyle = '#ffd700';
             ctx.font = 'bold 32px monospace';
-            const limitData = ['Limit', analysisResults.targetZeta2.toFixed(precision), '0.0', '0.0%', '—'];
+            
+            ctx.textAlign = 'left';
+            ctx.fillText('Limit', 50, limitY + 35);
+            
+            ctx.textAlign = 'center';
+            const limitData = [analysisResults.targetZeta2.toFixed(precision), '0.0', '0.0%', '—'];
             
             limitData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, limitY + 35);
+                ctx.fillText(cell, 40 + (colIdx + 1) * colW + colW / 2, limitY + 35);
             });
             
             return 60 + (data.length * 50) + 100;
@@ -4179,24 +4185,8 @@
                 });
             });
             
-            // Add LIMIT row (theoretical limits)
-            const limitY = startY + 60 + gaps.length * 50;
-            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
-            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
-            ctx.strokeStyle = '#8b5cf6';
-            ctx.lineWidth = 3;
-            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
-            
-            ctx.fillStyle = '#8b5cf6';
-            ctx.font = 'bold 32px monospace';
-            const limitData = ['Limit', '0.0', '1.0', '0', '—'];
-            
-            limitData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, limitY + 35);
-            });
-            
-            // Add DISPLAYED row (totals for shown gaps)
-            const displayedY = limitY + 50;
+            // Add DISPLAYED row (totals for shown gaps only)
+            const displayedY = startY + 60 + gaps.length * 50;
             ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
             ctx.fillRect(40, displayedY, canvasWidth - 80, 50);
             ctx.strokeStyle = '#ffd700';
@@ -4209,10 +4199,36 @@
             const totalCount = gaps.reduce((sum, gap) => sum + (analysisResults.gapProducts[gap]?.count || 0), 0);
             const totalProduct = Math.exp(totalLog);
             const avgLogPerPrime = totalCount > 0 ? (totalLog / totalCount).toFixed(precision) : '—';
-            const displayedData = ['Displayed', totalLog.toFixed(precision), totalProduct.toFixed(precision), totalCount.toLocaleString(), avgLogPerPrime];
+            
+            ctx.textAlign = 'left';
+            ctx.fillText('Displayed', 50, displayedY + 35);
+            
+            ctx.textAlign = 'center';
+            const displayedData = [totalLog.toFixed(precision), totalProduct.toFixed(precision), totalCount.toLocaleString(), avgLogPerPrime];
             
             displayedData.forEach((cell, colIdx) => {
-                ctx.fillText(cell, 40 + colIdx * colW + colW / 2, displayedY + 35);
+                ctx.fillText(cell, 40 + (colIdx + 1) * colW + colW / 2, displayedY + 35);
+            });
+            
+            // Add LIMIT row (theoretical limits)
+            const limitY = displayedY + 50;
+            ctx.fillStyle = 'rgba(139, 92, 246, 0.1)';
+            ctx.fillRect(40, limitY, canvasWidth - 80, 50);
+            ctx.strokeStyle = '#8b5cf6';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, limitY, canvasWidth - 80, 50);
+            
+            ctx.fillStyle = '#8b5cf6';
+            ctx.font = 'bold 32px monospace';
+            
+            ctx.textAlign = 'left';
+            ctx.fillText('Limit', 50, limitY + 35);
+            
+            ctx.textAlign = 'center';
+            const limitData = ['0.0', '1.0', analysisResults.totalPrimes.toLocaleString(), '—'];
+            
+            limitData.forEach((cell, colIdx) => {
+                ctx.fillText(cell, 40 + (colIdx + 1) * colW + colW / 2, limitY + 35);
             });
             
             return 60 + (gaps.length * 50) + 100;
@@ -5042,7 +5058,7 @@
             return sum;
         }
         
-        function computeGapDecompositionWithS(maxPrime, maxGap, s) {
+        function computeGapDecompositionWithS(maxPrime, s) {
             const primes = sievePrimes(maxPrime);
             
             // Get target value
@@ -5065,13 +5081,10 @@
             
             // Calculate products for each gap family using p^s/(p^s-1)
             const gapProducts = {};
-            const evenGaps = [1];
             
-            for (let g = 2; g <= maxGap; g += 2) {
-                if (gapFamilies[g] && gapFamilies[g].length > 0) {
-                    evenGaps.push(g);
-                }
-            }
+            // Find all unique gaps that actually exist in the data
+            const uniqueGaps = new Set(gaps);
+            const evenGaps = Array.from(uniqueGaps).sort((a, b) => a - b);
             
             evenGaps.forEach(gap => {
                 if (gapFamilies[gap] && gapFamilies[gap].length > 0) {
