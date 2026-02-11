@@ -1034,7 +1034,63 @@
                         Maximum Prime
                         <span class="control-value" id="maxPrimeDisplay">10000000</span>
                     </label>
-                    <input type="number" id="maxPrime" value="10000000" min="1000" max="10000000" step="1000">
+                    <input type="number" id="maxPrime" value="10000000" min="1000" max="100000000" step="1000000">
+                    <div style="margin-top: 8px; font-size: 0.85rem; color: #888;">
+                        Note: Values > 10M may take significant time
+                    </div>
+                </div>
+            </div>
+            
+            <div style="margin-top: 20px; padding: 16px; background: rgba(78, 205, 196, 0.05); border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                <h4 style="color: #4ecdc4; margin: 0 0 12px 0; font-size: 1rem;">Alternative Data Sources</h4>
+                <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px;">
+                    For ranges beyond 100M or to use pre-computed prime lists
+                </p>
+                
+                <div style="display: grid; gap: 12px;">
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-size: 0.9rem; color: #e0e0e0;">
+                            Upload Prime List (CSV/TXT)
+                        </label>
+                        <input type="file" id="primeFileUpload" accept=".txt,.csv" 
+                               style="width: 100%; padding: 8px; background: #1a1a2a; border: 1px solid #3a3a5a; border-radius: 4px; color: #e0e0e0;"
+                               onchange="handlePrimeFileUpload(event)">
+                        <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">
+                            Format: One prime per line or comma-separated<br>
+                            Sources: <a href="https://primes.utm.edu/lists/" target="_blank" style="color: #4ecdc4;">Prime Pages</a> | 
+                            <a href="https://oeis.org/A000040/b000040.txt" target="_blank" style="color: #4ecdc4;">OEIS A000040</a>
+                        </div>
+                    </div>
+                    
+                    <div>
+                        <label style="display: block; margin-bottom: 6px; font-size: 0.9rem; color: #e0e0e0;">
+                            OEIS A000040 (Prime Numbers Database)
+                        </label>
+                        <div style="display: flex; gap: 8px; align-items: flex-end;">
+                            <div style="flex: 1;">
+                                <label style="display: block; font-size: 0.75rem; color: #888; margin-bottom: 4px;">
+                                    Fetch first N primes
+                                </label>
+                                <input type="number" id="oeisCount" value="100000" min="1000" max="1000000" step="10000"
+                                       style="width: 100%; padding: 6px; background: #1a1a2a; border: 1px solid #3a3a5a; border-radius: 4px; color: #e0e0e0;">
+                            </div>
+                            <button class="btn btn-secondary" onclick="fetchFromOEIS()" style="flex-shrink: 0;">
+                                Fetch from OEIS
+                            </button>
+                        </div>
+                        <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">
+                            OEIS API provides up to 1M primes. For billions, upload a file.
+                        </div>
+                    </div>
+                </div>
+                
+                <div id="uploadStatus" style="margin-top: 12px; padding: 8px; background: rgba(255, 215, 0, 0.1); border-radius: 4px; display: none;">
+                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                        <span style="color: #ffd700; font-size: 0.85rem;"></span>
+                        <button class="btn btn-secondary" onclick="clearCustomPrimes()" style="padding: 4px 12px; font-size: 0.75rem;">
+                            Clear & Use Sieve
+                        </button>
+                    </div>
                 </div>
             </div>
             
@@ -1912,6 +1968,13 @@
         
         // Sieve of Eratosthenes
         function sievePrimes(max) {
+            // If custom prime list is loaded, use it instead of computing
+            if (customPrimeList && customPrimeList.length > 0) {
+                // Filter to primes <= max
+                return customPrimeList.filter(p => p <= max);
+            }
+            
+            // Otherwise, compute using sieve
             const sieve = new Array(max + 1).fill(true);
             sieve[0] = sieve[1] = false;
             
@@ -2027,6 +2090,119 @@
                 finalRelativeError: Math.abs(cumulative - targetZeta2) / targetZeta2,
                 s: s
             };
+        }
+        
+        // Global variable to store uploaded/fetched primes
+        let customPrimeList = null;
+        
+        // Handle file upload
+        function handlePrimeFileUpload(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+            
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.querySelector('span').textContent = 'Loading file...';
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const content = e.target.result;
+                    
+                    // Parse primes from file (handle CSV or one-per-line)
+                    let primes = [];
+                    if (content.includes(',')) {
+                        // CSV format
+                        primes = content.split(',').map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+                    } else {
+                        // One per line
+                        primes = content.split(/\r?\n/).map(s => parseInt(s.trim())).filter(n => !isNaN(n) && n > 0);
+                    }
+                    
+                    // Sort and deduplicate
+                    primes = Array.from(new Set(primes)).sort((a, b) => a - b);
+                    
+                    if (primes.length === 0) {
+                        statusDiv.querySelector('span').textContent = 'Error: No valid primes found in file';
+                        statusDiv.style.background = 'rgba(255, 100, 100, 0.1)';
+                        return;
+                    }
+                    
+                    customPrimeList = primes;
+                    statusDiv.querySelector('span').textContent = `✓ Loaded ${primes.length.toLocaleString()} primes (max: ${primes[primes.length-1].toLocaleString()})`;
+                    statusDiv.style.background = 'rgba(100, 255, 100, 0.1)';
+                    
+                    // Update max prime display
+                    document.getElementById('maxPrime').value = primes[primes.length-1];
+                    document.getElementById('maxPrimeDisplay').textContent = primes[primes.length-1].toLocaleString();
+                    
+                } catch (error) {
+                    statusDiv.querySelector('span').textContent = `Error: ${error.message}`;
+                    statusDiv.style.background = 'rgba(255, 100, 100, 0.1)';
+                }
+            };
+            reader.readAsText(file);
+        }
+        
+        // Fetch primes from OEIS
+        async function fetchFromOEIS() {
+            const count = parseInt(document.getElementById('oeisCount').value);
+            const statusDiv = document.getElementById('uploadStatus');
+            statusDiv.style.display = 'block';
+            statusDiv.querySelector('span').textContent = `Fetching ${count.toLocaleString()} primes from OEIS...`;
+            
+            try {
+                // OEIS API endpoint for A000040 (prime numbers)
+                // Note: OEIS has limits on how much data can be fetched at once
+                const url = `https://oeis.org/A000040/b000040.txt`;
+                
+                const response = await fetch(url);
+                if (!response.ok) throw new Error('OEIS fetch failed');
+                
+                const text = await response.text();
+                
+                // Parse OEIS b-file format: "n prime_n"
+                const lines = text.split('\n');
+                const primes = [];
+                
+                for (const line of lines) {
+                    if (line.startsWith('#') || line.trim() === '') continue;
+                    const parts = line.trim().split(/\s+/);
+                    if (parts.length >= 2) {
+                        const prime = parseInt(parts[1]);
+                        if (!isNaN(prime)) {
+                            primes.push(prime);
+                            if (primes.length >= count) break;
+                        }
+                    }
+                }
+                
+                if (primes.length === 0) {
+                    throw new Error('No primes found in OEIS response');
+                }
+                
+                customPrimeList = primes;
+                statusDiv.querySelector('span').textContent = `✓ Fetched ${primes.length.toLocaleString()} primes from OEIS (max: ${primes[primes.length-1].toLocaleString()})`;
+                statusDiv.style.background = 'rgba(100, 255, 100, 0.1)';
+                
+                // Update max prime display
+                document.getElementById('maxPrime').value = primes[primes.length-1];
+                document.getElementById('maxPrimeDisplay').textContent = primes[primes.length-1].toLocaleString();
+                
+            } catch (error) {
+                statusDiv.querySelector('span').textContent = `Error: ${error.message}. Try uploading a file instead.`;
+                statusDiv.style.background = 'rgba(255, 100, 100, 0.1)';
+                console.error('OEIS fetch error:', error);
+            }
+        }
+        
+        // Clear custom prime list
+        function clearCustomPrimes() {
+            customPrimeList = null;
+            document.getElementById('uploadStatus').style.display = 'none';
+            document.getElementById('primeFileUpload').value = '';
+            document.getElementById('maxPrime').value = 10000000;
+            document.getElementById('maxPrimeDisplay').textContent = '10,000,000';
         }
         
         // Update displays
