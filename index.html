@@ -198,6 +198,71 @@
             box-shadow: none;
         }
 
+        /* Collapsible Dropdown Styles */
+        .dropdown-section {
+            background: #12121a;
+            border-radius: 8px;
+            border: 1px solid #2a2a4a;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .dropdown-header {
+            padding: 16px 20px;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .dropdown-header:hover {
+            background: linear-gradient(135deg, #1e1e32 0%, #1a2542 100%);
+        }
+        
+        .dropdown-header h3 {
+            color: #ffd700;
+            font-size: 1.1rem;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .dropdown-icon {
+            color: #ffd700;
+            font-size: 1.2rem;
+            transition: transform 0.3s;
+        }
+        
+        .dropdown-section.active .dropdown-icon {
+            transform: rotate(180deg);
+        }
+        
+        .dropdown-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 20px;
+        }
+        
+        .dropdown-section.active .dropdown-content {
+            max-height: 3000px;
+            padding: 20px;
+            transition: max-height 0.5s ease-in;
+        }
+        
+        .dropdown-badge {
+            background: rgba(255, 215, 0, 0.2);
+            color: #ffd700;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+
         .preset-btn {
             padding: 6px 12px;
             background: #1e40af;
@@ -216,6 +281,69 @@
 
         .preset-btn:active {
             transform: scale(0.98);
+        }
+        
+        /* Collapsible Section Styles */
+        .collapsible-section {
+            background: #12121a;
+            border-radius: 8px;
+            border: 1px solid #2a2a4a;
+            margin-bottom: 16px;
+            overflow: hidden;
+        }
+        
+        .collapsible-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 16px 20px;
+            cursor: pointer;
+            background: #1a1a2a;
+            transition: all 0.2s;
+            user-select: none;
+        }
+        
+        .collapsible-header:hover {
+            background: #222232;
+        }
+        
+        .collapsible-header h3 {
+            margin: 0;
+            color: #ffd700;
+            font-size: 1.1rem;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+        
+        .collapsible-icon {
+            font-size: 1.5rem;
+            color: #ffd700;
+            transition: transform 0.3s;
+        }
+        
+        .collapsible-section.active .collapsible-icon {
+            transform: rotate(180deg);
+        }
+        
+        .collapsible-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease-out;
+            padding: 0 20px;
+        }
+        
+        .collapsible-section.active .collapsible-content {
+            max-height: 3000px;
+            padding: 20px;
+            transition: max-height 0.5s ease-in;
+        }
+        
+        .section-description {
+            color: #94a3b8;
+            font-size: 0.9rem;
+            margin-bottom: 16px;
+            line-height: 1.5;
         }
         
         .button-row {
@@ -897,44 +1025,9 @@
     </div>
     
     <div class="controls-container">
+        <!-- Computation Parameters (NOT in dropdown - on main page) -->
         <div class="control-panel">
-            <h3 style="color: #ffd700; margin-bottom: 20px;">Research Presets</h3>
-            <p style="font-size: 0.9rem; color: #94a3b8; margin-bottom: 16px;">
-                Quick configurations for common research scenarios - click to apply settings instantly
-            </p>
-            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px; margin-bottom: 30px;">
-                <button onclick="applyResearchPreset('complete')" class="preset-btn" style="background: #ffd700; color: #000; padding: 10px;">
-                    <strong>⭐ Complete Analysis</strong><br>
-                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 10M, All Gaps</span>
-                </button>
-                <button onclick="applyResearchPreset('twins')" class="preset-btn" style="background: #dc2626; padding: 10px;">
-                    <strong>Twin Prime Focus</strong><br>
-                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 100K, Gaps: 2-10</span>
-                </button>
-                <button onclick="applyResearchPreset('goldbach')" class="preset-btn" style="background: #ea580c; padding: 10px;">
-                    <strong>Goldbach Range</strong><br>
-                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 500K, Gaps: 2-30</span>
-                </button>
-                <button onclick="applyResearchPreset('topology')" class="preset-btn" style="background: #7c3aed; padding: 10px;">
-                    <strong>Large Gap Topology</strong><br>
-                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, Gaps: 30-90</span>
-                </button>
-                <button onclick="applyResearchPreset('extreme')" class="preset-btn" style="background: #c026d3; padding: 10px;">
-                    <strong>Extreme Range</strong><br>
-                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 5M, Gaps: 100+</span>
-                </button>
-                <button onclick="applyResearchPreset('full')" class="preset-btn" style="background: #059669; padding: 10px;">
-                    <strong>Full Spectrum</strong><br>
-                    <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, All Gaps</span>
-                </button>
-                <button onclick="applyResearchPreset('rh')" class="preset-btn" style="background: #0891b2; padding: 10px;">
-                    <strong>Riemann Hypothesis Analysis</strong><br>
-                    <span style="font-size: 0.85em; opacity: 0.9;">High-precision: 2M primes, Standard gap range</span>
-                </button>
-            </div>
-
             <h3>Computation Parameters</h3>
-            
             <div class="control-grid">
                 <div class="control-group">
                     <label>
@@ -957,27 +1050,80 @@
                         </label>
                     </div>
                 </div>
-                
-                <div class="control-group" style="border: 2px solid #8b5cf6; padding: 16px; border-radius: 8px; background: rgba(139, 92, 246, 0.05);">
-                    <label style="color: #8b5cf6; font-weight: 600;">
+            </div>
+            
+            <div class="button-row" style="margin-top: 20px;">
+                <button class="btn" onclick="runAnalysis()">Run Analysis</button>
+                <button class="btn btn-secondary" onclick="exportAllData()">Export All Data (CSV)</button>
+                <button class="btn btn-secondary" onclick="exportAllCharts()">Export All Charts (PNG)</button>
+            </div>
+        </div>
+
+        <!-- Advanced Controls Dropdown (Collapsed by default) -->
+        <div class="dropdown-section">
+            <div class="dropdown-header" onclick="toggleSection(this)">
+                <h3>Advanced Controls</h3>
+                <span class="dropdown-icon">▼</span>
+            </div>
+            <div class="dropdown-content">
+                <!-- Research Presets -->
+                <div style="margin-bottom: 24px; padding-bottom: 24px; border-bottom: 1px solid #2a2a4a;">
+                    <h4 style="color: #ffd700; margin: 0 0 12px 0; font-size: 1.1rem;">Research Presets</h4>
+                    <p class="section-description">
+                        Quick configurations for common research scenarios
+                    </p>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 10px;">
+                        <button onclick="applyResearchPreset('complete')" class="preset-btn" style="background: #ffd700; color: #000; padding: 10px;">
+                            <strong>Complete Analysis</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 10M, All Gaps</span>
+                        </button>
+                        <button onclick="applyResearchPreset('twins')" class="preset-btn" style="background: #dc2626; padding: 10px;">
+                            <strong>Twin Prime Focus</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 100K, Gaps: 2-10</span>
+                        </button>
+                        <button onclick="applyResearchPreset('goldbach')" class="preset-btn" style="background: #ea580c; padding: 10px;">
+                            <strong>Goldbach Range</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 500K, Gaps: 2-30</span>
+                        </button>
+                        <button onclick="applyResearchPreset('topology')" class="preset-btn" style="background: #7c3aed; padding: 10px;">
+                            <strong>Large Gap Topology</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, Gaps: 30-90</span>
+                        </button>
+                        <button onclick="applyResearchPreset('extreme')" class="preset-btn" style="background: #c026d3; padding: 10px;">
+                            <strong>Extreme Range</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 5M, Gaps: 100+</span>
+                        </button>
+                        <button onclick="applyResearchPreset('full')" class="preset-btn" style="background: #059669; padding: 10px;">
+                            <strong>Full Spectrum</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">Primes: 1M, All Gaps</span>
+                        </button>
+                        <button onclick="applyResearchPreset('rh')" class="preset-btn" style="background: #0891b2; padding: 10px;">
+                            <strong>Riemann Hypothesis Analysis</strong><br>
+                            <span style="font-size: 0.85em; opacity: 0.9;">High-precision: 2M primes</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Zeta Exponent -->
+                <div style="border: 2px solid #8b5cf6; padding: 16px; border-radius: 8px; background: rgba(139, 92, 246, 0.05); margin-bottom: 20px;">
+                    <label style="color: #8b5cf6; font-weight: 600; display: block; margin-bottom: 12px;">
                         Zeta Exponent (s)
-                        <span class="control-value" id="zetaSDisplay">2.00</span>
+                        <span class="control-value" id="zetaSDisplay" style="color: #ffd700;">2.00</span>
                     </label>
                     <input type="range" id="zetaS" value="2" min="1.01" max="20" step="0.01"
-                           oninput="updateZetaSDisplay()" onchange="updateZetaSDisplay()">
+                           style="width: 100%;" oninput="updateZetaSDisplay()" onchange="updateZetaSDisplay()">
                     
-                    <!-- Preset Buttons -->
                     <div style="display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; margin-top: 12px;">
                         <button onclick="setZetaS(1.5)" class="preset-btn" style="background: #7c3aed; padding: 6px; font-size: 0.8rem;">s=1.5</button>
-                        <button onclick="setZetaS(2)" class="preset-btn" style="background: #6366f1; padding: 6px; font-size: 0.8rem;">s=2</button>
-                        <button onclick="setZetaS(3)" class="preset-btn" style="background: #3b82f6; padding: 6px; font-size: 0.8rem;">s=3</button>
-                        <button onclick="setZetaS(4)" class="preset-btn" style="background: #0891b2; padding: 6px; font-size: 0.8rem;">s=4</button>
-                        <button onclick="setZetaS(Math.PI)" class="preset-btn" style="background: #059669; padding: 6px; font-size: 0.8rem;">s=π</button>
-                        <button onclick="setZetaS(10)" class="preset-btn" style="background: #dc2626; padding: 6px; font-size: 0.8rem;">s=10</button>
+                        <button onclick="setZetaS(2)" class="preset-btn" style="background: #7c3aed; padding: 6px; font-size: 0.8rem;">s=2</button>
+                        <button onclick="setZetaS(3)" class="preset-btn" style="background: #7c3aed; padding: 6px; font-size: 0.8rem;">s=3</button>
+                        <button onclick="setZetaS(4)" class="preset-btn" style="background: #7c3aed; padding: 6px; font-size: 0.8rem;">s=4</button>
+                        <button onclick="setZetaS(5)" class="preset-btn" style="background: #7c3aed; padding: 6px; font-size: 0.8rem;">s=5</button>
+                        <button onclick="setZetaS(10)" class="preset-btn" style="background: #7c3aed; padding: 6px; font-size: 0.8rem;">s=10</button>
                     </div>
                     
-                    <div style="margin-top: 12px; font-size: 0.85rem; color: #a78bfa;">
-                        <div id="zetaSInfo" style="font-weight: 600;">ζ(2) = π²/6 ≈ 1.6449</div>
+                    <div style="margin-top: 12px; padding: 12px; background: rgba(255, 215, 0, 0.05); border-radius: 6px;">
+                        <div id="zetaSInfo" style="font-weight: 600; color: #ffd700;">ζ(2) = π²/6 ≈ 1.6449</div>
                         <div id="zetaSBehavior" style="margin-top: 8px; color: #888; font-size: 0.8rem;">
                             Twin primes dominate at s=2
                         </div>
@@ -987,7 +1133,8 @@
                     </div>
                 </div>
 
-                <div class="control-group" style="grid-column: 1 / -1; border: 2px solid #3b82f6; padding: 16px; border-radius: 8px; background: rgba(59, 130, 246, 0.05);">
+                <!-- Gap Range Filter -->
+                <div style="border: 2px solid #3b82f6; padding: 16px; border-radius: 8px; background: rgba(59, 130, 246, 0.05); margin-bottom: 20px;">
                     <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px;">
                         <h4 style="margin: 0; color: #3b82f6; font-size: 1rem;">Gap Range Filter (Zoom)</h4>
                         <label style="display: flex; align-items: center; gap: 8px; font-size: 0.9rem;">
@@ -1000,6 +1147,7 @@
                         <p style="font-size: 0.85rem; color: #94a3b8; margin: 0 0 12px 0;">
                             Filter which gaps appear in all charts. Perfect for examining larger gaps without small gaps dominating.
                         </p>
+
                         
                         <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
                             <div>
@@ -1037,132 +1185,143 @@
                         </div>
                     </div>
                 </div>
-                
-                <div class="control-group">
-                    <label>
-                        Animation Speed (ms delay)
-                        <span class="control-value" id="animSpeedDisplay">100</span>
-                    </label>
-                    <input type="range" id="animSpeed" min="10" max="500" value="100" step="10"
-                           oninput="document.getElementById('animSpeedDisplay').textContent = this.value">
-                    <div style="margin-top: 4px; font-size: 0.75rem; color: #888;">
-                        Lower = Faster | Higher = Slower
+
+                <!-- Animation Controls -->
+                <div style="border: 2px solid #f59e0b; padding: 16px; border-radius: 8px; background: rgba(245, 158, 11, 0.05); margin-bottom: 20px;">
+                    <h4 style="margin: 0 0 12px 0; color: #f59e0b; font-size: 1rem;">Animation Speed (ms delay)</h4>
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: block; margin-bottom: 6px;">
+                            <span style="color: #94a3b8;">Delay: </span>
+                            <span class="control-value" id="animSpeedDisplay">100</span>
+                            <span style="color: #888; font-size: 0.75rem;"> (Lower = Faster, Higher = Slower)</span>
+                        </label>
+                        <input type="range" id="animSpeed" min="10" max="500" value="100" step="10"
+                               style="width: 100%;" oninput="document.getElementById('animSpeedDisplay').textContent = this.value">
                     </div>
-                </div>
-                
-                <div class="control-group">
-                    <label style="display: flex; align-items: center; gap: 8px;">
-                        <input type="checkbox" id="useMaxPrimeForAnim" style="width: auto;" checked>
-                        <span>Animate from 0 to Max Prime</span>
-                    </label>
-                    <div style="margin-top: 4px; font-size: 0.75rem; color: #888;">
-                        Uncheck to set custom range below
+                    
+                    <div style="margin-bottom: 12px;">
+                        <label style="display: flex; align-items: center; gap: 8px;">
+                            <input type="checkbox" id="useMaxPrimeForAnim" style="width: auto;" checked>
+                            <span>Animate from 0 to Max Prime</span>
+                        </label>
+                        <div style="margin-top: 4px; font-size: 0.75rem; color: #888;">
+                            Uncheck to set custom range below
+                        </div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 16px;">
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; color: #94a3b8;">
+                                Custom Start
+                                <span class="control-value" id="animStartDisplay">1</span>
+                            </label>
+                            <input type="number" id="animStart" value="1" min="1" max="10000000" step="100"
+                                   style="width: 100%; padding: 6px; background: #1a1a2a; border: 1px solid #3a3a5a; border-radius: 4px; color: #e0e0e0;">
+                        </div>
+                        <div>
+                            <label style="display: block; font-size: 0.85rem; margin-bottom: 4px; color: #94a3b8;">
+                                Custom End
+                                <span class="control-value" id="animEndDisplay">10000000</span>
+                            </label>
+                            <input type="number" id="animEnd" value="10000000" min="1000" max="10000000" step="1000"
+                                   style="width: 100%; padding: 6px; background: #1a1a2a; border: 1px solid #3a3a5a; border-radius: 4px; color: #e0e0e0;">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; gap: 12px;">
+                        <button class="btn btn-secondary" onclick="startAnimation()" style="flex: 1;">Start Animation</button>
+                        <button class="btn btn-secondary" onclick="stopAnimation()" style="flex: 1;">Stop Animation</button>
                     </div>
                 </div>
 
-                <div class="control-group">
-                    <label>
-                        Custom Start (if unchecked above)
-                        <span class="control-value" id="animStartDisplay">1</span>
-                    </label>
-                    <input type="number" id="animStart" value="1" min="1" max="10000000" step="100">
-                </div>
-                
-                <div class="control-group">
-                    <label>
-                        Custom End (if unchecked above)
-                        <span class="control-value" id="animEndDisplay">10000000</span>
-                    </label>
-                    <input type="number" id="animEnd" value="10000000" min="1000" max="10000000" step="1000">
-                </div>
-            </div>
-            
-            <div style="margin-top: 20px; padding: 16px; background: rgba(139, 92, 246, 0.05); border-radius: 8px; border-left: 4px solid #8b5cf6;">
-                <label style="display: flex; align-items: center; gap: 12px; cursor: pointer;">
-                    <input type="checkbox" id="enableComparison" style="width: auto;">
-                    <div>
-                        <span style="color: #8b5cf6; font-weight: 600; font-size: 1rem;">Enable Comparison Mode</span>
-                        <div style="font-size: 0.85rem; color: #888; margin-top: 4px;">
-                            Compare how gap contributions change across s = [1.5, 2, 3, 4, 5, 10]
+                <!-- Comparison Mode -->
+                <div style="margin-top: 20px; margin-bottom: 20px; padding: 16px; background: rgba(139, 92, 246, 0.05); border-radius: 8px; border-left: 4px solid #8b5cf6;">
+                    <h4 style="margin: 0 0 12px 0; color: #8b5cf6; font-size: 1rem;">Comparison Mode</h4>
+                    <label style="display: flex; align-items: start; gap: 12px; cursor: pointer;">
+                        <input type="checkbox" id="enableComparison" style="width: auto; margin-top: 4px;">
+                        <div>
+                            <span style="color: #e0e0e0; font-weight: 600; font-size: 0.95rem;">Enable Comparison Mode</span>
+                            <div style="font-size: 0.85rem; color: #888; margin-top: 4px;">
+                                Compare how gap contributions change across different exponent values: s = [1.5, 2, 3, 4, 5, 10]. This generates multiple overlayed analyses to study how varying the zeta exponent affects the relative importance of different gap classes.
+                            </div>
                         </div>
+                    </label>
+                </div>
+
+                <!-- Chart Options -->
+                <div style="padding: 16px; background: rgba(59, 130, 246, 0.05); border-radius: 8px; border-left: 4px solid #3b82f6;">
+                    <h4 style="margin: 0 0 16px 0; color: #3b82f6; font-size: 1rem;">Chart Options</h4>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="showGapContributions" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Show Gap Contributions Chart</span>
                     </div>
-                </label>
-            </div>
-            
-            <div class="button-row">
-                <button class="btn" onclick="runAnalysis()">Run Analysis</button>
-                <button class="btn btn-secondary" onclick="startAnimation()">Start Animation</button>
-                <button class="btn btn-secondary" onclick="stopAnimation()">Stop Animation</button>
-                <button class="btn btn-secondary" onclick="exportAllData()">Export All Data (CSV)</button>
-                <button class="btn btn-secondary" onclick="exportAllCharts()">Export All Charts (PNG)</button>
-            </div>
-            
-            <div id="statusBar" class="status-bar" style="display: none;">
-                Ready to compute...
-            </div>
-            
-            <div id="progressContainer" style="display: none;">
-                <div class="progress-bar">
-                    <div class="progress-fill" id="progressFill"></div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="showConvergence" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Show Progressive Convergence</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="showGapDistribution" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Show Gap Distribution</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="showPercentageContrib" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Show Percentage Contributions</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="showErrorAnalysis" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Show Error Analysis</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
+                            <input type="checkbox" id="showLogScale" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Show Log-Scale Product Analysis</span>
+                    </div>
                 </div>
             </div>
         </div>
-        
-        <div class="control-panel">
-            <h3>Chart Options</h3>
-            
-            <div class="toggle-wrapper">
-                <label class="toggle">
-                    <input type="checkbox" id="showGapContributions" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-                <span>Show Gap Contributions Chart</span>
+
+        <!-- Analysis Statistics (Fixed toggle) -->
+        <div id="statsPanel" class="dropdown-section" style="display: none; border: 2px solid #22c55e;">
+            <div class="dropdown-header" onclick="toggleSection(this)" style="background: rgba(34, 197, 94, 0.1);">
+                <h3 style="color: #22c55e;">Analysis Statistics</h3>
+                <span class="dropdown-icon" style="color: #22c55e;">▼</span>
             </div>
-            
-            <div class="toggle-wrapper">
-                <label class="toggle">
-                    <input type="checkbox" id="showConvergence" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-                <span>Show Progressive Convergence</span>
-            </div>
-            
-            <div class="toggle-wrapper">
-                <label class="toggle">
-                    <input type="checkbox" id="showGapDistribution" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-                <span>Show Gap Distribution</span>
-            </div>
-            
-            <div class="toggle-wrapper">
-                <label class="toggle">
-                    <input type="checkbox" id="showPercentageContrib" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-                <span>Show Percentage Contributions</span>
-            </div>
-            
-            <div class="toggle-wrapper">
-                <label class="toggle">
-                    <input type="checkbox" id="showErrorAnalysis" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-                <span>Show Error Analysis</span>
-            </div>
-            
-            <div class="toggle-wrapper">
-                <label class="toggle">
-                    <input type="checkbox" id="showLogScale" checked>
-                    <span class="toggle-slider"></span>
-                </label>
-                <span>Show Log-Scale Product Analysis</span>
+            <div class="dropdown-content">
+                <div class="stats-grid" id="statsGrid"></div>
             </div>
         </div>
         
-        <div id="statsPanel" class="control-panel" style="display: none;">
-            <h3>Analysis Statistics</h3>
-            <div class="stats-grid" id="statsGrid"></div>
+        <div id="statusBar" class="status-bar" style="display: none;">
+            Ready to compute...
+        </div>
+        
+        <div id="progressContainer" style="display: none;">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
         </div>
     </div>
     
@@ -1560,63 +1719,67 @@
     
     <!-- CREDITS SECTION -->
     <div class="controls-container" style="margin-top: 40px;">
-        <div class="control-panel" style="background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%); border: 2px solid #ffd700;">
-            <h3 style="color: #ffd700; margin-bottom: 20px; text-align: center; font-size: 1.4rem;">Credits & Attribution</h3>
-            
-            <div style="display: grid; gap: 20px;">
-                <!-- Author -->
-                <div style="background: rgba(255, 215, 0, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #ffd700;">
-                    <h4 style="color: #ffd700; margin: 0 0 10px 0; font-size: 1.1rem;">Author</h4>
-                    <p style="margin: 0; color: #e0e0e0; line-height: 1.8;">
-                        <strong>Wessen Getachew</strong><br>
-                        Independent Mathematical Researcher<br>
-                        Twitter: <a href="https://twitter.com/7dview" target="_blank" style="color: #4ecdc4; text-decoration: none;">@7dview</a>
-                    </p>
-                </div>
-                
-                <!-- Related Work -->
-                <div style="background: rgba(78, 205, 196, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #4ecdc4;">
-                    <h4 style="color: #4ecdc4; margin: 0 0 10px 0; font-size: 1.1rem;">Related Research Tools</h4>
-                    <p style="margin: 0 0 12px 0; color: #ccc;">
-                        This tool is part of a broader investigation into prime number distribution and connections to the Riemann Hypothesis:
-                    </p>
-                    <ul style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
-                        <li>
-                            <a href="https://wessengetachew.github.io/Ethiopian/" target="_blank" style="color: #4ecdc4; text-decoration: none;">
-                                Modular Sieve Calculator
-                            </a> - Prime residue ring visualizations and ζ(2n) computations
-                        </li>
-                        <li>Farey Sequence Analysis - Fixed point at 1/2 and RH connections</li>
-                        <li>Gap Phase Alignment Framework - φ(p,t) = t·log(p) - π/2 mechanism</li>
-                        <li>Combinatorial Twin Prime Framework - T(M_n) = 3·2^n formula</li>
-                    </ul>
-                </div>
-                
-                <!-- Mathematical Foundation -->
-                <div style="background: rgba(139, 92, 246, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #8b5cf6;">
-                    <h4 style="color: #8b5cf6; margin: 0 0 10px 0; font-size: 1.1rem;">Mathematical Framework</h4>
-                    <p style="margin: 0; color: #ccc; line-height: 1.8;">
-                        This analysis builds on Leonhard Euler's 1734 proof that ζ(2) = π²/6 and introduces a novel 
-                        gap-class decomposition of the Euler product. The framework partitions primes by their forward 
-                        differences, revealing that twin primes contribute approximately 34.79% to the logarithmic product 
-                        log(ζ(2)), with contribution decay following precise combinatorial patterns.
-                    </p>
-                </div>
-                
-                <!-- License & Usage -->
-                <div style="background: rgba(255, 255, 255, 0.02); padding: 20px; border-radius: 8px; border: 1px solid #2a2a4a;">
-                    <h4 style="color: #aaa; margin: 0 0 10px 0; font-size: 1.1rem;">License & Usage</h4>
-                    <p style="margin: 0; color: #888; font-size: 0.9rem; line-height: 1.6;">
-                        This tool is provided for educational and research purposes. If you use this tool or its findings 
-                        in academic work, presentations, or publications, please provide appropriate attribution to 
-                        <strong>Wessen Getachew</strong> and cite the gap-class decomposition framework.
-                    </p>
-                </div>
-                
-                <!-- Build Info -->
-                <div style="text-align: center; padding: 15px; color: #666; font-size: 0.85rem; border-top: 1px solid #2a2a4a;">
-                    Gap-Class Decomposition Explorer v2.0 | Built February 2026<br>
-                    Interactive Mathematical Research Tool
+        <div class="dropdown-section" style="border: 2px solid #ffd700;">
+            <div class="dropdown-header" onclick="toggleSection(this)" style="background: linear-gradient(135deg, #1a1a2e 0%, #0f0f1a 100%);">
+                <h3 style="color: #ffd700;">Credits & Attribution</h3>
+                <span class="dropdown-icon" style="color: #ffd700;">▼</span>
+            </div>
+            <div class="dropdown-content">
+                <div style="display: grid; gap: 20px;">
+                    <!-- Author -->
+                    <div style="background: rgba(255, 215, 0, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #ffd700;">
+                        <h4 style="color: #ffd700; margin: 0 0 10px 0; font-size: 1.1rem;">Author</h4>
+                        <p style="margin: 0; color: #e0e0e0; line-height: 1.8;">
+                            <strong>Wessen Getachew</strong><br>
+                            Independent Mathematical Researcher<br>
+                            Twitter: <a href="https://twitter.com/7dview" target="_blank" style="color: #4ecdc4; text-decoration: none;">@7dview</a>
+                        </p>
+                    </div>
+                    
+                    <!-- Related Work -->
+                    <div style="background: rgba(78, 205, 196, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #4ecdc4;">
+                        <h4 style="color: #4ecdc4; margin: 0 0 10px 0; font-size: 1.1rem;">Related Research Tools</h4>
+                        <p style="margin: 0 0 12px 0; color: #ccc;">
+                            This tool is part of a broader investigation into prime number distribution and connections to the Riemann Hypothesis:
+                        </p>
+                        <ul style="margin: 0; padding-left: 20px; color: #ccc; line-height: 1.8;">
+                            <li>
+                                <a href="https://wessengetachew.github.io/Ethiopian/" target="_blank" style="color: #4ecdc4; text-decoration: none;">
+                                    Modular Sieve Calculator
+                                </a> - Prime residue ring visualizations and ζ(2n) computations
+                            </li>
+                            <li>Farey Sequence Analysis - Fixed point at 1/2 and RH connections</li>
+                            <li>Gap Phase Alignment Framework - φ(p,t) = t·log(p) - π/2 mechanism</li>
+                            <li>Combinatorial Twin Prime Framework - T(M_n) = 3·2^n formula</li>
+                        </ul>
+                    </div>
+                    
+                    <!-- Mathematical Foundation -->
+                    <div style="background: rgba(139, 92, 246, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #8b5cf6;">
+                        <h4 style="color: #8b5cf6; margin: 0 0 10px 0; font-size: 1.1rem;">Mathematical Framework</h4>
+                        <p style="margin: 0; color: #ccc; line-height: 1.8;">
+                            This analysis builds on Leonhard Euler's 1734 proof that ζ(2) = π²/6 and introduces a novel 
+                            gap-class decomposition of the Euler product. The framework partitions primes by their forward 
+                            differences, revealing that twin primes contribute approximately 34.79% to the logarithmic product 
+                            log(ζ(2)), with contribution decay following precise combinatorial patterns.
+                        </p>
+                    </div>
+                    
+                    <!-- License & Usage -->
+                    <div style="background: rgba(255, 255, 255, 0.02); padding: 20px; border-radius: 8px; border: 1px solid #2a2a4a;">
+                        <h4 style="color: #aaa; margin: 0 0 10px 0; font-size: 1.1rem;">License & Usage</h4>
+                        <p style="margin: 0; color: #888; font-size: 0.9rem; line-height: 1.6;">
+                            This tool is provided for educational and research purposes. If you use this tool or its findings 
+                            in academic work, presentations, or publications, please provide appropriate attribution to 
+                            <strong>Wessen Getachew</strong> and cite the gap-class decomposition framework.
+                        </p>
+                    </div>
+                    
+                    <!-- Build Info -->
+                    <div style="text-align: center; padding: 15px; color: #666; font-size: 0.85rem; border-top: 1px solid #2a2a4a;">
+                        Gap-Class Decomposition Explorer v2.0 | Built February 2026<br>
+                        Interactive Mathematical Research Tool
+                    </div>
                 </div>
             </div>
         </div>
@@ -1645,7 +1808,18 @@
     <!-- END TAB: Main -->
 
     <script>
-        // Gap Decomposition Analyzer v2.1 - Fixed xPos scope issue
+        // Collapsible section toggle function
+        function toggleSection(header) {
+            const section = header.parentElement;
+            section.classList.toggle('active');
+        }
+        // Dropdown toggle functionality
+        function toggleDropdown(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('active');
+        }
+        
+// Gap Decomposition Analyzer v2.1 - Fixed xPos scope issue
         // Global variables
         let analysisResults = null;
         let animationId = null;
