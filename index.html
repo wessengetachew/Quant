@@ -364,6 +364,7 @@
             border: 1px solid #2a2a4a;
             padding: 20px;
             margin-bottom: 24px;
+            position: relative;
         }
         
         .chart-title {
@@ -371,6 +372,99 @@
             font-size: 1.2rem;
             margin-bottom: 16px;
             font-weight: 600;
+        }
+        
+        .chart-animation-controls {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            background: rgba(26, 26, 42, 0.95);
+            padding: 12px;
+            border-radius: 6px;
+            border: 1px solid #3a3a5a;
+            z-index: 10;
+        }
+        
+        .chart-play-pause-btn {
+            padding: 8px 16px;
+            background: linear-gradient(135deg, #22c55e 0%, #16a34a 100%);
+            border: none;
+            border-radius: 4px;
+            color: #fff;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+            min-width: 100px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+        }
+        
+        .chart-play-pause-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(34, 197, 94, 0.4);
+        }
+        
+        .chart-play-pause-btn.playing {
+            background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);
+        }
+        
+        .chart-play-pause-btn.playing:hover {
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.4);
+        }
+        
+        .chart-speed-control {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+        }
+        
+        .chart-speed-label {
+            font-size: 0.75rem;
+            color: #aaa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .chart-speed-value {
+            color: #ffd700;
+            font-family: monospace;
+            font-size: 0.75rem;
+        }
+        
+        .chart-speed-slider {
+            width: 100%;
+            height: 6px;
+            background: #1a1a2a;
+            border: 1px solid #3a3a5a;
+            border-radius: 3px;
+            outline: none;
+            -webkit-appearance: none;
+        }
+        
+        .chart-speed-slider::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+        }
+        
+        .chart-speed-slider::-moz-range-thumb {
+            width: 14px;
+            height: 14px;
+            border-radius: 50%;
+            background: #ffd700;
+            cursor: pointer;
+            border: none;
         }
         
         canvas {
@@ -974,6 +1068,30 @@
                 opacity: 1;
             }
         }
+        
+        @keyframes slideDown {
+            from {
+                max-height: 0;
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                max-height: 500px;
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        @keyframes slideUp {
+            from {
+                max-height: 500px;
+                opacity: 1;
+            }
+            to {
+                max-height: 0;
+                opacity: 0;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1052,9 +1170,49 @@
                         Maximum Prime
                         <span class="control-value" id="maxPrimeDisplay">10000000</span>
                     </label>
-                    <input type="number" id="maxPrime" value="10000000" min="1000" max="100000000" step="1000000">
+                    <input type="number" id="maxPrime" value="10000000" min="1000" max="100000000" step="1000000"
+                           oninput="updateMaxPrimeDisplay()">
                     <div style="margin-top: 8px; font-size: 0.85rem; color: #888;">
                         Note: Values > 10M may take significant time
+                    </div>
+                </div>
+                
+                <div class="control-group">
+                    <label style="display: block; margin-bottom: 8px; color: #ffd700; font-size: 1rem;">
+                        Gap Range Filter
+                    </label>
+                    <div style="display: flex; flex-direction: column; gap: 8px;">
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="radio" name="gapRangeMode" value="auto" checked 
+                                   onchange="updateGapRangeMode()" style="width: auto;">
+                            <span style="color: #ccc;">Auto (all gaps found)</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 10px;">
+                            <input type="radio" name="gapRangeMode" value="manual" 
+                                   onchange="updateGapRangeMode()" style="width: auto;">
+                            <span style="color: #ccc;">Manual range</span>
+                        </label>
+                    </div>
+                    <div id="manualGapRangeControls" style="display: none; margin-top: 12px;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                            <div>
+                                <label style="font-size: 0.85rem; color: #888; margin-bottom: 4px; display: block;">
+                                    Min Gap (even)
+                                </label>
+                                <input type="number" id="minGapRange" value="0" min="0" step="2"
+                                       oninput="validateGapRange()">
+                            </div>
+                            <div>
+                                <label style="font-size: 0.85rem; color: #888; margin-bottom: 4px; display: block;">
+                                    Max Gap (even)
+                                </label>
+                                <input type="number" id="maxGapRange" value="50" min="2" step="2"
+                                       oninput="validateGapRange()">
+                            </div>
+                        </div>
+                        <div id="gapRangeError" style="margin-top: 6px; font-size: 0.8rem; color: #ff6464; display: none;">
+                            Min gap must be less than max gap. Both must be even numbers (or 0 for gap-1).
+                        </div>
                     </div>
                 </div>
                 
@@ -1423,6 +1581,11 @@
                     Sequential view of all primes colored by gap to next prime. Click any prime to filter by its gap class.
                 </p>
             </div>
+            <div style="margin-bottom: 16px; display: flex; justify-content: flex-end;">
+                <button class="btn btn-secondary" onclick="screenshotClassicalView()" style="padding: 8px 16px; font-size: 0.85rem;">
+                    📸 Screenshot Classical View (4K)
+                </button>
+            </div>
             <div id="classicalTableWrapper" style="max-height: 600px; overflow-y: auto; background: rgba(0, 0, 0, 0.2); border-radius: 6px; padding: 16px;">
                 <table id="classicalTable" style="width: 100%; border-collapse: collapse; color: #e0e0e0; font-family: 'Courier New', monospace;">
                     <thead style="position: sticky; top: 0; background: #1a1a2a; z-index: 1;">
@@ -1717,7 +1880,7 @@
                             <option value="all">All rows (may be very large)</option>
                         </select>
                         <div style="margin-top: 4px; font-size: 0.75rem; color: #888;">
-                            When you click "Export Chart PNG" or "Export Table PNG", this many rows will be included
+                            Applies to all chart PNG exports (individual and composite screenshots)
                         </div>
                     </div>
                 </div>
@@ -1802,24 +1965,6 @@
                     <option value="3840" selected>4K (3840×2160)</option>
                     <option value="7680">8K (7680×4320)</option>
                 </select>
-            </div>
-            
-            <div class="control-group">
-                <label>Data Table Rows in Screenshots</label>
-                <select id="screenshotTableRows">
-                    <option value="5">5 rows</option>
-                    <option value="10">10 rows</option>
-                    <option value="15" selected>15 rows</option>
-                    <option value="20">20 rows</option>
-                    <option value="25">25 rows</option>
-                    <option value="30">30 rows</option>
-                    <option value="40">40 rows</option>
-                    <option value="50">50 rows</option>
-                    <option value="all">All rows</option>
-                </select>
-                <div style="margin-top: 4px; font-size: 0.75rem; color: #888;">
-                    Applies to: Step-by-Step table PNG export
-                </div>
             </div>
             
             <div class="section-divider"></div>
@@ -2051,7 +2196,7 @@
         }
         
         // Core analysis function
-        function computeGapDecomposition(maxPrime) {
+        function computeGapDecomposition(maxPrime, gapRangeFilter = null) {
             const primes = sievePrimes(maxPrime);
             const targetZeta2 = Math.PI * Math.PI / 6;
             
@@ -2074,7 +2219,14 @@
             
             // Find all unique gaps that actually exist in the data
             const uniqueGaps = new Set(gaps);
-            const evenGaps = Array.from(uniqueGaps).sort((a, b) => a - b);
+            let evenGaps = Array.from(uniqueGaps).sort((a, b) => a - b);
+            
+            // Apply gap range filter if specified
+            if (gapRangeFilter && gapRangeFilter.mode === 'manual') {
+                const minGap = gapRangeFilter.min;
+                const maxGap = gapRangeFilter.max;
+                evenGaps = evenGaps.filter(gap => gap >= minGap && gap <= maxGap);
+            }
             
             evenGaps.forEach(gap => {
                 if (gapFamilies[gap] && gapFamilies[gap].length > 0) {
@@ -2116,7 +2268,7 @@
                 }
             });
             
-            // Calculate total primes actually included in analysis (those with gaps <= maxGap)
+            // Calculate total primes actually included in analysis (those with gaps in filtered range)
             const totalPrimesInAnalysis = evenGaps.reduce((sum, gap) => {
                 return sum + (gapProducts[gap]?.count || 0);
             }, 0);
@@ -2132,10 +2284,10 @@
             
             return {
                 primes: primes,
-                totalPrimes: totalPrimesInAnalysis,  // Only count primes with gaps <= maxGap
+                totalPrimes: totalPrimesInAnalysis,  // Only count primes with gaps in filtered range
                 allPrimesFound: primes.length,        // Total primes found in range
                 maxPrime: maxPrime,
-                maxGapFound: evenGaps.length > 0 ? Math.max(...evenGaps) : 0,  // Largest gap found
+                maxGapFound: evenGaps.length > 0 ? Math.max(...evenGaps) : 0,  // Largest gap in filtered range
                 targetZeta2: targetZeta2,
                 gapFamilies: gapFamilies,
                 gapProducts: gapProducts,
@@ -2145,7 +2297,7 @@
                 finalProduct: cumulative,
                 finalError: Math.abs(cumulative - targetZeta2),
                 finalRelativeError: Math.abs(cumulative - targetZeta2) / targetZeta2,
-                s: s
+                s: 2  // This function always uses s=2
             };
         }
         
@@ -2210,11 +2362,11 @@
             
             try {
                 // OEIS API endpoint for A000040 (prime numbers)
-                // Note: OEIS has limits on how much data can be fetched at once
+                // Note: Network access is disabled in this environment
                 const url = `https://oeis.org/A000040/b000040.txt`;
                 
                 const response = await fetch(url);
-                if (!response.ok) throw new Error('OEIS fetch failed');
+                if (!response.ok) throw new Error('Network access is disabled. Please download the file manually from OEIS and upload it instead.');
                 
                 const text = await response.text();
                 
@@ -2247,8 +2399,9 @@
                 document.getElementById('maxPrimeDisplay').textContent = primes[primes.length-1].toLocaleString();
                 
             } catch (error) {
-                statusDiv.querySelector('span').textContent = `Error: ${error.message}. Try uploading a file instead.`;
-                statusDiv.style.background = 'rgba(255, 100, 100, 0.1)';
+                statusDiv.querySelector('span').textContent = `Network access disabled. Please: (1) Visit https://oeis.org/A000040/b000040.txt, (2) Download the file, (3) Upload it using the file input above.`;
+                statusDiv.style.background = 'rgba(255, 215, 0, 0.2)';
+                statusDiv.style.borderLeft = '4px solid #ffd700';
                 console.error('OEIS fetch error:', error);
             }
         }
@@ -2277,6 +2430,13 @@
             const maxPrime = parseInt(document.getElementById('maxPrime').value);
             const s = parseFloat(document.getElementById('zetaS').value);
             const comparisonMode = document.getElementById('enableComparison').checked;
+            const gapRangeFilter = getGapRangeFilter();
+            
+            // Validate gap range if in manual mode
+            if (gapRangeFilter.mode === 'manual' && !validateGapRange()) {
+                alert('Please fix the gap range errors before running analysis.');
+                return;
+            }
             
             const statusBar = document.getElementById('statusBar');
             statusBar.style.display = 'block';
@@ -2285,7 +2445,8 @@
             if (comparisonMode) {
                 statusBar.textContent = `Computing comparison across s = [1.5, 2, 3, 4, 5, 10]...`;
             } else {
-                statusBar.textContent = `Computing ζ(${s.toFixed(2)}) for primes up to ${maxPrime.toLocaleString()}...`;
+                const gapInfo = gapRangeFilter.mode === 'auto' ? 'all gaps' : `gaps ${gapRangeFilter.min}-${gapRangeFilter.max}`;
+                statusBar.textContent = `Computing ζ(${s.toFixed(2)}) for primes up to ${maxPrime.toLocaleString()} (${gapInfo})...`;
             }
             
             // Use setTimeout to allow UI update
@@ -2293,7 +2454,7 @@
                 try {
                     if (comparisonMode) {
                         // Compute for multiple s values
-                        const compData = computeComparisonData();
+                        const compData = computeComparisonData(gapRangeFilter);
                         // Use s=2 as primary result for compatibility
                         analysisResults = compData[2];
                         analysisResults.comparisonData = compData;
@@ -2302,14 +2463,15 @@
                         statusBar.textContent = `Comparison complete: Computed for s = [1.5, 2, 3, 4, 5, 10]`;
                     } else {
                         // Single s analysis
-                        analysisResults = computeGapDecompositionWithS(maxPrime, s);
+                        analysisResults = computeGapDecompositionWithS(maxPrime, s, gapRangeFilter);
                         
                         const known = getKnownZetaValue(s);
                         const zetaLabel = known ? `ζ(${s}) = ${known.formula}` : `ζ(${s.toFixed(2)})`;
                         const maxGapFound = Math.max(...analysisResults.evenGaps);
                         
                         statusBar.className = 'status-bar complete';
-                        statusBar.textContent = `${zetaLabel}: ${analysisResults.totalPrimes.toLocaleString()} primes, ${analysisResults.evenGaps.length} gap families (max gap: ${maxGapFound}), error = ${(analysisResults.finalRelativeError * 100).toFixed(8)}%`;
+                        const gapInfo = gapRangeFilter.mode === 'auto' ? 'all gaps' : `gaps ${gapRangeFilter.min}-${gapRangeFilter.max}`;
+                        statusBar.textContent = `${zetaLabel}: ${analysisResults.totalPrimes.toLocaleString()} primes, ${analysisResults.evenGaps.length} gap families (${gapInfo}, max: ${maxGapFound}), error = ${(analysisResults.finalRelativeError * 100).toFixed(8)}%`;
                     }
                     
                     updateStatistics();
@@ -2553,16 +2715,33 @@
                         this.classList.add('highlighted');
                         
                         // Get gap value from the row
-                        const gapCell = this.cells[0] || this.cells[1]; // Try first or second column
-                        if (gapCell) {
-                            const gapValue = parseInt(gapCell.textContent);
-                            if (!isNaN(gapValue)) {
-                                highlightedGap = gapValue;
-                                highlightGapOnCharts(gapValue);
-                                
-                                // Show detailed popup
-                                showGapDetails(gapValue);
+                        // For step-by-step table: cells[1] is the gap column
+                        // For other tables: cells[0] might be the gap
+                        let gapValue;
+                        
+                        // Try to find gap value - check if second cell looks like a gap (small number)
+                        if (this.cells[1] && this.cells[1].textContent) {
+                            const secondColValue = parseInt(this.cells[1].textContent);
+                            if (!isNaN(secondColValue) && secondColValue < 1000) {
+                                // Likely a gap value (gaps are typically < 1000)
+                                gapValue = secondColValue;
                             }
+                        }
+                        
+                        // If not found in second column, try first
+                        if (gapValue === undefined && this.cells[0]) {
+                            const firstColValue = parseInt(this.cells[0].textContent);
+                            if (!isNaN(firstColValue) && firstColValue < 1000) {
+                                gapValue = firstColValue;
+                            }
+                        }
+                        
+                        if (gapValue !== undefined && !isNaN(gapValue)) {
+                            highlightedGap = gapValue;
+                            highlightGapOnCharts(gapValue);
+                            
+                            // Show detailed popup
+                            showGapDetails(gapValue);
                         }
                     });
                 });
@@ -3196,8 +3375,7 @@
                     return;
                 }
                 
-                const maxGap = parseInt(document.getElementById('maxGap').value);
-                analysisResults = computeGapDecomposition(currentRange, maxGap);
+                analysisResults = computeGapDecomposition(currentRange);
                 
                 const progress = ((currentRange - startRange) / (endRange - startRange)) * 100;
                 progressFill.style.width = progress + '%';
@@ -4892,10 +5070,8 @@
             
             const precision = parseInt(document.getElementById('stepByStepPrecision').value);
             
-            // Get row count from global export setting (fallback to screenshot setting, then 15)
-            const globalRows = document.getElementById('globalExportRows')?.value;
-            const screenshotRows = document.getElementById('screenshotTableRows')?.value;
-            const rowCountSetting = globalRows || screenshotRows || '15';
+            // Get row count from global export setting
+            const rowCountSetting = document.getElementById('globalExportRows')?.value || '15';
             
             const maxRows = rowCountSetting === 'all' ? analysisResults.evenGaps.length : parseInt(rowCountSetting);
             const gaps = analysisResults.evenGaps.slice(0, maxRows);
@@ -5378,7 +5554,7 @@
             return sum;
         }
         
-        function computeGapDecompositionWithS(maxPrime, s) {
+        function computeGapDecompositionWithS(maxPrime, s, gapRangeFilter = null) {
             const primes = sievePrimes(maxPrime);
             
             // Get target value
@@ -5404,7 +5580,14 @@
             
             // Find all unique gaps that actually exist in the data
             const uniqueGaps = new Set(gaps);
-            const evenGaps = Array.from(uniqueGaps).sort((a, b) => a - b);
+            let evenGaps = Array.from(uniqueGaps).sort((a, b) => a - b);
+            
+            // Apply gap range filter if specified
+            if (gapRangeFilter && gapRangeFilter.mode === 'manual') {
+                const minGap = gapRangeFilter.min;
+                const maxGap = gapRangeFilter.max;
+                evenGaps = evenGaps.filter(gap => gap >= minGap && gap <= maxGap);
+            }
             
             evenGaps.forEach(gap => {
                 if (gapFamilies[gap] && gapFamilies[gap].length > 0) {
@@ -5485,15 +5668,14 @@
             };
         }
         
-        function computeComparisonData() {
+        function computeComparisonData(gapRangeFilter = null) {
             const maxPrime = parseInt(document.getElementById('maxPrime').value);
-            const maxGap = parseInt(document.getElementById('maxGap').value);
             const sValues = [1.5, 2, 3, 4, 5, 10];
             
             const comparisonResults = {};
             
             sValues.forEach(s => {
-                comparisonResults[s] = computeGapDecompositionWithS(maxPrime, maxGap, s);
+                comparisonResults[s] = computeGapDecompositionWithS(maxPrime, s, gapRangeFilter);
             });
             
             return comparisonResults;
@@ -5565,28 +5747,98 @@
         }
         function applyResearchPreset(preset) {
             const presets = {
-                'complete': { maxPrime: 10000000, maxGap: 500, gapFilter: false, minGap: 1, maxGapFilter: 500, desc: 'Complete Analysis - 10 Million Primes' },
-                'twins': { maxPrime: 100000, maxGap: 10, gapFilter: true, minGap: 2, maxGapFilter: 10, desc: 'Twin Prime Focus' },
-                'goldbach': { maxPrime: 500000, maxGap: 30, gapFilter: false, minGap: 2, maxGapFilter: 30, desc: 'Goldbach Range' },
-                'topology': { maxPrime: 1000000, maxGap: 150, gapFilter: true, minGap: 30, maxGapFilter: 90, desc: 'Large Gap Topology' },
-                'extreme': { maxPrime: 5000000, maxGap: 500, gapFilter: true, minGap: 100, maxGapFilter: 500, desc: 'Extreme Range' },
-                'full': { maxPrime: 1000000, maxGap: 200, gapFilter: false, minGap: 2, maxGapFilter: 200, desc: 'Full Spectrum' },
-                'rh': { maxPrime: 2000000, maxGap: 50, gapFilter: false, minGap: 2, maxGapFilter: 50, desc: 'RH Investigation' }
+                'complete': { maxPrime: 10000000, gapRangeMode: 'auto', minGapRange: 0, maxGapRange: 500, gapFilter: false, minGap: 0, maxGapFilter: 500, desc: 'Complete Analysis - 10 Million Primes (All Gaps)' },
+                'twins': { maxPrime: 100000, gapRangeMode: 'manual', minGapRange: 0, maxGapRange: 10, gapFilter: true, minGap: 2, maxGapFilter: 10, desc: 'Twin Prime Focus (Gaps 0-10)' },
+                'goldbach': { maxPrime: 500000, gapRangeMode: 'manual', minGapRange: 0, maxGapRange: 30, gapFilter: false, minGap: 0, maxGapFilter: 30, desc: 'Goldbach Range (Gaps 0-30)' },
+                'topology': { maxPrime: 1000000, gapRangeMode: 'manual', minGapRange: 30, maxGapRange: 90, gapFilter: true, minGap: 30, maxGapFilter: 90, desc: 'Large Gap Topology (Gaps 30-90)' },
+                'extreme': { maxPrime: 5000000, gapRangeMode: 'manual', minGapRange: 100, maxGapRange: 500, gapFilter: true, minGap: 100, maxGapFilter: 500, desc: 'Extreme Range (Gaps 100-500)' },
+                'full': { maxPrime: 1000000, gapRangeMode: 'auto', minGapRange: 0, maxGapRange: 200, gapFilter: false, minGap: 0, maxGapFilter: 200, desc: 'Full Spectrum (All Gaps)' },
+                'rh': { maxPrime: 2000000, gapRangeMode: 'manual', minGapRange: 0, maxGapRange: 50, gapFilter: false, minGap: 0, maxGapFilter: 50, desc: 'RH Investigation (Gaps 0-50)' }
             };
             const config = presets[preset];
             if (!config) return;
+            
             document.getElementById('maxPrime').value = config.maxPrime;
-            document.getElementById('maxGap').value = config.maxGap;
-            document.getElementById('enableGapFilter').checked = config.gapFilter;
-            document.getElementById('minGapFilter').value = config.minGap;
-            document.getElementById('maxGapFilter').value = config.maxGapFilter;
-            toggleGapFilter();
+            document.getElementById('maxPrimeDisplay').textContent = config.maxPrime.toLocaleString();
+            
+            // Set gap range mode
+            document.querySelector(`input[name="gapRangeMode"][value="${config.gapRangeMode}"]`).checked = true;
+            document.getElementById('minGapRange').value = config.minGapRange;
+            document.getElementById('maxGapRange').value = config.maxGapRange;
+            updateGapRangeMode();
+            
+            // Only set gap filter if the checkbox exists
+            const gapFilterCheckbox = document.getElementById('enableGapFilter');
+            if (gapFilterCheckbox) {
+                gapFilterCheckbox.checked = config.gapFilter;
+            }
+            
+            // Only set gap filter values if the inputs exist
+            const minGapFilter = document.getElementById('minGapFilter');
+            const maxGapFilter = document.getElementById('maxGapFilter');
+            if (minGapFilter) minGapFilter.value = config.minGap;
+            if (maxGapFilter) maxGapFilter.value = config.maxGapFilter;
+            
+            if (typeof toggleGapFilter === 'function') {
+                toggleGapFilter();
+            }
+            
             const statusBar = document.getElementById('statusBar');
-            statusBar.style.display = 'block';
-            statusBar.style.background = 'rgba(34, 197, 94, 0.2)';
-            statusBar.style.borderLeft = '4px solid #22c55e';
-            statusBar.textContent = 'Applied preset: ' + config.desc + '. Click "Run Analysis" to compute.';
-            setTimeout(() => statusBar.style.display = 'none', 4000);
+            if (statusBar) {
+                statusBar.style.display = 'block';
+                statusBar.style.background = 'rgba(34, 197, 94, 0.2)';
+                statusBar.style.borderLeft = '4px solid #22c55e';
+                statusBar.textContent = 'Applied preset: ' + config.desc + '. Click "Run Analysis" to compute.';
+                setTimeout(() => statusBar.style.display = 'none', 4000);
+            }
+        }
+        
+        function updateMaxPrimeDisplay() {
+            const value = parseInt(document.getElementById('maxPrime').value);
+            document.getElementById('maxPrimeDisplay').textContent = value.toLocaleString();
+        }
+        
+        function updateGapRangeMode() {
+            const manualMode = document.querySelector('input[name="gapRangeMode"]:checked').value === 'manual';
+            const controls = document.getElementById('manualGapRangeControls');
+            controls.style.display = manualMode ? 'block' : 'none';
+            
+            if (manualMode) {
+                validateGapRange();
+            }
+        }
+        
+        function validateGapRange() {
+            const minGap = parseInt(document.getElementById('minGapRange').value) || 0;
+            const maxGap = parseInt(document.getElementById('maxGapRange').value) || 0;
+            const errorDiv = document.getElementById('gapRangeError');
+            
+            // Check if both are even (or min is 0 for gap-1)
+            const minValid = minGap === 0 || minGap % 2 === 0;
+            const maxValid = maxGap % 2 === 0;
+            
+            // Check if min < max
+            const rangeValid = minGap < maxGap;
+            
+            if (!minValid || !maxValid || !rangeValid) {
+                errorDiv.style.display = 'block';
+                return false;
+            } else {
+                errorDiv.style.display = 'none';
+                return true;
+            }
+        }
+        
+        function getGapRangeFilter() {
+            const mode = document.querySelector('input[name="gapRangeMode"]:checked').value;
+            
+            if (mode === 'auto') {
+                return { mode: 'auto', min: null, max: null };
+            } else {
+                const min = parseInt(document.getElementById('minGapRange').value) || 0;
+                const max = parseInt(document.getElementById('maxGapRange').value) || 50;
+                return { mode: 'manual', min: min, max: max };
+            }
         }
 
 
@@ -6335,9 +6587,115 @@
 
         // ========== MODAL POPUP FUNCTIONS ==========
         
+        // Expand inline detail section for a specific gap in all chart tables
+        function expandInlineGapDetail(gap) {
+            if (!analysisResults || !analysisResults.gapProducts[gap]) return;
+            
+            const gapData = analysisResults.gapProducts[gap];
+            const s = analysisResults.s || 2;
+            const pctContribution = analysisResults.percentageContributions[gap] || 0;
+            
+            // Create detail HTML
+            const detailHTML = `
+                <div class="gap-inline-detail" id="gapDetail${gap}" style="background: linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border-left: 4px solid #4ecdc4; padding: 16px; margin: 8px 0; border-radius: 6px; animation: slideDown 0.3s;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
+                        <h4 style="color: #4ecdc4; margin: 0; font-size: 1.1rem;">Gap ${gap} - Quick Stats</h4>
+                        <button onclick="closeInlineDetail(${gap})" style="background: #ff4444; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">✕ Close</button>
+                    </div>
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
+                        <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px;">
+                            <div style="color: #888; font-size: 0.8rem;">Prime Count</div>
+                            <div style="color: #ffd700; font-size: 1.2rem; font-weight: bold;">${gapData.count.toLocaleString()}</div>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px;">
+                            <div style="color: #888; font-size: 0.8rem;">Product P<sub>${gap}</sub>(${s})</div>
+                            <div style="color: #4ecdc4; font-size: 1.2rem; font-weight: bold;">${gapData.product.toFixed(8)}</div>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px;">
+                            <div style="color: #888; font-size: 0.8rem;">% Contribution</div>
+                            <div style="color: #8b5cf6; font-size: 1.2rem; font-weight: bold;">${pctContribution.toFixed(4)}%</div>
+                        </div>
+                        <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px;">
+                            <div style="color: #888; font-size: 0.8rem;">Avg Prime</div>
+                            <div style="color: #e0e0e0; font-size: 1.2rem; font-weight: bold;">${(gapData.primes.reduce((a,b) => a+b, 0) / gapData.count).toFixed(0)}</div>
+                        </div>
+                    </div>
+                    <div style="margin-top: 12px; text-align: center;">
+                        <button onclick="showGapDetails(${gap}); event.stopPropagation();" style="background: #4ecdc4; color: #000; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
+                            View Full Details & Prime List
+                        </button>
+                    </div>
+                </div>
+            `;
+            
+            // Insert detail section after each table in all chart wrappers
+            const tableWrappers = document.querySelectorAll('.stats-table-wrapper');
+            tableWrappers.forEach(wrapper => {
+                // Remove any existing inline details
+                const existingDetails = wrapper.querySelectorAll('.gap-inline-detail');
+                existingDetails.forEach(detail => detail.remove());
+                
+                // Insert new detail after the table container
+                const tableContainer = wrapper.querySelector('.stats-table-container');
+                if (tableContainer) {
+                    tableContainer.insertAdjacentHTML('afterend', detailHTML);
+                    
+                    // Scroll to the detail section
+                    const detailElement = wrapper.querySelector(`#gapDetail${gap}`);
+                    if (detailElement) {
+                        detailElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                }
+            });
+            
+            // Highlight the gap row in tables
+            highlightGapRow(gap);
+        }
+        
+        // Close inline detail section
+        function closeInlineDetail(gap) {
+            const details = document.querySelectorAll(`#gapDetail${gap}`);
+            details.forEach(detail => {
+                detail.style.animation = 'slideUp 0.3s';
+                setTimeout(() => detail.remove(), 300);
+            });
+            unhighlightAllRows();
+        }
+        
+        // Highlight gap row in all tables
+        function highlightGapRow(gap) {
+            const tables = document.querySelectorAll('.stats-table');
+            tables.forEach(table => {
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    const firstCell = row.querySelector('td');
+                    if (firstCell && firstCell.textContent.trim() === gap.toString()) {
+                        row.style.background = 'rgba(78, 205, 196, 0.2)';
+                        row.style.outline = '2px solid #4ecdc4';
+                    }
+                });
+            });
+        }
+        
+        // Remove all row highlights
+        function unhighlightAllRows() {
+            const tables = document.querySelectorAll('.stats-table');
+            tables.forEach(table => {
+                const rows = table.querySelectorAll('tr');
+                rows.forEach(row => {
+                    row.style.background = '';
+                    row.style.outline = '';
+                });
+            });
+        }
+        
         function showGapDetails(gap) {
             if (!analysisResults) return;
             
+            // First, expand inline detail sections
+            expandInlineGapDetail(gap);
+            
+            // Then show modal popup
             const modal = document.getElementById('gapModal');
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
@@ -6380,7 +6738,7 @@
                             <div class="modal-stat-value" style="font-size: 1rem;">${gapType}</div>
                         </div>
                         <div class="modal-stat-item">
-                            <div class="modal-stat-label">Prime Count in Gap Family</div>
+                            <div class="modal-stat-label">Prime Count in Gap Family (up to ${analysisResults.maxPrime.toLocaleString()})</div>
                             <div class="modal-stat-value">${gapData.count.toLocaleString()}</div>
                         </div>
                         <div class="modal-stat-item">
@@ -6424,7 +6782,7 @@
                             <div class="modal-stat-value">${Math.min(...gapData.primes).toLocaleString()}</div>
                         </div>
                         <div class="modal-stat-item">
-                            <div class="modal-stat-label">Largest Prime (shown)</div>
+                            <div class="modal-stat-label">Largest Prime in Range</div>
                             <div class="modal-stat-value">${Math.max(...gapData.primes).toLocaleString()}</div>
                         </div>
                         <div class="modal-stat-item">
@@ -6436,7 +6794,7 @@
                 
                 <div class="modal-section">
                     <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <div class="modal-section-title" style="margin-bottom: 0;">All ${gapData.count.toLocaleString()} Primes in Gap ${gap} Family</div>
+                        <div class="modal-section-title" style="margin-bottom: 0;">All ${gapData.count.toLocaleString()} Primes in Gap ${gap} Family (up to ${analysisResults.maxPrime.toLocaleString()})</div>
                         <button class="btn btn-secondary" onclick="copyPrimesToClipboard(${gap})" style="padding: 6px 12px; font-size: 0.85rem;">
                             Copy All Primes
                         </button>
@@ -6500,6 +6858,40 @@
                     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
                     const modalTitle = document.getElementById('modalTitle').textContent.replace(/[^a-zA-Z0-9]/g, '_');
                     link.download = `${modalTitle}_${timestamp}_4K.png`;
+                    link.href = url;
+                    link.click();
+                });
+            });
+        }
+        
+        // Screenshot the classical or gap view at the bottom
+        function screenshotClassicalView() {
+            // Check which view is currently shown
+            const classicalView = document.getElementById('classicalView');
+            const isClassicalViewVisible = classicalView.style.display !== 'none';
+            
+            if (!isClassicalViewVisible) {
+                alert('Please switch to Classical Sequential View mode to take a screenshot of it.');
+                return;
+            }
+            
+            const viewElement = classicalView.querySelector('.chart-wrapper');
+            
+            // Use html2canvas to capture the view
+            html2canvas(viewElement, {
+                scale: 3, // 4K quality (3x scale)
+                backgroundColor: '#0a0a0f',
+                logging: false,
+                useCORS: true,
+                width: viewElement.scrollWidth,
+                height: viewElement.scrollHeight
+            }).then(canvas => {
+                // Convert to blob and download
+                canvas.toBlob(blob => {
+                    const url = URL.createObjectURL(blob);
+                    const link = document.createElement('a');
+                    const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
+                    link.download = `Classical_Prime_Sequence_${timestamp}_4K.png`;
                     link.href = url;
                     link.click();
                 });
@@ -6580,6 +6972,140 @@
                 const clickedGap = gaps[clickedIndex];
                 showGapDetails(clickedGap);
             }
+        }
+        
+        // Chart Animation System
+        const chartAnimations = {
+            convergenceChart: { isPlaying: false, currentRange: 100, intervalId: null, speed: 1.0 },
+            gapContribChart: { isPlaying: false, currentRange: 100, intervalId: null, speed: 1.0 },
+            gapDistChart: { isPlaying: false, currentRange: 100, intervalId: null, speed: 1.0 },
+            percentageChart: { isPlaying: false, currentRange: 100, intervalId: null, speed: 1.0 },
+            errorChart: { isPlaying: false, currentRange: 100, intervalId: null, speed: 1.0 },
+            logScaleChart: { isPlaying: false, currentRange: 100, intervalId: null, speed: 1.0 }
+        };
+        
+        function toggleChartAnimation(chartId) {
+            const anim = chartAnimations[chartId];
+            if (!anim) return;
+            
+            const btn = event.target.closest('.chart-play-pause-btn');
+            
+            if (anim.isPlaying) {
+                // Pause
+                anim.isPlaying = false;
+                btn.classList.remove('playing');
+                btn.innerHTML = '<span>▶</span> Play';
+                if (anim.intervalId) {
+                    clearInterval(anim.intervalId);
+                    anim.intervalId = null;
+                }
+            } else {
+                // Play
+                if (!analysisResults) {
+                    alert('Please run the analysis first!');
+                    return;
+                }
+                
+                // Reset to starting range
+                anim.currentRange = 100;
+                
+                anim.isPlaying = true;
+                btn.classList.add('playing');
+                btn.innerHTML = '<span>⏸</span> Pause';
+                startChartAnimation(chartId);
+            }
+        }
+        
+        function startChartAnimation(chartId) {
+            const anim = chartAnimations[chartId];
+            if (!anim) return;
+            
+            const maxRange = parseInt(document.getElementById('maxPrime').value);
+            const baseInterval = 100; // Base update interval in ms
+            const interval = baseInterval / anim.speed;
+            
+            anim.intervalId = setInterval(() => {
+                if (anim.currentRange >= maxRange) {
+                    // Animation complete - reset to start and stop
+                    anim.currentRange = 100;
+                    const btn = document.querySelector(`[onclick="toggleChartAnimation('${chartId}')"]`);
+                    if (btn) {
+                        anim.isPlaying = false;
+                        btn.classList.remove('playing');
+                        btn.innerHTML = '<span>▶</span> Play';
+                    }
+                    clearInterval(anim.intervalId);
+                    anim.intervalId = null;
+                    
+                    // Re-render with full range
+                    renderIndividualChart(chartId, maxRange);
+                    return;
+                }
+                
+                // Increment range
+                const increment = Math.max(1, Math.floor(maxRange / 100));
+                anim.currentRange = Math.min(anim.currentRange + increment, maxRange);
+                
+                // Re-render chart with current range
+                renderIndividualChart(chartId, anim.currentRange);
+            }, interval);
+        }
+        
+        function updateChartSpeed(chartId) {
+            const anim = chartAnimations[chartId];
+            if (!anim) return;
+            
+            const slider = document.getElementById(chartId + 'SpeedSlider');
+            const speedDisplay = document.getElementById(chartId + 'Speed');
+            
+            anim.speed = parseFloat(slider.value);
+            speedDisplay.textContent = anim.speed.toFixed(1) + 'x';
+            
+            // If playing, restart with new speed
+            if (anim.isPlaying) {
+                clearInterval(anim.intervalId);
+                anim.intervalId = null;
+                startChartAnimation(chartId);
+            }
+        }
+        
+        function renderIndividualChart(chartId, maxPrime) {
+            // Get current s value
+            const s = analysisResults.s || 2;
+            
+            // Calculate gap decomposition for the specified range
+            const tempResults = computeGapDecompositionWithS(maxPrime, s);
+            
+            // Store original results
+            const originalResults = analysisResults;
+            
+            // Temporarily use the new results for rendering
+            analysisResults = tempResults;
+            
+            // Render the specific chart - these functions use the global analysisResults
+            switch(chartId) {
+                case 'convergenceChart':
+                    renderConvergenceChart();
+                    break;
+                case 'gapContribChart':
+                    renderGapContribChart();
+                    break;
+                case 'gapDistChart':
+                    renderGapDistChart();
+                    break;
+                case 'percentageChart':
+                    renderPercentageChart();
+                    break;
+                case 'errorChart':
+                    renderErrorChart();
+                    break;
+                case 'logScaleChart':
+                    renderLogScaleChart();
+                    break;
+            }
+            
+            // Restore original results
+            analysisResults = originalResults;
         }
     </script>
 </body>
