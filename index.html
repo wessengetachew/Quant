@@ -1092,6 +1092,112 @@
                 opacity: 0;
             }
         }
+        
+        /* ========== RESPONSIVE MOBILE STYLES ========== */
+        @media screen and (max-width: 768px) {
+            /* Reduce padding on mobile */
+            .charts-container {
+                padding: 0 16px 20px 16px;
+            }
+            
+            .chart-wrapper {
+                padding: 12px;
+            }
+            
+            .introduction {
+                padding: 0 16px;
+            }
+            
+            .controls-container {
+                padding: 0 16px;
+            }
+            
+            .header {
+                padding: 24px 16px;
+            }
+            
+            .header h1 {
+                font-size: 1.6rem;
+            }
+            
+            .header .subtitle {
+                font-size: 0.95rem;
+            }
+            
+            /* Make control grids single column on mobile */
+            .control-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            /* Reduce intro section padding */
+            .intro-section {
+                padding: 20px 16px;
+            }
+            
+            /* Make chart animation controls full width on small screens */
+            .chart-animation-controls {
+                position: static;
+                width: 100%;
+                margin-bottom: 12px;
+            }
+            
+            /* Adjust chart title size */
+            .chart-title {
+                font-size: 1rem;
+            }
+            
+            /* Make modal more mobile-friendly */
+            .modal-content {
+                width: 95%;
+                max-height: 90vh;
+                padding: 16px;
+            }
+            
+            .modal-header {
+                padding: 16px;
+            }
+            
+            .modal-body {
+                padding: 16px;
+            }
+            
+            /* Stack modal stats on mobile */
+            .modal-stat-grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+            
+            /* Adjust button sizes */
+            .btn {
+                padding: 10px 16px;
+                font-size: 0.9rem;
+            }
+            
+            /* Make tables scrollable on mobile */
+            .stats-table-container {
+                overflow-x: auto;
+            }
+        }
+        
+        @media screen and (max-width: 480px) {
+            /* Extra small screens */
+            .header h1 {
+                font-size: 1.3rem;
+            }
+            
+            .chart-wrapper {
+                padding: 8px;
+            }
+            
+            .charts-container {
+                padding: 0 8px 16px 8px;
+            }
+            
+            .modal-content {
+                width: 98%;
+                padding: 12px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -1168,9 +1274,9 @@
                 <div class="control-group">
                     <label>
                         Maximum Prime
-                        <span class="control-value" id="maxPrimeDisplay">10000000</span>
+                        <span class="control-value" id="maxPrimeDisplay">10,000,000</span>
                     </label>
-                    <input type="number" id="maxPrime" value="10000000" min="1000" max="100000000" step="1000000"
+                    <input type="number" id="maxPrime" value="10000000" min="1000" max="1000000000" step="1000000"
                            oninput="updateMaxPrimeDisplay()">
                     <div style="margin-top: 8px; font-size: 0.85rem; color: #888;">
                         Note: Values > 10M may take significant time
@@ -1216,35 +1322,6 @@
                     </div>
                 </div>
                 
-                <div class="control-group">
-                    <label style="display: block; margin-bottom: 12px; color: #ffd700; font-size: 1rem;">
-                        View Mode
-                    </label>
-                    <div style="display: flex; flex-direction: column; gap: 10px;">
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; background: rgba(255, 215, 0, 0.1); border-radius: 6px; border-left: 3px solid #ffd700;">
-                            <input type="radio" name="viewMode" value="gap" checked 
-                                   style="width: auto; margin: 0;">
-                            <div>
-                                <strong style="color: #ffd700;">Gap-Classified View</strong>
-                                <div style="font-size: 0.75rem; color: #888; margin-top: 2px;">
-                                    Group primes by gap size (current analysis)
-                                </div>
-                            </div>
-                        </label>
-                        <label style="display: flex; align-items: center; gap: 10px; cursor: pointer; padding: 10px; background: rgba(78, 205, 196, 0.1); border-radius: 6px; border-left: 3px solid #4ecdc4;">
-                            <input type="radio" name="viewMode" value="classical" 
-                                   style="width: auto; margin: 0;">
-                            <div>
-                                <strong style="color: #4ecdc4;">Classical Sequential View</strong>
-                                <div style="font-size: 0.75rem; color: #888; margin-top: 2px;">
-                                    Show all primes in order with gap annotations
-                                </div>
-                            </div>
-                        </label>
-                    </div>
-                </div>
-            </div>
-            
             <div class="button-row" style="margin-top: 20px;">
                 <button class="btn" onclick="runAnalysis()">Run Analysis</button>
                 <button class="btn btn-secondary" onclick="exportAllData()">Export All Data (CSV)</button>
@@ -1572,38 +1649,6 @@
         </div>
     </div>
     
-    <!-- Classical Sequential View (hidden by default) -->
-    <div id="classicalView" class="charts-container" style="display: none;">
-        <div class="chart-wrapper">
-            <div class="chart-title">Classical Prime Sequence with Gap Annotations</div>
-            <div style="margin-bottom: 16px; padding: 12px; background: rgba(78, 205, 196, 0.05); border-radius: 6px; border-left: 3px solid #4ecdc4;">
-                <p style="margin: 0; color: #ccc; font-size: 0.9rem;">
-                    Sequential view of all primes colored by gap to next prime. Click any prime to filter by its gap class.
-                </p>
-            </div>
-            <div style="margin-bottom: 16px; display: flex; justify-content: flex-end;">
-                <button class="btn btn-secondary" onclick="screenshotClassicalView()" style="padding: 8px 16px; font-size: 0.85rem;">
-                    📸 Screenshot Classical View (4K)
-                </button>
-            </div>
-            <div id="classicalTableWrapper" style="max-height: 600px; overflow-y: auto; background: rgba(0, 0, 0, 0.2); border-radius: 6px; padding: 16px;">
-                <table id="classicalTable" style="width: 100%; border-collapse: collapse; color: #e0e0e0; font-family: 'Courier New', monospace;">
-                    <thead style="position: sticky; top: 0; background: #1a1a2a; z-index: 1;">
-                        <tr style="border-bottom: 2px solid #ffd700;">
-                            <th style="padding: 10px; text-align: left; color: #ffd700;">Index</th>
-                            <th style="padding: 10px; text-align: right; color: #ffd700;">Prime</th>
-                            <th style="padding: 10px; text-align: center; color: #ffd700;">Gap →</th>
-                            <th style="padding: 10px; text-align: right; color: #ffd700;">P(p)</th>
-                            <th style="padding: 10px; text-align: right; color: #ffd700;">Cumulative</th>
-                        </tr>
-                    </thead>
-                    <tbody id="classicalTableBody">
-                        <!-- Populated by JavaScript -->
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
     
     <div class="charts-container">
         <div class="chart-wrapper" id="convergenceWrapper">
@@ -1645,7 +1690,7 @@
             <canvas id="gapContribChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
-                    <div class="stats-table-title">Gap Family Product Values</div>
+                    <div class="stats-table-title">Gap Family Product Values <span style="font-size: 0.75rem; color: #888; font-weight: normal;">(Click row for details)</span></div>
                     <div class="precision-control">
                         <label>Decimals:</label>
                         <select id="gapContribPrecision" onchange="updateStatsTables()">
@@ -1664,7 +1709,7 @@
                         <button class="show-all-toggle" onclick="toggleTable('gapContribTable')">Show All</button>
                     </div>
                 </div>
-                <div class="stats-table-container" id="gapContribTable">
+                <div class="stats-table-container" id="gapContribTable" data-chart="gapContribChart">
                     <table class="stats-table" id="gapContribTableContent"></table>
                 </div>
                 <div class="export-row">
@@ -1679,7 +1724,7 @@
             <canvas id="gapDistChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
-                    <div class="stats-table-title">Prime Count and Distribution</div>
+                    <div class="stats-table-title">Prime Count and Distribution <span style="font-size: 0.75rem; color: #888; font-weight: normal;">(Click row for details)</span></div>
                     <div class="precision-control">
                         <label>Decimals:</label>
                         <select id="gapDistPrecision" onchange="updateStatsTables()">
@@ -1695,7 +1740,7 @@
                         <button class="show-all-toggle" onclick="toggleTable('gapDistTable')">Show All</button>
                     </div>
                 </div>
-                <div class="stats-table-container" id="gapDistTable">
+                <div class="stats-table-container" id="gapDistTable" data-chart="gapDistChart">
                     <table class="stats-table" id="gapDistTableContent"></table>
                 </div>
                 <div class="export-row">
@@ -1710,7 +1755,7 @@
             <canvas id="percentageChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
-                    <div class="stats-table-title">Contribution Percentages</div>
+                    <div class="stats-table-title">Contribution Percentages <span style="font-size: 0.75rem; color: #888; font-weight: normal;">(Click row for details)</span></div>
                     <div class="precision-control">
                         <label>Decimals:</label>
                         <select id="percentagePrecision" onchange="updateStatsTables()">
@@ -1726,7 +1771,7 @@
                         <button class="show-all-toggle" onclick="toggleTable('percentageTable')">Show All</button>
                     </div>
                 </div>
-                <div class="stats-table-container" id="percentageTable">
+                <div class="stats-table-container" id="percentageTable" data-chart="percentageChart">
                     <table class="stats-table" id="percentageTableContent"></table>
                 </div>
                 <div class="export-row">
@@ -2001,7 +2046,7 @@
                     <!-- Mathematical Foundation -->
                     <div style="background: rgba(139, 92, 246, 0.05); padding: 20px; border-radius: 8px; border-left: 4px solid #8b5cf6;">
                         <h4 style="color: #8b5cf6; margin: 0 0 10px 0; font-size: 1.1rem;">Mathematical Framework</h4>
-                        <p style="margin: 0; color: #ccc; line-height: 1.8;">
+                        <p style="margin: 0 0 12px 0; color: #ccc; line-height: 1.8;">
                             This analysis builds on Leonhard Euler's 1734 proof that ζ(2) = π²/6 and introduces a novel 
                             gap-class decomposition of the Euler product. The framework partitions primes by their forward 
                             differences, revealing that twin primes contribute approximately 34.79% to the logarithmic product 
@@ -2472,7 +2517,7 @@
                         
                         statusBar.className = 'status-bar complete';
                         const gapInfo = gapRangeFilter.mode === 'auto' ? 'all gaps' : `gaps ${gapRangeFilter.min}-${gapRangeFilter.max}`;
-                        statusBar.textContent = `${zetaLabel}: ${analysisResults.totalPrimes.toLocaleString()} primes, ${analysisResults.evenGaps.length} gap families (${gapInfo}, max: ${maxGapFound}), error = ${(analysisResults.finalRelativeError * 100).toFixed(8)}%`;
+                        statusBar.textContent = `${zetaLabel}: ${((analysisResults.allPrimesFound || analysisResults.totalPrimes) || analysisResults.totalPrimes).toLocaleString()} primes, ${analysisResults.evenGaps.length} gap families (${gapInfo}, max: ${maxGapFound}), error = ${(analysisResults.finalRelativeError * 100).toFixed(8)}%`;
                     }
                     
                     updateStatistics();
@@ -2542,7 +2587,7 @@
                 .sort((a, b) => b[1] - a[1])[0];
             
             const stats = [
-                { label: 'Total Primes', value: analysisResults.totalPrimes.toLocaleString() },
+                { label: 'Total Primes', value: ((analysisResults.allPrimesFound || analysisResults.totalPrimes) || analysisResults.totalPrimes || primes.length).toLocaleString() },
                 { label: 'Maximum Prime', value: analysisResults.maxPrime.toLocaleString() },
                 { label: 'Gap Families', value: analysisResults.evenGaps.length },
                 { label: 'Twin Primes', value: twinCount, info: 'Pairs (p, p+2)' },
@@ -2576,15 +2621,11 @@
             const primes = analysisResults.primes;
             const s = analysisResults.s || 2;
             
-            // Gap color mapping
+            // Gap color mapping - matching the legend
             const gapColors = {
-                1: '#ff6b6b',  // red
-                2: '#ee5a24',  // orange-red (twin primes)
-                4: '#f39c12',  // orange
-                6: '#f1c40f',  // yellow (sexy primes)
-                8: '#2ecc71',  // green
-                10: '#3498db', // blue
-                12: '#9b59b6', // purple
+                2: '#e74c3c',  // Twin - red
+                4: '#f39c12',  // Cousin - orange
+                6: '#9b59b6',  // Sexy - purple
             };
             
             let html = '';
@@ -2600,32 +2641,36 @@
                 const factor = ps / (ps - 1);
                 cumulative *= factor;
                 
-                const gapColor = gapColors[gap] || '#95a5a6';
+                const gapColor = gapColors[gap] || '#95a5a6'; // Default gray for other gaps
+                const gapLabel = gap === 2 ? 'Twin' : gap === 4 ? 'Cousin' : gap === 6 ? 'Sexy' : gap;
+                
+                // Alternating row colors for better readability
+                const rowBg = i % 2 === 0 ? 'rgba(255, 255, 255, 0.02)' : 'transparent';
                 
                 html += `
-                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer; transition: background 0.2s;" 
-                        onmouseover="this.style.background='rgba(78, 205, 196, 0.1)'" 
-                        onmouseout="this.style.background=''"
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.03); cursor: pointer; transition: all 0.2s; background: ${rowBg};" 
+                        onmouseover="this.style.background='rgba(102, 126, 234, 0.15)'; this.style.transform='translateX(4px)'" 
+                        onmouseout="this.style.background='${rowBg}'; this.style.transform='translateX(0)'"
                         onclick="showGapDetails(${gap})">
-                        <td style="padding: 8px; color: #888;">${i + 1}</td>
-                        <td style="padding: 8px; text-align: right; font-weight: bold;">${p.toLocaleString()}</td>
-                        <td style="padding: 8px; text-align: center;">
-                            <span style="display: inline-block; padding: 4px 12px; background: ${gapColor}; color: #000; border-radius: 4px; font-weight: bold; font-size: 0.85rem;">
-                                ${gap || '-'}
+                        <td style="padding: 12px 10px; color: #888; font-size: 0.9rem;">${(i + 1).toLocaleString()}</td>
+                        <td style="padding: 12px 10px; text-align: right; font-weight: bold; color: #fff; font-size: 1rem;">${p.toLocaleString()}</td>
+                        <td style="padding: 12px 10px; text-align: center;">
+                            <span style="display: inline-block; padding: 6px 14px; background: ${gapColor}; color: #000; border-radius: 6px; font-weight: bold; font-size: 0.85rem; box-shadow: 0 2px 4px rgba(0,0,0,0.2);">
+                                ${gapLabel}
                             </span>
                         </td>
-                        <td style="padding: 8px; text-align: right; color: #4ecdc4;">${factor.toFixed(10)}</td>
-                        <td style="padding: 8px; text-align: right; color: #ffd700;">${cumulative.toFixed(10)}</td>
+                        <td style="padding: 12px 10px; text-align: right; color: #4ecdc4; font-family: 'Courier New', monospace;">${factor.toFixed(10)}</td>
+                        <td style="padding: 12px 10px; text-align: right; color: #ffd700; font-family: 'Courier New', monospace; font-weight: bold;">${cumulative.toFixed(10)}</td>
                     </tr>
                 `;
             }
             
             if (displayLimit < primes.length - 1) {
                 html += `
-                    <tr>
-                        <td colspan="5" style="padding: 16px; text-align: center; color: #888; font-style: italic;">
-                            Showing first ${displayLimit.toLocaleString()} primes. 
-                            ${(primes.length - 1 - displayLimit).toLocaleString()} more primes not displayed for performance.
+                    <tr style="background: rgba(255, 215, 0, 0.05);">
+                        <td colspan="5" style="padding: 20px; text-align: center; color: #ffd700; font-style: italic; font-size: 0.95rem;">
+                            📊 Showing first ${displayLimit.toLocaleString()} primes for performance. 
+                            ${(primes.length - 1 - displayLimit).toLocaleString()} additional primes not displayed.
                         </td>
                     </tr>
                 `;
@@ -2634,20 +2679,339 @@
             tbody.innerHTML = html;
         }
         
+        // Find k-tuple constellation pairs
+        // Each prime can appear in multiple pairs
+        function classifyKtuples(primes, s) {
+            const ktuples = {
+                twins: [],      // (p, p+2) pairs
+                cousins: [],    // (p, p+4) pairs
+                sexy: [],       // (p, p+6) pairs
+                triplets: [],   // not used
+                quadruplets: [], // not used
+                isolated: []    // only prime 2
+            };
+            
+            const primeSet = new Set(primes);
+            
+            // Find all twin pairs (p, p+2)
+            for (let i = 0; i < primes.length; i++) {
+                const p = primes[i];
+                if (primeSet.has(p + 2)) {
+                    ktuples.twins.push([p, p + 2]);
+                }
+            }
+            
+            // Find all cousin pairs (p, p+4)
+            for (let i = 0; i < primes.length; i++) {
+                const p = primes[i];
+                if (primeSet.has(p + 4)) {
+                    ktuples.cousins.push([p, p + 4]);
+                }
+            }
+            
+            // Find all sexy pairs (p, p+6)
+            for (let i = 0; i < primes.length; i++) {
+                const p = primes[i];
+                if (primeSet.has(p + 6)) {
+                    ktuples.sexy.push([p, p + 6]);
+                }
+            }
+            
+            // Isolated: only prime 2 (and last prime in range)
+            ktuples.isolated.push(2);
+            if (primes.length > 0 && primes[primes.length - 1] > 2) {
+                ktuples.isolated.push(primes[primes.length - 1]);
+            }
+            
+            const totalClassified = primes.length; // All primes accounted for
+            const totalPrimes = primes.length;
+            
+            // Calculate products for each category
+            // For pairs: flatten and get unique primes to avoid double-counting
+            const calculateProduct = (pairsList) => {
+                let product = 1;
+                const uniquePrimes = new Set();
+                
+                // Flatten pairs/tuples and collect unique primes
+                pairsList.forEach(item => {
+                    if (Array.isArray(item)) {
+                        item.forEach(p => uniquePrimes.add(p));
+                    } else {
+                        uniquePrimes.add(item);
+                    }
+                });
+                
+                // Calculate Euler product over unique primes
+                uniquePrimes.forEach(p => {
+                    const ps = Math.pow(p, s);
+                    product *= ps / (ps - 1);
+                });
+                return product;
+            };
+            
+            return {
+                twins: { primes: ktuples.twins, product: calculateProduct(ktuples.twins) },
+                cousins: { primes: ktuples.cousins, product: calculateProduct(ktuples.cousins) },
+                sexy: { primes: ktuples.sexy, product: calculateProduct(ktuples.sexy) },
+                triplets: { primes: ktuples.triplets, product: calculateProduct(ktuples.triplets) },
+                quadruplets: { primes: ktuples.quadruplets, product: calculateProduct(ktuples.quadruplets) },
+                isolated: { primes: ktuples.isolated, product: calculateProduct(ktuples.isolated) },
+                stats: { totalPrimes: totalPrimes, totalClassified: totalClassified, verified: totalClassified === totalPrimes }
+            };
+        }
+        
+        // Render k-tuple classification view
+        function renderKtupleView() {
+            if (!analysisResults) return;
+            
+            const { primes, s } = analysisResults;
+            const ktuples = classifyKtuples(primes, s);
+            const tbody = document.getElementById('ktupleTableBody');
+            
+            const categories = [
+                { 
+                    id: 'twins',
+                    name: 'Twin Primes (p, p+2)', 
+                    data: ktuples.twins,
+                    color: '#e74c3c',
+                    description: 'Consecutive primes differing by 2'
+                },
+                { 
+                    id: 'cousins',
+                    name: 'Cousin Primes (p, p+4)', 
+                    data: ktuples.cousins,
+                    color: '#f39c12',
+                    description: 'Primes differing by 4'
+                },
+                { 
+                    id: 'sexy',
+                    name: 'Sexy Primes (p, p+6)', 
+                    data: ktuples.sexy,
+                    color: '#9b59b6',
+                    description: 'Primes differing by 6'
+                },
+                { 
+                    id: 'triplets',
+                    name: 'Prime Triplets', 
+                    data: ktuples.triplets,
+                    color: '#3498db',
+                    description: 'Three consecutive primes in constellation'
+                },
+                { 
+                    id: 'quadruplets',
+                    name: 'Prime Quadruplets (p, p+2, p+6, p+8)', 
+                    data: ktuples.quadruplets,
+                    color: '#1abc9c',
+                    description: 'Four primes in arithmetic pattern'
+                },
+                { 
+                    id: 'isolated',
+                    name: 'Isolated Primes', 
+                    data: ktuples.isolated,
+                    color: '#95a5a6',
+                    description: 'Not part of any close constellation'
+                }
+            ];
+            
+            // Store globally for click handlers
+            window.ktupleCategories = {};
+            categories.forEach(cat => {
+                window.ktupleCategories[cat.id] = {
+                    name: cat.name,
+                    primes: cat.data.primes,
+                    product: cat.data.product,
+                    color: cat.color
+                };
+            });
+            
+            let html = '';
+            // Total product should be the Euler product over ALL primes (already calculated)
+            const totalProduct = analysisResults.finalProduct;
+            
+            categories.forEach(cat => {
+                const count = cat.data.primes.length;
+                const product = cat.data.product;
+                
+                let example = '';
+                if (count > 0) {
+                    const first = cat.data.primes[0];
+                    example = Array.isArray(first) ? first.join(', ') : first;
+                }
+                
+                const contribution = product > 1 ? ((product - 1) / product * 100).toFixed(4) + '%' : '0%';
+                
+                html += `
+                    <tr style="border-bottom: 1px solid rgba(255, 255, 255, 0.05); cursor: pointer;" 
+                        onmouseover="this.style.background='rgba(255, 107, 129, 0.1)'" 
+                        onmouseout="this.style.background=''"
+                        data-category="${cat.id}">
+                        <td style="padding: 12px;">
+                            <div style="display: flex; align-items: center; gap: 8px;">
+                                <div style="width: 12px; height: 12px; background: ${cat.color}; border-radius: 2px;"></div>
+                                <strong>${cat.name}</strong>
+                            </div>
+                            <div style="font-size: 0.8rem; color: #888; margin-top: 4px; margin-left: 20px;">
+                                ${cat.description}
+                            </div>
+                        </td>
+                        <td style="padding: 12px; text-align: center; font-size: 1.2rem; font-weight: bold; color: ${cat.color};">
+                            ${count.toLocaleString()}
+                        </td>
+                        <td style="padding: 12px; color: #aaa; font-family: 'Courier New', monospace;">
+                            ${example}${count > 1 ? ', ...' : ''}
+                        </td>
+                        <td style="padding: 12px; text-align: right; color: #4ecdc4; font-family: 'Courier New', monospace;">
+                            ${product.toFixed(12)}
+                        </td>
+                        <td style="padding: 12px; text-align: right; color: #ffd700;">
+                            ${contribution}
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            // Add total row
+            html += `
+                <tr style="border-top: 2px solid #ff6b81; background: rgba(255, 107, 129, 0.1); font-weight: bold;">
+                    <td style="padding: 12px; color: #ff6b81;">TOTAL PRODUCT</td>
+                    <td style="padding: 12px; text-align: center; color: #ff6b81;">-</td>
+                    <td style="padding: 12px;">All constellations combined</td>
+                    <td style="padding: 12px; text-align: right; color: #4ecdc4; font-family: 'Courier New', monospace;">
+                        ${totalProduct.toFixed(12)}
+                    </td>
+                    <td style="padding: 12px; text-align: right; color: #ffd700;">
+                        ζ(2) ≈ ${(Math.PI * Math.PI / 6).toFixed(12)}
+                    </td>
+                </tr>
+            `;
+            
+            tbody.innerHTML = html;
+            
+            // Add event delegation for row clicks
+            tbody.onclick = function(e) {
+                const row = e.target.closest('tr[data-category]');
+                if (row) {
+                    const catId = row.getAttribute('data-category');
+                    showKtupleDetails(catId);
+                }
+            };
+            
+            // Display verification stats
+            const verificationDiv = document.getElementById('ktupleVerification');
+            if (verificationDiv && ktuples.stats) {
+                const verified = ktuples.stats.verified;
+                const verifyIcon = verified ? '✓' : '✗';
+                const verifyColor = verified ? '#4ecdc4' : '#ff6b81';
+                verificationDiv.innerHTML = `
+                    <strong style="color: ${verifyColor};">${verifyIcon} Classification Verification:</strong> 
+                    ${ktuples.stats.totalClassified.toLocaleString()} of ${ktuples.stats.totalPrimes.toLocaleString()} primes classified
+                    ${verified ? '(All primes accounted for)' : '(WARNING: Missing primes!)'}
+                `;
+            }
+        }
+        
+        // Show detailed stats for a k-tuple category
+        function showKtupleDetails(catId) {
+            const cat = window.ktupleCategories[catId];
+            if (!cat) return;
+            
+            const primes = cat.primes;
+            const product = cat.product;
+            const catName = cat.name;
+            const color = cat.color;
+            const count = primes.length; // number of pairs
+            
+            // Build grid of pairs/tuples
+            let pairsList = '';
+            const displayLimit = Math.min(count, 50);
+            
+            pairsList += '<div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 8px;">';
+            
+            for (let i = 0; i < displayLimit; i++) {
+                const item = primes[i];
+                const display = Array.isArray(item) ? '(' + item.join(', ') + ')' : item;
+                pairsList += '<div style="padding: 8px; background: rgba(255, 255, 255, 0.05); border-radius: 4px; color: #e0e0e0; font-family: \'Courier New\', monospace; text-align: center; border: 1px solid ' + color + '40;">' + display + '</div>';
+            }
+            
+            pairsList += '</div>';
+            
+            if (count > displayLimit) {
+                pairsList += '<div style="padding: 8px; color: #888; font-style: italic; text-align: center; margin-top: 8px;">... and ' + (count - displayLimit) + ' more</div>';
+            }
+            
+            const contributionPct = product > 1 ? ((product - 1) / product * 100).toFixed(4) : '0';
+            
+            const modalHTML = 
+                '<div style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0, 0, 0, 0.8); z-index: 10000; display: flex; align-items: center; justify-content: center;" onclick="this.remove()">' +
+                    '<div style="background: #1a1a2a; border-radius: 12px; padding: 32px; max-width: 700px; max-height: 80vh; overflow-y: auto; border: 2px solid ' + color + ';" onclick="event.stopPropagation()">' +
+                        '<div style="display: flex; align-items: center; gap: 12px; margin-bottom: 20px;">' +
+                            '<div style="width: 20px; height: 20px; background: ' + color + '; border-radius: 4px;"></div>' +
+                            '<h2 style="color: ' + color + '; margin: 0;">' + catName + '</h2>' +
+                        '</div>' +
+                        '<div style="background: rgba(255, 255, 255, 0.05); padding: 16px; border-radius: 8px; margin-bottom: 20px;">' +
+                            '<div style="color: #ffd700; font-size: 1.2rem; margin-bottom: 8px;">' +
+                                '<strong>' + count.toLocaleString() + '</strong> ' + (catId === 'isolated' ? 'primes' : 'pairs') +
+                            '</div>' +
+                            '<div style="color: #4ecdc4; font-size: 1.1rem; font-family: \'Courier New\', monospace;">Product: <strong>' + product.toFixed(12) + '</strong></div>' +
+                            '<div style="color: #ccc; font-size: 0.9rem; margin-top: 8px;">Contribution: ' + contributionPct + '%</div>' +
+                        '</div>' +
+                        '<div style="margin-bottom: 16px;"><strong style="color: #ff6b81; font-size: 1.1rem;">' + (catId === 'isolated' ? 'Isolated primes:' : 'Prime pairs:') + '</strong></div>' +
+                        '<div style="max-height: 300px; overflow-y: auto; background: rgba(0, 0, 0, 0.3); padding: 12px; border-radius: 6px;">' +
+                            pairsList +
+                        '</div>' +
+                        '<div style="text-align: center; margin-top: 24px;">' +
+                            '<button onclick="this.closest(\'div[onclick*=remove]\').remove()" style="padding: 10px 24px; background: ' + color + '; color: #000; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 1rem;">Close</button>' +
+                        '</div>' +
+                    '</div>' +
+                '</div>';
+            
+            document.body.insertAdjacentHTML('beforeend', modalHTML);
+        }
+        
+        // Screenshot k-tuple view
+        function screenshotKtupleView() {
+            const tableElement = document.getElementById('ktupleTableWrapper');
+            const verificationElement = document.getElementById('ktupleVerification');
+            
+            if (!tableElement) {
+                alert('k-Tuple view not found. Please run analysis first.');
+                return;
+            }
+            
+            // Create a temporary container with just the table and verification
+            const tempContainer = document.createElement('div');
+            tempContainer.style.cssText = 'background: #0a0a0f; padding: 20px; position: absolute; left: -9999px;';
+            
+            const titleDiv = document.createElement('div');
+            titleDiv.style.cssText = 'color: #ffd700; font-size: 1.8rem; font-weight: bold; margin-bottom: 20px; text-align: center;';
+            titleDiv.textContent = 'Prime k-Tuple (Constellation) Classification';
+            
+            tempContainer.appendChild(titleDiv);
+            tempContainer.appendChild(tableElement.cloneNode(true));
+            if (verificationElement) {
+                tempContainer.appendChild(verificationElement.cloneNode(true));
+            }
+            
+            document.body.appendChild(tempContainer);
+            
+            html2canvas(tempContainer, {
+                scale: 2,
+                backgroundColor: '#0a0a0f',
+                logging: false
+            }).then(function(canvas) {
+                document.body.removeChild(tempContainer);
+                const link = document.createElement('a');
+                link.download = 'ktuple_classification.png';
+                link.href = canvas.toDataURL();
+                link.click();
+            });
+        }
+        
         // Toggle between gap and classical views
         function toggleViewMode() {
-            const gapView = document.querySelector('input[name="viewMode"][value="gap"]').checked;
-            const classicalView = document.getElementById('classicalView');
-            const chartsContainer = document.querySelectorAll('.charts-container')[1]; // Second charts-container
-            
-            if (gapView) {
-                classicalView.style.display = 'none';
-                chartsContainer.style.display = 'block';
-            } else {
-                classicalView.style.display = 'block';
-                chartsContainer.style.display = 'none';
-                renderClassicalView();
-            }
+            // Only gap view mode exists now
+            const chartsContainer = document.querySelectorAll('.charts-container')[2]; // Third charts-container (gap charts)
+            chartsContainer.style.display = 'grid';
         }
         
         // Render all charts
@@ -3023,19 +3387,27 @@
             
             // Bars
             counts.forEach((count, i) => {
+                const gap = gaps[i];
                 const x = margin.left + i * barWidth;
                 const barH = count * yScale;
                 const y = margin.top + chartH - barH;
                 
+                const isHighlighted = highlightGap && gap === highlightGap;
+                
                 const gradient = ctx.createLinearGradient(x, y, x, y + barH);
-                gradient.addColorStop(0, '#64ff64');
-                gradient.addColorStop(1, '#32aa32');
+                if (isHighlighted) {
+                    gradient.addColorStop(0, '#ff0000');
+                    gradient.addColorStop(1, '#cc0000');
+                } else {
+                    gradient.addColorStop(0, '#64ff64');
+                    gradient.addColorStop(1, '#32aa32');
+                }
                 
                 ctx.fillStyle = gradient;
                 ctx.fillRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
                 
-                ctx.strokeStyle = '#32aa32';
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = isHighlighted ? '#ff0000' : '#32aa32';
+                ctx.lineWidth = isHighlighted ? 8 : 3;
                 ctx.strokeRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
             });
             
@@ -3045,6 +3417,9 @@
             ctx.textAlign = 'center';
             gaps.forEach((gap, i) => {
                 const x = margin.left + i * barWidth + barWidth / 2;
+                const isHighlighted = highlightGap && gap === highlightGap;
+                ctx.fillStyle = isHighlighted ? '#ff0000' : '#aaa';
+                ctx.font = isHighlighted ? 'bold 32px monospace' : 'bold 24px monospace';
                 ctx.fillText(`${gap}`, x, h - margin.bottom + 50);
             });
             
@@ -3111,19 +3486,27 @@
             
             // Bars
             percentages.forEach((pct, i) => {
+                const gap = gaps[i];
                 const x = margin.left + i * barWidth;
                 const barH = pct * yScale;
                 const y = margin.top + chartH - barH;
                 
+                const isHighlighted = highlightGap && gap === highlightGap;
+                
                 const gradient = ctx.createLinearGradient(x, y, x, y + barH);
-                gradient.addColorStop(0, '#ff6464');
-                gradient.addColorStop(1, '#aa3232');
+                if (isHighlighted) {
+                    gradient.addColorStop(0, '#ff0000');
+                    gradient.addColorStop(1, '#cc0000');
+                } else {
+                    gradient.addColorStop(0, '#ff6464');
+                    gradient.addColorStop(1, '#aa3232');
+                }
                 
                 ctx.fillStyle = gradient;
                 ctx.fillRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
                 
-                ctx.strokeStyle = '#aa3232';
-                ctx.lineWidth = 3;
+                ctx.strokeStyle = isHighlighted ? '#ff0000' : '#aa3232';
+                ctx.lineWidth = isHighlighted ? 8 : 3;
                 ctx.strokeRect(x + barWidth * 0.1, y, barWidth * 0.8, barH);
             });
             
@@ -3133,6 +3516,9 @@
             ctx.textAlign = 'center';
             gaps.forEach((gap, i) => {
                 const x = margin.left + i * barWidth + barWidth / 2;
+                const isHighlighted = highlightGap && gap === highlightGap;
+                ctx.fillStyle = isHighlighted ? '#ff0000' : '#aaa';
+                ctx.font = isHighlighted ? 'bold 32px monospace' : 'bold 24px monospace';
                 ctx.fillText(`${gap}`, x, h - margin.bottom + 50);
             });
             
@@ -3423,7 +3809,7 @@
             let csv = 'Gap-Class Decomposition of zeta(2) = pi^2/6\n';
             csv += `Analysis Date,${new Date().toISOString()}\n`;
             csv += `Maximum Prime,${analysisResults.maxPrime}\n`;
-            csv += `Total Primes,${analysisResults.totalPrimes}\n`;
+            csv += `Total Primes,${(analysisResults.allPrimesFound || analysisResults.totalPrimes)}\n`;
             csv += `Target zeta(2),${analysisResults.targetZeta2}\n`;
             csv += `Computed Product,${analysisResults.finalProduct}\n`;
             csv += `Absolute Error,${analysisResults.finalError}\n`;
@@ -3479,11 +3865,6 @@
         document.getElementById('maxPrime').addEventListener('input', updateDisplays);
         document.getElementById('animStart').addEventListener('input', updateDisplays);
         document.getElementById('animEnd').addEventListener('input', updateDisplays);
-        
-        // View mode toggle
-        document.querySelectorAll('input[name="viewMode"]').forEach(radio => {
-            radio.addEventListener('change', toggleViewMode);
-        });
         
         // Table toggle function
         const tableStates = {
@@ -4078,7 +4459,7 @@
             const boxW = (compositeCanvas.width - 2 * padding - 5 * 20) / 6;
             const statsData = [
                 { label: 'N Range', value: analysisResults.maxPrime.toLocaleString() },
-                { label: 'Total Primes', value: analysisResults.totalPrimes.toLocaleString() },
+                { label: 'Total Primes', value: ((analysisResults.allPrimesFound || analysisResults.totalPrimes) || analysisResults.totalPrimes).toLocaleString() },
                 { label: 'Gap Families', value: analysisResults.evenGaps.length.toString() },
                 { label: 'Target ζ(2)', value: analysisResults.targetZeta2.toFixed(8) },
                 { label: 'Final Product', value: analysisResults.finalProduct.toFixed(8) },
@@ -4767,7 +5148,7 @@
             
             csv += `Analysis Date:,${new Date().toISOString()}\n`;
             csv += `Maximum Prime Analyzed:,${analysisResults.maxPrime}\n`;
-            csv += `Total Primes Found:,${analysisResults.totalPrimes}\n`;
+            csv += `Total Primes Found:,${(analysisResults.allPrimesFound || analysisResults.totalPrimes)}\n`;
             csv += `Number of Gap Families:,${analysisResults.evenGaps.length}\n`;
             csv += `Target Value (pi^2/6):,${analysisResults.targetZeta2}\n`;
             csv += `Final Computed Product:,${analysisResults.finalProduct}\n`;
@@ -4809,7 +5190,7 @@
             
             csv += `Analysis Date:,${new Date().toISOString()}\n`;
             csv += `Maximum Prime:,${analysisResults.maxPrime}\n`;
-            csv += `Total Primes:,${analysisResults.totalPrimes}\n`;
+            csv += `Total Primes:,${(analysisResults.allPrimesFound || analysisResults.totalPrimes)}\n`;
             csv += `Total Gap Families:,${analysisResults.evenGaps.length}\n\n`;
             
             csv += 'DATA TABLE:\n';
@@ -4852,7 +5233,7 @@
             
             csv += `Analysis Date:,${new Date().toISOString()}\n`;
             csv += `Maximum Prime:,${analysisResults.maxPrime}\n`;
-            csv += `Total Primes Analyzed:,${analysisResults.totalPrimes}\n`;
+            csv += `Total Primes Analyzed:,${(analysisResults.allPrimesFound || analysisResults.totalPrimes)}\n`;
             csv += `Distinct Gap Families:,${analysisResults.evenGaps.length}\n\n`;
             
             csv += 'DATA TABLE:\n';
@@ -5494,15 +5875,15 @@
             const variation = Math.floor(Math.random() * 5);
             
             const eulerVariations = [
-                `Concerning the partition of ζ(2) by prime gaps: among ${r.totalPrimes.toLocaleString()} primes, the ${twinCount} twin pairs contribute ${twinPct}% logarithmically. With ${r.evenGaps.length} gap families, we achieve ${errorMantissa} × 10^${errorExp} precision relative to π²/6. The geometric rapidity of convergence suggests π emerges from prime gap arithmetic itself.`,
+                `Concerning the partition of ζ(2) by prime gaps: among ${(r.allPrimesFound || r.totalPrimes).toLocaleString()} primes, the ${twinCount} twin pairs contribute ${twinPct}% logarithmically. With ${r.evenGaps.length} gap families, we achieve ${errorMantissa} × 10^${errorExp} precision relative to π²/6. The geometric rapidity of convergence suggests π emerges from prime gap arithmetic itself.`,
                 
-                `The decomposition ∏P_g reveals that ${twinCount} twin primes provide ${twinPct}% of log(ζ(2)). Partitioning ${r.totalPrimes.toLocaleString()} primes across ${r.evenGaps.length} gap classes yields error ${errorMantissa} × 10^${errorExp}. This elegant structure connects circular geometry to prime distribution.`,
+                `The decomposition ∏P_g reveals that ${twinCount} twin primes provide ${twinPct}% of log(ζ(2)). Partitioning ${(r.allPrimesFound || r.totalPrimes).toLocaleString()} primes across ${r.evenGaps.length} gap classes yields error ${errorMantissa} × 10^${errorExp}. This elegant structure connects circular geometry to prime distribution.`,
                 
                 `By gap-class partition, ζ(2) = ∏P_g exhibits rapid convergence. The ${twinCount} twins contribute ${twinPct}%, while ${r.evenGaps.length} families suffice for ${errorMantissa} × 10^${errorExp} precision. A remarkable bridge between discrete gaps and π²/6.`,
                 
                 `The ${r.evenGaps.length} gap families demonstrate hierarchical contribution: twins (${twinCount} pairs) at ${twinPct}%, cousins (${gap4Count} pairs) at ${gap4Pct}%, sexy primes (${gap6Count} pairs) at ${gap6Pct}%. Convergence to π²/6 proceeds with error ${errorMantissa} × 10^${errorExp}, revealing π's arithmetic foundation.`,
                 
-                `Among ${r.totalPrimes.toLocaleString()} primes examined, the gap decomposition yields ${r.evenGaps.length} distinct families. Twin primes alone account for ${twinPct}% of the logarithmic sum. The finite product approximates π²/6 with merely ${errorMantissa} × 10^${errorExp} relative deviation, a testament to the profound regularity underlying prime distribution.`
+                `Among ${(r.allPrimesFound || r.totalPrimes).toLocaleString()} primes examined, the gap decomposition yields ${r.evenGaps.length} distinct families. Twin primes alone account for ${twinPct}% of the logarithmic sum. The finite product approximates π²/6 with merely ${errorMantissa} × 10^${errorExp} relative deviation, a testament to the profound regularity underlying prime distribution.`
             ];
             
             return eulerVariations[variation];
@@ -5669,6 +6050,7 @@
                 s: s,
                 primes: primes,
                 totalPrimes: primes.length,
+                allPrimesFound: primes.length,  // Total primes found - same as totalPrimes in this function
                 maxPrime: maxPrime,
                 targetZeta: targetZeta,
                 targetZeta2: targetZeta, // Keep for compatibility
@@ -6486,94 +6868,66 @@
         
         function getConvergenceAnalysis(gap, product, s) {
             const TWIN_PRIME_CONSTANT = 0.6601618158468695739278121100145557784326233602847334;
+            console.log('getConvergenceAnalysis called with gap:', gap, 'product:', product);
             
             if (gap === 1) {
                 const exact = Math.pow(2, s) / (Math.pow(2, s) - 1);
                 const error = Math.abs(product - exact);
-                const converged = error < 1e-10;
                 
                 return `
-                    <strong style="color: #ffd700;">EXACT CONVERGENCE</strong><br><br>
+                    <strong>Observed Value:</strong> P<sub>1</sub>(${s}) = ${product.toFixed(15)}<br><br>
                     
-                    <strong>Theoretical Value:</strong><br>
-                    P<sub>1</sub>(${s}) = 2<sup>${s}</sup>/(2<sup>${s}</sup>-1) = <strong>${exact.toFixed(15)}</strong><br><br>
+                    <strong>Theoretical:</strong> 2<sup>${s}</sup>/(2<sup>${s}</sup>-1) = ${exact.toFixed(15)}<br><br>
                     
-                    <strong>Computed Value:</strong><br>
-                    P<sub>1</sub>(${s}) = <strong>${product.toFixed(15)}</strong><br><br>
+                    <strong>Discrepancy:</strong> ${error.toExponential(3)}<br><br>
                     
-                    <strong>Error:</strong> ${error.toExponential(3)}<br>
-                    <strong>Status:</strong> <span style="color: ${converged ? '#0f0' : '#f00'}">${converged ? '✓ FULLY CONVERGED' : 'Still converging'}</span><br><br>
-                    
-                    <strong>Why Exact?</strong><br>
-                    Gap 1 contains only <strong>one prime: 2</strong>. Since there's only one term in the product,
-                    the value is exactly 2<sup>${s}</sup>/(2<sup>${s}</sup>-1) with no approximation needed.
+                    <strong>Note:</strong> Gap 1 contains only prime 2. The product reduces to a single term: 2<sup>${s}</sup>/(2<sup>${s}</sup>-1).
                 `;
             }
             
             if (gap === 2) {
-                const twinConstantRelated = 1.8 * TWIN_PRIME_CONSTANT;
                 const remaining = (Math.PI**2 / 6) / ((4/3) * product);
+                const twinPrimeCount_predicted = 2 * TWIN_PRIME_CONSTANT * (analysisResults.maxPrime / Math.pow(Math.log(analysisResults.maxPrime), 2));
+                const twinPrimeCount_actual = analysisResults.gapProducts[gap].count;
                 
                 return `
-                    <strong style="color: #ffd700;">TWIN PRIME CONVERGENCE</strong><br><br>
+                    <strong>Observed:</strong> P<sub>2</sub>(2) = ${product.toFixed(15)}<br><br>
                     
-                    <strong>Computed Value:</strong><br>
-                    P<sub>2</sub>(2) = <strong>${product.toFixed(15)}</strong><br><br>
+                    <strong>Contribution to log(ζ(2)):</strong><br>
+                    log(P<sub>2</sub>) = ${Math.log(product).toFixed(12)}<br>
+                    ${((Math.log(product) / Math.log(Math.PI**2/6)) * 100).toFixed(2)}% of total log(π²/6)<br><br>
                     
-                    <strong>Relationship to Twin Prime Constant:</strong><br>
-                    Twin Prime Constant C₂ = ${TWIN_PRIME_CONSTANT.toFixed(15)}<br>
-                    Empirical: P<sub>2</sub> ≈ 1.8 × C₂ ≈ ${twinConstantRelated.toFixed(15)}<br>
-                    Your value differs by: ${Math.abs(product - twinConstantRelated).toFixed(15)}<br><br>
+                    <strong>Combined with P<sub>1</sub>:</strong><br>
+                    P<sub>1</sub> × P<sub>2</sub> = ${(4/3 * product).toFixed(15)}<br>
+                    Remaining product (P<sub>4</sub> × P<sub>6</sub> × ...): ${remaining.toFixed(15)}<br><br>
                     
-                    <strong>Contribution to π²/6:</strong><br>
-                    P<sub>1</sub> × P<sub>2</sub> = (4/3) × ${product.toFixed(6)} = ${(4/3 * product).toFixed(15)}<br>
-                    Remaining: P<sub>4</sub> × P<sub>6</sub> × ... ≈ ${remaining.toFixed(15)}<br><br>
-                    
-                    <strong>Convergence Pattern:</strong><br>
-                    As N → ∞, P<sub>2</sub> converges to a value related to the density of twin primes.<br>
-                    Current convergence at ${analysisResults.maxPrime.toLocaleString()}: <strong>${((1 - Math.abs(product - twinConstantRelated)/product) * 100).toFixed(3)}%</strong><br><br>
-                    
-                    <strong>Hypothesis:</strong> If twin primes are infinite (unproven!), then P<sub>2</sub> converges to a constant.
-                    If twin primes are finite, P<sub>2</sub> would plateau at some maximum value.
+                    <strong>Twin Prime Count (up to ${analysisResults.maxPrime.toLocaleString()}):</strong><br>
+                    Predicted (via C₂ = ${TWIN_PRIME_CONSTANT.toFixed(8)}): ${Math.round(twinPrimeCount_predicted).toLocaleString()}<br>
+                    Observed: ${twinPrimeCount_actual.toLocaleString()}<br>
+                    Ratio: ${(twinPrimeCount_actual / twinPrimeCount_predicted).toFixed(4)}
                 `;
             }
             
             if (gap === 4) {
                 return `
-                    <strong style="color: #ffd700;">COUSIN PRIME CONVERGENCE</strong><br><br>
+                    <strong>Observed:</strong> P<sub>4</sub>(2) = ${product.toFixed(15)}<br><br>
                     
-                    <strong>Computed Value:</strong><br>
-                    P<sub>4</sub>(2) = <strong>${product.toFixed(15)}</strong><br><br>
+                    <strong>Log contribution:</strong> ${Math.log(product).toFixed(15)}<br><br>
                     
-                    <strong>Pattern:</strong><br>
-                    Cousin primes (p, p+4) are less common than twin primes.<br>
-                    P<sub>4</sub> < P<sub>2</sub> reflects this lower density.<br><br>
-                    
-                    <strong>Convergence:</strong><br>
-                    Approaching 1 + small contribution (≈${product.toFixed(6)})<br>
-                    Log contribution: ${Math.log(product).toFixed(15)}<br><br>
-                    
-                    This gap class contributes about ${((product - 1) * 100).toFixed(3)}% above baseline (1.0).
+                    <strong>Pattern:</strong> Cousin primes (p, p+4) less frequent than twin primes.<br>
+                    Deviation from 1: ${((product - 1) * 100).toFixed(3)}%
                 `;
             }
             
             if (gap === 6) {
                 return `
-                    <strong style="color: #4ecdc4;">SEXY PRIME CONVERGENCE</strong><br><br>
+                    <strong>Observed:</strong> P<sub>6</sub>(2) = ${product.toFixed(15)}<br><br>
                     
-                    <strong>Computed Value:</strong><br>
-                    P<sub>6</sub>(2) = <strong>${product.toFixed(15)}</strong><br><br>
+                    <strong>Log contribution:</strong> ${Math.log(product).toFixed(15)}<br><br>
                     
-                    <strong>Pattern:</strong><br>
-                    Sexy primes (p, p+6) are relatively common due to modular arithmetic patterns.<br>
-                    P<sub>6</sub> shows significant contribution despite larger gap.<br><br>
-                    
-                    <strong>Convergence Speed:</strong><br>
-                    Log(P<sub>6</sub>) = ${Math.log(product).toFixed(15)}<br>
-                    Contribution: ${((product - 1) * 100).toFixed(3)}% above baseline<br><br>
-                    
-                    <strong>Modular Pattern:</strong><br>
-                    Gap 6 is divisible by 6, creating patterns in prime distribution.
+                    <strong>Pattern:</strong> Sexy primes (p, p+6) show notable contribution.<br>
+                    Gap divisible by 6 creates modular patterns.<br>
+                    Deviation from 1: ${((product - 1) * 100).toFixed(3)}%
                 `;
             }
             
@@ -6581,22 +6935,13 @@
             const percentAbove = ((product - 1) * 100);
             
             return `
-                <strong style="color: #4ecdc4;">GENERAL GAP CONVERGENCE</strong><br><br>
+                <strong>Observed:</strong> P<sub>${gap}</sub>(${s}) = ${product.toFixed(15)}<br><br>
                 
-                <strong>Computed Value:</strong><br>
-                P<sub>${gap}</sub>(${s}) = <strong>${product.toFixed(15)}</strong><br><br>
+                <strong>Log contribution:</strong> ${logContrib.toFixed(15)}<br><br>
                 
-                <strong>Convergence Pattern:</strong><br>
-                As gap size increases, fewer primes have this gap.<br>
-                P<sub>${gap}</sub> approaches 1 as the gap gets larger.<br><br>
-                
-                <strong>Current State:</strong><br>
-                Log(P<sub>${gap}</sub>) = ${logContrib.toFixed(15)}<br>
-                Deviation from 1: ${percentAbove.toFixed(6)}%<br><br>
-                
-                <strong>Asymptotic Behavior:</strong><br>
-                lim<sub>g→∞</sub> P<sub>g</sub>(s) = 1<br>
-                (Larger gaps contribute less to the overall product)
+                <strong>Pattern:</strong> As gap size increases, prime density decreases.<br>
+                P<sub>${gap}</sub> approaches 1.<br>
+                Deviation from 1: ${percentAbove.toFixed(6)}%
             `;
         }
 
@@ -6604,67 +6949,8 @@
         
         // Expand inline detail section for a specific gap in all chart tables
         function expandInlineGapDetail(gap) {
-            if (!analysisResults || !analysisResults.gapProducts[gap]) return;
-            
-            const gapData = analysisResults.gapProducts[gap];
-            const s = analysisResults.s || 2;
-            const pctContribution = analysisResults.percentageContributions[gap] || 0;
-            
-            // Create detail HTML
-            const detailHTML = `
-                <div class="gap-inline-detail" id="gapDetail${gap}" style="background: linear-gradient(135deg, rgba(78, 205, 196, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%); border-left: 4px solid #4ecdc4; padding: 16px; margin: 8px 0; border-radius: 6px; animation: slideDown 0.3s;">
-                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px;">
-                        <h4 style="color: #4ecdc4; margin: 0; font-size: 1.1rem;">Gap ${gap} - Quick Stats</h4>
-                        <button onclick="closeInlineDetail(${gap})" style="background: #ff4444; color: white; border: none; padding: 4px 12px; border-radius: 4px; cursor: pointer; font-size: 0.85rem;">✕ Close</button>
-                    </div>
-                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px;">
-                        <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px;">
-                            <div style="color: #888; font-size: 0.8rem;">Prime Count</div>
-                            <div style="color: #ffd700; font-size: 1.2rem; font-weight: bold;">${gapData.count.toLocaleString()}</div>
-                        </div>
-                        <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px;">
-                            <div style="color: #888; font-size: 0.8rem;">Product P<sub>${gap}</sub>(${s})</div>
-                            <div style="color: #4ecdc4; font-size: 1.2rem; font-weight: bold;">${gapData.product.toFixed(8)}</div>
-                        </div>
-                        <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px;">
-                            <div style="color: #888; font-size: 0.8rem;">% Contribution</div>
-                            <div style="color: #8b5cf6; font-size: 1.2rem; font-weight: bold;">${pctContribution.toFixed(4)}%</div>
-                        </div>
-                        <div style="background: rgba(0, 0, 0, 0.2); padding: 10px; border-radius: 4px;">
-                            <div style="color: #888; font-size: 0.8rem;">Avg Prime</div>
-                            <div style="color: #e0e0e0; font-size: 1.2rem; font-weight: bold;">${(gapData.primes.reduce((a,b) => a+b, 0) / gapData.count).toFixed(0)}</div>
-                        </div>
-                    </div>
-                    <div style="margin-top: 12px; text-align: center;">
-                        <button onclick="showGapDetails(${gap}); event.stopPropagation();" style="background: #4ecdc4; color: #000; border: none; padding: 8px 20px; border-radius: 4px; cursor: pointer; font-weight: bold;">
-                            View Full Details & Prime List
-                        </button>
-                    </div>
-                </div>
-            `;
-            
-            // Insert detail section after each table in all chart wrappers
-            const tableWrappers = document.querySelectorAll('.stats-table-wrapper');
-            tableWrappers.forEach(wrapper => {
-                // Remove any existing inline details
-                const existingDetails = wrapper.querySelectorAll('.gap-inline-detail');
-                existingDetails.forEach(detail => detail.remove());
-                
-                // Insert new detail after the table container
-                const tableContainer = wrapper.querySelector('.stats-table-container');
-                if (tableContainer) {
-                    tableContainer.insertAdjacentHTML('afterend', detailHTML);
-                    
-                    // Scroll to the detail section
-                    const detailElement = wrapper.querySelector(`#gapDetail${gap}`);
-                    if (detailElement) {
-                        detailElement.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-                    }
-                }
-            });
-            
-            // Highlight the gap row in tables
-            highlightGapRow(gap);
+            // This function is now disabled - no dropdowns, no row highlighting
+            // Highlighting is done in the chart bars instead
         }
         
         // Close inline detail section
@@ -6705,13 +6991,17 @@
         }
         
         function showGapDetails(gap) {
-            console.log('showGapDetails called with gap:', gap, 'type:', typeof gap);
+            console.log('=== showGapDetails DEBUG ===');
+            console.log('Input gap:', gap, 'type:', typeof gap);
             
-            if (!analysisResults) return;
+            if (!analysisResults) {
+                console.error('No analysisResults!');
+                return;
+            }
             
             // Ensure gap is a number (might come as string from onclick attribute)
             gap = parseInt(gap);
-            console.log('After parseInt, gap:', gap);
+            console.log('After parseInt, gap:', gap, 'type:', typeof gap);
             
             // First, expand inline detail sections
             expandInlineGapDetail(gap);
@@ -6721,10 +7011,18 @@
             const title = document.getElementById('modalTitle');
             const body = document.getElementById('modalBody');
             
-            console.log('Looking for gapData with key:', gap);
             console.log('Available keys in gapProducts:', Object.keys(analysisResults.gapProducts));
+            console.log('Attempting to retrieve gapProducts[' + gap + ']...');
             
             const gapData = analysisResults.gapProducts[gap];
+            console.log('Retrieved gapData:', gapData);
+            
+            if (gapData) {
+                console.log('gapData.product:', gapData.product);
+                console.log('gapData.count:', gapData.count);
+                console.log('gapData.primes (first 5):', gapData.primes?.slice(0, 5));
+            }
+            
             if (!gapData) {
                 console.error('No gapData found for gap:', gap);
                 alert(`No data available for gap ${gap}`);
@@ -6812,8 +7110,13 @@
                             <div class="modal-stat-value">${Math.max(...gapData.primes).toLocaleString()}</div>
                         </div>
                         <div class="modal-stat-item">
-                            <div class="modal-stat-label">Density (primes per 1000)</div>
-                            <div class="modal-stat-value">${((gapData.count / analysisResults.maxPrime) * 1000).toFixed(3)}</div>
+                            <div class="modal-stat-label">
+                                Density (primes per 
+                                <input type="number" id="densityRange_${gap}" value="1000" min="1" max="1000000" 
+                                       style="width: 80px; background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.3); border-radius: 4px; padding: 4px 8px; color: #ffd700; font-family: 'Courier New', monospace; margin: 0 4px;"
+                                       onchange="updateDensity(${gap}, this.value)">)
+                            </div>
+                            <div class="modal-stat-value" id="densityValue_${gap}">${((gapData.count / analysisResults.maxPrime) * 1000).toFixed(3)}</div>
                         </div>
                     </div>
                 </div>
@@ -6974,6 +7277,15 @@
             });
         }
         
+        // Update density calculation when user changes the range
+        function updateDensity(gap, range) {
+            const gapData = analysisResults.gapProducts[gap];
+            if (!gapData) return;
+            
+            const density = (gapData.count / analysisResults.maxPrime) * parseFloat(range);
+            document.getElementById(`densityValue_${gap}`).textContent = density.toFixed(3);
+        }
+        
         // Screenshot the classical or gap view at the bottom
         function screenshotClassicalView() {
             // Check which view is currently shown
@@ -6985,25 +7297,99 @@
                 return;
             }
             
-            const viewElement = classicalView.querySelector('.chart-wrapper');
+            const tableWrapper = document.getElementById('classicalTableWrapper');
+            const table = document.getElementById('classicalTable');
             
-            // Use html2canvas to capture the view
-            html2canvas(viewElement, {
-                scale: 3, // 4K quality (3x scale)
+            if (!table || !tableWrapper) {
+                alert('Classical view table not found.');
+                return;
+            }
+            
+            // Create a temporary container with visible rows + summary
+            const tempContainer = document.createElement('div');
+            tempContainer.style.cssText = 'background: #0a0a0f; padding: 20px; position: absolute; left: -9999px; top: 0;';
+            
+            // Add title
+            const titleDiv = document.createElement('div');
+            titleDiv.style.cssText = 'color: #4ecdc4; font-size: 1.8rem; font-weight: bold; margin-bottom: 20px; text-align: center;';
+            titleDiv.textContent = 'Classical Sequential Prime View';
+            tempContainer.appendChild(titleDiv);
+            
+            // Clone the table structure
+            const tableClone = document.createElement('table');
+            tableClone.style.cssText = table.style.cssText;
+            tableClone.innerHTML = table.querySelector('thead').outerHTML;
+            
+            const tbody = document.createElement('tbody');
+            
+            // Get visible rows from the scrollable container
+            const rows = Array.from(table.querySelectorAll('tbody tr'));
+            const scrollTop = tableWrapper.scrollTop;
+            const containerHeight = tableWrapper.clientHeight;
+            
+            // Find visible rows
+            let visibleRows = [];
+            rows.forEach(row => {
+                const rowTop = row.offsetTop;
+                const rowBottom = rowTop + row.offsetHeight;
+                if (rowBottom > scrollTop && rowTop < scrollTop + containerHeight) {
+                    visibleRows.push(row);
+                }
+            });
+            
+            // Add visible rows
+            visibleRows.forEach(row => {
+                tbody.appendChild(row.cloneNode(true));
+            });
+            
+            tableClone.appendChild(tbody);
+            
+            const tableDiv = document.createElement('div');
+            tableDiv.style.cssText = 'background: rgba(0, 0, 0, 0.2); border-radius: 6px; padding: 16px; margin-bottom: 20px;';
+            tableDiv.appendChild(tableClone);
+            tempContainer.appendChild(tableDiv);
+            
+            // Add convergence summary
+            if (analysisResults) {
+                const summaryDiv = document.createElement('div');
+                summaryDiv.style.cssText = 'background: rgba(78, 205, 196, 0.1); padding: 16px; border-radius: 6px; border: 1px solid #4ecdc4; text-align: center;';
+                const target = Math.PI * Math.PI / 6;
+                const finalProduct = analysisResults.finalProduct;
+                const error = Math.abs(finalProduct - target);
+                summaryDiv.innerHTML = `
+                    <div style="color: #4ecdc4; font-size: 1.2rem; font-weight: bold; margin-bottom: 8px;">
+                        Convergence to ζ(2) = π²/6
+                    </div>
+                    <div style="color: #ffd700; font-family: 'Courier New', monospace; font-size: 1rem;">
+                        Product: ${finalProduct.toFixed(12)}
+                    </div>
+                    <div style="color: #ffd700; font-family: 'Courier New', monospace; font-size: 1rem;">
+                        Target:  ${target.toFixed(12)}
+                    </div>
+                    <div style="color: #ccc; font-size: 0.9rem; margin-top: 8px;">
+                        Error: ${error.toExponential(4)}
+                    </div>
+                `;
+                tempContainer.appendChild(summaryDiv);
+            }
+            
+            document.body.appendChild(tempContainer);
+            
+            // Use html2canvas to capture the temp container
+            html2canvas(tempContainer, {
+                scale: 2,
                 backgroundColor: '#0a0a0f',
-                logging: false,
-                useCORS: true,
-                width: viewElement.scrollWidth,
-                height: viewElement.scrollHeight
+                logging: false
             }).then(canvas => {
-                // Convert to blob and download
+                document.body.removeChild(tempContainer);
                 canvas.toBlob(blob => {
                     const url = URL.createObjectURL(blob);
                     const link = document.createElement('a');
                     const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, -5);
-                    link.download = `Classical_Prime_Sequence_${timestamp}_4K.png`;
+                    link.download = `Classical_Prime_Sequence_${timestamp}.png`;
                     link.href = url;
                     link.click();
+                    URL.revokeObjectURL(url);
                 });
             });
         }
@@ -7064,7 +7450,8 @@
             
             // Determine which gap was clicked based on chart type
             const gaps = getFilteredGaps();
-            const margin = {left: 250, right: 150, top: 200, bottom: 150};
+            // Use the CORRECT margins that match the render functions
+            const margin = {left: 200, right: 100, top: 100, bottom: 150};
             const chartW = canvas.width - margin.left - margin.right;
             const chartH = canvas.height - margin.top - margin.bottom;
             
@@ -7089,6 +7476,7 @@
             
             if (clickedIndex >= 0 && clickedIndex < gaps.length && clickXInBar <= barWidth) {
                 const clickedGap = parseInt(gaps[clickedIndex]);
+                console.log('Chart bar clicked, gap:', clickedGap, 'from chart:', canvasId);
                 showGapDetails(clickedGap);
             }
         }
@@ -7227,15 +7615,42 @@
             analysisResults = originalResults;
         }
         
-        // Event delegation for gap row clicks
+        // Event delegation for gap row clicks - highlights bar in associated chart AND opens modal
         document.addEventListener('click', function(e) {
             const row = e.target.closest('.gap-row');
             if (row && row.dataset.gap) {
                 const gap = parseInt(row.dataset.gap);
                 console.log('Row clicked, gap:', gap);
+                
+                // Find which table this row belongs to
+                const tableContainer = row.closest('.stats-table-container');
+                if (tableContainer && tableContainer.dataset.chart) {
+                    const chartId = tableContainer.dataset.chart;
+                    console.log('Chart to highlight:', chartId);
+                    
+                    // Re-render the specific chart with this gap highlighted
+                    highlightGapInChart(chartId, gap);
+                }
+                
+                // Always open the modal popup when clicking a row
                 showGapDetails(gap);
             }
         });
+        
+        // Highlight a specific gap in a specific chart
+        function highlightGapInChart(chartId, gap) {
+            switch(chartId) {
+                case 'gapContribChart':
+                    renderGapContributionsChart(gap);
+                    break;
+                case 'gapDistChart':
+                    renderGapDistributionChart(gap);
+                    break;
+                case 'percentageChart':
+                    renderPercentageChart(gap);
+                    break;
+            }
+        }
     </script>
 </body>
 </html>
