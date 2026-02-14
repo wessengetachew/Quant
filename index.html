@@ -1639,6 +1639,14 @@
                     
                     <div class="toggle-wrapper">
                         <label class="toggle">
+                            <input type="checkbox" id="showDecimalConvergence" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span>Show Decimal Convergence Analysis</span>
+                    </div>
+                    
+                    <div class="toggle-wrapper">
+                        <label class="toggle">
                             <input type="checkbox" id="showCustomGapCompare" checked>
                             <span class="toggle-slider"></span>
                         </label>
@@ -2020,6 +2028,50 @@
             </div>
         </div>
         
+        <!-- DECIMAL CONVERGENCE ANALYSIS -->
+        <div class="chart-wrapper" id="decimalConvergenceWrapper">
+            <div class="chart-title">Decimal Place Convergence Analysis: Weight Decay & Marginal Contribution</div>
+            <div class="chart-description" style="background: rgba(34, 197, 94, 0.1); padding: 16px; border-radius: 6px; border-left: 4px solid #22c55e; margin-bottom: 20px;">
+                <strong>Understanding Weight Decay:</strong> As primes get larger, the factor p²/(p²-1) approaches 1.0, so later primes contribute less. 
+                For example, prime 2 contributes 4/3 = 1.333... (fixed), but prime 1,000,003 contributes ≈1.000000000004.
+                This analysis shows <strong>which primes "lock in" each decimal place</strong> of convergence for each gap family.
+            </div>
+            
+            <canvas id="decimalConvergenceChart" width="3840" height="2160"></canvas>
+            
+            <div class="stats-table-wrapper">
+                <div class="stats-table-header">
+                    <div class="stats-table-title">Per-Prime Marginal Contribution</div>
+                    <div class="precision-control">
+                        <label>Gap to Analyze:</label>
+                        <select id="decimalGapSelect" onchange="updateDecimalAnalysis()">
+                            <option value="1">Gap 1</option>
+                            <option value="2" selected>Gap 2 (Twin Primes)</option>
+                            <option value="4">Gap 4 (Cousin Primes)</option>
+                            <option value="6">Gap 6 (Sexy Primes)</option>
+                            <option value="8">Gap 8</option>
+                            <option value="10">Gap 10</option>
+                            <option value="12">Gap 12</option>
+                        </select>
+                        <label style="margin-left: 20px;">Show:</label>
+                        <select id="decimalDetailLevel" onchange="updateDecimalAnalysis()">
+                            <option value="summary" selected>Summary (First 20 primes)</option>
+                            <option value="detailed">Detailed (First 100 primes)</option>
+                            <option value="full">Full (All primes in gap)</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="stats-table-container" id="decimalAnalysisTable">
+                    <table class="stats-table" id="decimalAnalysisTableContent"></table>
+                </div>
+                <div class="export-row">
+                    <button class="export-btn csv" onclick="exportDecimalAnalysisCSV()">Export Table CSV</button>
+                    <button class="export-btn png" onclick="exportChartPNG_DOM('decimalConvergenceChart', 'decimal_convergence')" style="background: linear-gradient(135deg, #3b82f6 0%, #1e40af 100%); border-color: #3b82f6;">DOM Export</button>
+                    <button class="export-btn png" onclick="exportChartPNG_Canvas('decimalConvergenceChart', 'decimal_convergence')" style="background: linear-gradient(135deg, #ef4444 0%, #991b1b 100%); border-color: #ef4444;">Canvas Export</button>
+                </div>
+            </div>
+        </div>
+        
         <!-- GAP RATIO ANALYSIS CHART -->
     </div>
     
@@ -2104,6 +2156,22 @@
                         <span class="toggle-slider"></span>
                     </label>
                     <span>Log-Scale Products</span>
+                </div>
+                
+                <div class="toggle-wrapper">
+                    <label class="toggle">
+                        <input type="checkbox" id="screenshotGapRatio" checked>
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Gap Ratio Analysis</span>
+                </div>
+                
+                <div class="toggle-wrapper">
+                    <label class="toggle">
+                        <input type="checkbox" id="screenshotDecimalConv">
+                        <span class="toggle-slider"></span>
+                    </label>
+                    <span>Decimal Convergence</span>
                 </div>
             </div>
             
@@ -2439,6 +2507,14 @@
                     });
                 }
             });
+            
+            // Include the last prime's contribution (it has no gap after it, but still contributes to ζ(2))
+            if (primes.length > 0) {
+                const lastPrime = primes[primes.length - 1];
+                const lastFactor = (lastPrime * lastPrime) / (lastPrime * lastPrime - 1);
+                cumulative *= lastFactor;
+                cumulativeLog += Math.log(lastFactor);
+            }
             
             // Calculate total primes actually included in analysis (those with gaps in filtered range)
             const totalPrimesInAnalysis = evenGaps.reduce((sum, gap) => {
@@ -3165,6 +3241,11 @@
             }
             if (document.getElementById('showGapRatio').checked) {
                 renderGapRatioChart();
+            }
+            
+            // Render decimal convergence analysis
+            if (document.getElementById('showDecimalConvergence')?.checked) {
+                updateDecimalAnalysis();
             }
             
             // Render comparison chart if in comparison mode
@@ -4366,6 +4447,319 @@
             link.click();
         }
         
+        // ========== DECIMAL CONVERGENCE ANALYSIS ==========
+        
+        function updateDecimalAnalysis() {
+            if (!analysisResults) return;
+            
+            const gap = parseInt(document.getElementById('decimalGapSelect').value);
+            const detailLevel = document.getElementById('decimalDetailLevel').value;
+            
+            renderDecimalConvergenceChart(gap);
+            renderDecimalAnalysisTable(gap, detailLevel);
+        }
+        
+        function renderDecimalConvergenceChart(focusGap = 2) {
+            if (!analysisResults) return;
+            
+            const canvas = document.getElementById('decimalConvergenceChart');
+            const ctx = canvas.getContext('2d');
+            const w = canvas.width;
+            const h = canvas.height;
+            
+            ctx.fillStyle = '#0a0a10';
+            ctx.fillRect(0, 0, w, h);
+            
+            const margin = { left: 300, right: 250, top: 150, bottom: 150 };
+            const chartW = w - margin.left - margin.right;
+            const chartH = h - margin.top - margin.bottom;
+            
+            // Get primes for the selected gap
+            const gapData = analysisResults.gapProducts[focusGap];
+            if (!gapData || !gapData.primes) {
+                ctx.fillStyle = '#888';
+                ctx.font = '48px sans-serif';
+                ctx.textAlign = 'center';
+                ctx.fillText('No data for selected gap', w/2, h/2);
+                return;
+            }
+            
+            const primes = gapData.primes.slice(0, Math.min(100, gapData.primes.length));
+            
+            // Calculate cumulative product and contribution for each prime
+            const data = [];
+            let cumProduct = 1;
+            
+            primes.forEach((p, idx) => {
+                const factor = (p * p) / (p * p - 1);
+                const prevProduct = cumProduct;
+                cumProduct *= factor;
+                
+                const contribution = Math.log10(factor);  // log base 10 for decimal places
+                const cumulativeLog = Math.log10(cumProduct);
+                
+                data.push({
+                    index: idx + 1,
+                    prime: p,
+                    factor: factor,
+                    cumProduct: cumProduct,
+                    contribution: contribution,  // How much this prime contributes
+                    cumulativeLog: cumulativeLog,
+                    decimalPlacesStable: Math.floor(-Math.log10(Math.abs(cumProduct - prevProduct * factor)))
+                });
+            });
+            
+            // Title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 72px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Gap ${focusGap} Decimal Convergence: Weight Decay Analysis`, w / 2, 90);
+            
+            // Subtitle
+            ctx.fillStyle = '#22c55e';
+            ctx.font = '40px sans-serif';
+            ctx.fillText(`How each prime's contribution affects decimal places (first ${primes.length} primes)`, w / 2, 145);
+            
+            // Draw TWO subcharts: contribution magnitude and cumulative product
+            
+            // SUBCHART 1: Log10 contribution (shows which decimal places affected)
+            const x1 = margin.left;
+            const subW = chartW / 2 - 40;
+            
+            ctx.fillStyle = '#4ade80';
+            ctx.font = 'bold 42px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Marginal Contribution (log₁₀)', x1 + subW/2, margin.top - 20);
+            
+            const maxContrib = Math.max(...data.map(d => d.contribution));
+            const yScale1 = chartH / maxContrib;
+            
+            data.forEach((d, i) => {
+                const x = x1 + (i / data.length) * subW;
+                const barH = d.contribution * yScale1;
+                const y = margin.top + chartH - barH;
+                
+                ctx.fillStyle = i < 5 ? '#22c55e' : i < 20 ? '#4ade80' : '#86efac';
+                ctx.fillRect(x, y, Math.max(3, subW / data.length * 0.8), barH);
+            });
+            
+            // Y-axis for contribution
+            ctx.fillStyle = '#888';
+            ctx.font = '28px monospace';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const val = (maxContrib / 5) * i;
+                const y = margin.top + chartH - (chartH / 5) * i;
+                ctx.fillText(val.toExponential(1), x1 - 20, y + 10);
+            }
+            
+            // SUBCHART 2: Cumulative product convergence
+            const x2 = margin.left + subW + 80;
+            
+            ctx.fillStyle = '#60a5fa';
+            ctx.font = 'bold 42px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText('Cumulative Product P_g', x2 + subW/2, margin.top - 20);
+            
+            const minProd = Math.min(...data.map(d => d.cumProduct));
+            const maxProd = Math.max(...data.map(d => d.cumProduct));
+            const yScale2 = chartH / (maxProd - minProd);
+            
+            // Line chart
+            ctx.strokeStyle = '#3b82f6';
+            ctx.lineWidth = 6;
+            ctx.beginPath();
+            
+            data.forEach((d, i) => {
+                const x = x2 + (i / data.length) * subW;
+                const y = margin.top + chartH - (d.cumProduct - minProd) * yScale2;
+                if (i === 0) ctx.moveTo(x, y);
+                else ctx.lineTo(x, y);
+            });
+            ctx.stroke();
+            
+            // Points
+            data.forEach((d, i) => {
+                const x = x2 + (i / data.length) * subW;
+                const y = margin.top + chartH - (d.cumProduct - minProd) * yScale2;
+                ctx.fillStyle = i < 5 ? '#ef4444' : '#3b82f6';
+                ctx.beginPath();
+                ctx.arc(x, y, i < 5 ? 12 : 8, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+            
+            // Y-axis for cumulative
+            ctx.fillStyle = '#888';
+            ctx.font = '28px monospace';
+            ctx.textAlign = 'right';
+            for (let i = 0; i <= 5; i++) {
+                const val = minProd + ((maxProd - minProd) / 5) * i;
+                const y = margin.top + chartH - (chartH / 5) * i;
+                ctx.fillText(val.toFixed(6), x2 - 20, y + 10);
+            }
+            
+            // Legend
+            ctx.fillStyle = '#aaa';
+            ctx.font = '32px sans-serif';
+            ctx.textAlign = 'left';
+            let legendY = margin.top + 50;
+            
+            ctx.fillStyle = '#22c55e';
+            ctx.fillRect(w - 230, legendY, 40, 40);
+            ctx.fillStyle = '#ccc';
+            ctx.fillText('First 5 primes', w - 180, legendY + 30);
+            legendY += 60;
+            
+            ctx.fillStyle = '#4ade80';
+            ctx.fillRect(w - 230, legendY, 40, 40);
+            ctx.fillStyle = '#ccc';
+            ctx.fillText('Primes 6-20', w - 180, legendY + 30);
+            legendY += 60;
+            
+            ctx.fillStyle = '#86efac';
+            ctx.fillRect(w - 230, legendY, 40, 40);
+            ctx.fillStyle = '#ccc';
+            ctx.fillText('Primes 20+', w - 180, legendY + 30);
+            
+            // Footer annotations
+            ctx.fillStyle = '#888';
+            ctx.font = '32px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Gap ${focusGap}: ${primes.length} primes analyzed | Final P_${focusGap} = ${data[data.length-1].cumProduct.toFixed(12)}`, w / 2, h - 60);
+            
+            ctx.font = '28px sans-serif';
+            ctx.fillText(`First prime contributes log₁₀ ≈ ${data[0].contribution.toExponential(3)}, Last prime contributes log₁₀ ≈ ${data[data.length-1].contribution.toExponential(3)}`, w / 2, h - 20);
+        }
+        
+        function renderDecimalAnalysisTable(gap, detailLevel) {
+            if (!analysisResults) return;
+            
+            const gapData = analysisResults.gapProducts[gap];
+            if (!gapData || !gapData.primes) return;
+            
+            const maxPrimes = detailLevel === 'summary' ? 20 : detailLevel === 'detailed' ? 100 : gapData.primes.length;
+            const primes = gapData.primes.slice(0, maxPrimes);
+            
+            const table = document.getElementById('decimalAnalysisTableContent');
+            
+            // Calculate data
+            let cumProduct = 1;
+            const rows = [];
+            
+            primes.forEach((p, idx) => {
+                const factor = (p * p) / (p * p - 1);
+                const prevProduct = cumProduct;
+                cumProduct *= factor;
+                
+                const contribution = factor - 1;  // How much > 1
+                const logContribution = Math.log10(factor);
+                const percentChange = ((cumProduct - prevProduct) / prevProduct) * 100;
+                
+                // Calculate which decimal places are affected
+                const decimalChange = Math.abs(cumProduct - prevProduct);
+                const decimalPlace = decimalChange > 0 ? Math.ceil(-Math.log10(decimalChange)) : 15;
+                
+                rows.push({
+                    index: idx + 1,
+                    prime: p,
+                    factor: factor.toFixed(15),
+                    contribution: contribution.toExponential(6),
+                    logContrib: logContribution.toExponential(6),
+                    cumProduct: cumProduct.toFixed(15),
+                    percentChange: percentChange.toExponential(4),
+                    decimalPlace: Math.min(decimalPlace, 15)
+                });
+            });
+            
+            let html = `
+                <thead>
+                    <tr>
+                        <th>#</th>
+                        <th>Prime p</th>
+                        <th>p²/(p²-1)</th>
+                        <th>Contribution<br>(factor - 1)</th>
+                        <th>log₁₀(factor)</th>
+                        <th>Cumulative P<sub>${gap}</sub></th>
+                        <th>% Change</th>
+                        <th>Decimal Places<br>Affected</th>
+                    </tr>
+                </thead>
+                <tbody>
+            `;
+            
+            rows.forEach(row => {
+                const highlight = row.index <= 5 ? 'style="background: rgba(34, 197, 94, 0.1);"' : '';
+                html += `
+                    <tr ${highlight}>
+                        <td style="font-weight: bold;">${row.index}</td>
+                        <td style="font-family: monospace;">${row.prime.toLocaleString()}</td>
+                        <td style="font-family: monospace; font-size: 0.9rem;">${row.factor}</td>
+                        <td style="font-family: monospace; color: #4ade80;">${row.contribution}</td>
+                        <td style="font-family: monospace;">${row.logContrib}</td>
+                        <td style="font-family: monospace; color: #ffd700;">${row.cumProduct}</td>
+                        <td style="font-family: monospace;">${row.percentChange}%</td>
+                        <td style="text-align: center; color: ${row.decimalPlace > 10 ? '#22c55e' : '#ffd700'};">
+                            ${row.decimalPlace}+
+                        </td>
+                    </tr>
+                `;
+            });
+            
+            // Add summary row
+            html += `
+                <tr style="border-top: 3px solid #ffd700; background: rgba(255, 215, 0, 0.05);">
+                    <td colspan="3"><strong>Summary</strong></td>
+                    <td colspan="5" style="text-align: left; padding-left: 20px;">
+                        <strong>First prime (p=${primes[0]}):</strong> Contributes ${((primes[0]**2/(primes[0]**2-1) - 1)*100).toFixed(4)}% increase<br>
+                        <strong>Last prime (p=${primes[primes.length-1]}):</strong> Contributes ${((primes[primes.length-1]**2/(primes[primes.length-1]**2-1) - 1)*100).toExponential(4)}% increase<br>
+                        <strong>Weight ratio:</strong> First/Last = ${((primes[0]**2/(primes[0]**2-1) - 1) / (primes[primes.length-1]**2/(primes[primes.length-1]**2-1) - 1)).toExponential(2)}×
+                    </td>
+                </tr>
+            `;
+            
+            html += '</tbody>';
+            table.innerHTML = html;
+        }
+        
+        function exportDecimalAnalysisCSV() {
+            if (!analysisResults) return;
+            
+            const gap = parseInt(document.getElementById('decimalGapSelect').value);
+            const detailLevel = document.getElementById('decimalDetailLevel').value;
+            const gapData = analysisResults.gapProducts[gap];
+            
+            if (!gapData || !gapData.primes) return;
+            
+            const maxPrimes = detailLevel === 'summary' ? 20 : detailLevel === 'detailed' ? 100 : gapData.primes.length;
+            const primes = gapData.primes.slice(0, maxPrimes);
+            
+            let csv = 'DECIMAL CONVERGENCE ANALYSIS\\n';
+            csv += `Gap ${gap} - Per-Prime Contribution Analysis\\n`;
+            csv += `Date: ${new Date().toISOString()}\\n\\n`;
+            
+            csv += 'Index,Prime,Factor (p²/(p²-1)),Contribution (factor-1),Log₁₀(factor),Cumulative Product,Percent Change,Decimal Places Affected\\n';
+            
+            let cumProduct = 1;
+            primes.forEach((p, idx) => {
+                const factor = (p * p) / (p * p - 1);
+                const prevProduct = cumProduct;
+                cumProduct *= factor;
+                const contribution = factor - 1;
+                const logContribution = Math.log10(factor);
+                const percentChange = ((cumProduct - prevProduct) / prevProduct) * 100;
+                const decimalChange = Math.abs(cumProduct - prevProduct);
+                const decimalPlace = decimalChange > 0 ? Math.ceil(-Math.log10(decimalChange)) : 15;
+                
+                csv += `${idx+1},${p},${factor.toFixed(15)},${contribution.toExponential(6)},${logContribution.toExponential(6)},${cumProduct.toFixed(15)},${percentChange.toExponential(4)}%,${Math.min(decimalPlace, 15)}+\\n`;
+            });
+            
+            const blob = new Blob([csv], { type: 'text/csv' });
+            const link = document.createElement('a');
+            link.href = URL.createObjectURL(blob);
+            link.download = `gap${gap}_decimal_convergence_${Date.now()}.csv`;
+            link.click();
+        }
+        
         // Animation functions
         function startAnimation() {
             if (isAnimating) return;
@@ -5208,18 +5602,21 @@
             ctx.fillRect(0, 0, compositeCanvas.width, compositeCanvas.height);
             
             // Title section
+            const s = analysisResults.s || 2;
+            const zetaFormula = s === 2 ? `ζ(${s}) = π²/6` : `ζ(${s})`;
             const titleMap = {
-                'convergenceChart': 'Progressive Convergence to ζ(2) = π²/6',
+                'convergenceChart': `Progressive Convergence to ${zetaFormula}`,
                 'gapContribChart': 'Individual Gap Family Products P_g',
                 'gapDistChart': 'Prime Distribution by Gap Class',
-                'percentageChart': 'Percentage Contribution to ζ(2)',
+                'percentageChart': `Percentage Contribution to ζ(${s})`,
                 'errorChart': 'Convergence Error Analysis',
                 'logScaleChart': 'Log-Scale Product Growth',
                 'gapRatioChart': 'Gap Ratio Analysis',
-                'customGapCompareChart': 'Custom Gap Family Comparison'
+                'customGapCompareChart': 'Custom Gap Family Comparison',
+                'decimalConvergenceChart': `Gap Decimal Convergence Analysis`
             };
             
-            // Only add title for charts that don't already have it in canvas
+            // Draw title at TOP of image (not middle of canvas)
             if (canvasId !== 'customGapCompareChart') {
                 ctx.fillStyle = '#ffd700';
                 ctx.font = 'bold 72px sans-serif';
@@ -5289,6 +5686,11 @@
                 const input = document.getElementById('compareGapsInput')?.value || '';
                 const gapCount = input.split(',').filter(s => s.trim() !== '').length;
                 ctx.fillText(`Comparing ${gapCount} gaps | Analysis: ${analysisResults.allPrimesFound.toLocaleString()} primes up to ${analysisResults.maxPrime.toLocaleString()}`, compositeCanvas.width / 2, footerY);
+            } else if (canvasId === 'decimalConvergenceChart') {
+                const gap = parseInt(document.getElementById('decimalGapSelect')?.value || 2);
+                const detailLevel = document.getElementById('decimalDetailLevel')?.value || 'summary';
+                const detailText = detailLevel === 'summary' ? 'First 20 primes' : detailLevel === 'detailed' ? 'First 100 primes' : 'All primes';
+                ctx.fillText(`Gap ${gap} - ${detailText} | Showing ${maxRows} table rows | Analysis: ${analysisResults.totalPrimes.toLocaleString()} primes up to ${analysisResults.maxPrime.toLocaleString()}`, compositeCanvas.width / 2, footerY);
             } else {
                 ctx.fillText(`Showing ${maxRows} rows | Analysis: ${analysisResults.totalPrimes.toLocaleString()} primes up to ${analysisResults.maxPrime.toLocaleString()}`, compositeCanvas.width / 2, footerY);
             }
@@ -5310,7 +5712,8 @@
                 'errorChart': renderErrorTableData,
                 'logScaleChart': renderLogScaleTableData,
                 'gapRatioChart': renderGapRatioTableData,
-                'customGapCompareChart': renderCustomGapCompareTableData
+                'customGapCompareChart': renderCustomGapCompareTableData,
+                'decimalConvergenceChart': renderDecimalConvergenceTableData
             };
             
             const renderFunc = tableMap[canvasId];
@@ -6112,6 +6515,93 @@
             return startY - arguments[1] + 60; // Return total height used
         }
         
+        function renderDecimalConvergenceTableData(ctx, startY, canvasWidth, maxRows) {
+            // Get selected gap from dropdown, default to 2
+            const gap = parseInt(document.getElementById('decimalGapSelect')?.value || 2);
+            const gapData = analysisResults.gapProducts[gap];
+            
+            if (!gapData || !gapData.primes) {
+                return 0;
+            }
+            
+            const originalStartY = startY;
+            const numPrimes = Math.min(maxRows || 20, gapData.primes.length);
+            const primes = gapData.primes.slice(0, numPrimes);
+            
+            // Title
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(40, startY, canvasWidth - 80, 60);
+            
+            ctx.fillStyle = '#22c55e';
+            ctx.font = 'bold 36px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Gap ${gap} - Per-Prime Marginal Contribution (First ${numPrimes})`, canvasWidth / 2, startY + 40);
+            
+            startY += 60;
+            
+            // Headers
+            const headers = ['#', 'Prime', 'Factor', 'Contrib.', 'Cumulative', 'Decimal'];
+            const colW = (canvasWidth - 80) / headers.length;
+            
+            ctx.fillStyle = '#1a1a2a';
+            ctx.fillRect(40, startY, canvasWidth - 80, 50);
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 28px sans-serif';
+            ctx.textAlign = 'center';
+            
+            headers.forEach((header, idx) => {
+                ctx.fillText(header, 40 + idx * colW + colW / 2, startY + 35);
+            });
+            
+            startY += 50;
+            
+            // Data rows
+            let cumProduct = 1;
+            ctx.font = '24px monospace';
+            
+            primes.forEach((p, idx) => {
+                const factor = (p * p) / (p * p - 1);
+                const prevProduct = cumProduct;
+                cumProduct *= factor;
+                
+                const contribution = factor - 1;
+                const decimalChange = Math.abs(cumProduct - prevProduct);
+                const decimalPlace = decimalChange > 0 ? Math.ceil(-Math.log10(decimalChange)) : 15;
+                
+                const y = startY + idx * 45;
+                
+                // Alternate row background + highlight first 5
+                if (idx < 5) {
+                    ctx.fillStyle = 'rgba(34, 197, 94, 0.1)';
+                    ctx.fillRect(40, y, canvasWidth - 80, 45);
+                } else if (idx % 2 === 0) {
+                    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+                    ctx.fillRect(40, y, canvasWidth - 80, 45);
+                }
+                
+                ctx.fillStyle = idx < 5 ? '#4ade80' : '#e0e0e0';
+                ctx.textAlign = 'center';
+                
+                // Index
+                ctx.fillText((idx + 1).toString(), 40 + 0 * colW + colW / 2, y + 32);
+                // Prime
+                ctx.fillText(p.toLocaleString(), 40 + 1 * colW + colW / 2, y + 32);
+                // Factor
+                ctx.fillText(factor.toFixed(6), 40 + 2 * colW + colW / 2, y + 32);
+                // Contribution
+                ctx.fillText(contribution.toExponential(2), 40 + 3 * colW + colW / 2, y + 32);
+                // Cumulative Product
+                ctx.fillText(cumProduct.toFixed(6), 40 + 4 * colW + colW / 2, y + 32);
+                // Decimal Places
+                ctx.fillStyle = decimalPlace > 10 ? '#22c55e' : '#ffd700';
+                ctx.fillText(`${Math.min(decimalPlace, 15)}+`, 40 + 5 * colW + colW / 2, y + 32);
+            });
+            
+            startY += primes.length * 45 + 40;
+            
+            return startY - originalStartY;
+        }
+        
         function renderCustomGapCompareTableData(ctx, startY, canvasWidth, maxRows) {
             // Get selected gaps from input
             const input = document.getElementById('compareGapsInput')?.value || '';
@@ -6829,7 +7319,9 @@
                         gapDist: document.getElementById('screenshotGapDist').checked,
                         percentage: document.getElementById('screenshotPercentage').checked,
                         error: document.getElementById('screenshotError').checked,
-                        logScale: document.getElementById('screenshotLogScale').checked
+                        logScale: document.getElementById('screenshotLogScale').checked,
+                        gapRatio: document.getElementById('screenshotGapRatio').checked,
+                        decimalConv: document.getElementById('screenshotDecimalConv').checked
                     };
                     
                     const selectedCharts = [];
@@ -6839,7 +7331,9 @@
                         gapDist: 'gapDistChart',
                         percentage: 'percentageChart',
                         error: 'errorChart',
-                        logScale: 'logScaleChart'
+                        logScale: 'logScaleChart',
+                        gapRatio: 'gapRatioChart',
+                        decimalConv: 'decimalConvergenceChart'
                     };
                     
                     Object.keys(chartSelections).forEach(key => {
@@ -7967,6 +8461,7 @@
                 'showErrorAnalysis',
                 'showLogScale',
                 'showGapRatio',
+                'showDecimalConvergence',
                 'showCustomGapCompare'
             ];
             
