@@ -5605,34 +5605,28 @@
             const s = analysisResults.s || 2;
             const zetaFormula = s === 2 ? `ζ(${s}) = π²/6` : `ζ(${s})`;
             const titleMap = {
-                'convergenceChart': `Progressive Convergence to ${zetaFormula}`,
+                'convergenceChart': `Progressive Product Convergence to ${zetaFormula}`,
                 'gapContribChart': 'Individual Gap Family Products P_g',
                 'gapDistChart': 'Prime Distribution by Gap Class',
-                'percentageChart': `Percentage Contribution to ζ(${s})`,
+                'percentageChart': `Percentage Contribution to log(ζ(${s}))`,
                 'errorChart': 'Convergence Error Analysis',
-                'logScaleChart': 'Log-Scale Product Growth',
-                'gapRatioChart': 'Gap Ratio Analysis',
+                'logScaleChart': 'Log-Scale Product Growth: log(P_g)',
+                'gapRatioChart': 'Gap Ratio Analysis: Twin Prime Conjecture Evidence',
                 'customGapCompareChart': 'Custom Gap Family Comparison',
-                'decimalConvergenceChart': `Gap Decimal Convergence Analysis`
+                'decimalConvergenceChart': `Decimal Convergence Analysis: Weight Decay & Precision`
             };
             
-            // Draw title at TOP of image (not middle of canvas)
+            // Draw title at TOP of image
             if (canvasId !== 'customGapCompareChart') {
                 ctx.fillStyle = '#ffd700';
                 ctx.font = 'bold 72px sans-serif';
                 ctx.textAlign = 'center';
                 ctx.fillText(titleMap[canvasId] || 'Chart', compositeCanvas.width / 2, 90);
                 
+                // Author credit instead of date
                 ctx.fillStyle = '#888';
-                ctx.font = '36px monospace';
-                const dateStr = new Date().toLocaleDateString('en-GB', { 
-                    day: '2-digit', 
-                    month: '2-digit',
-                    year: 'numeric',
-                    hour: '2-digit',
-                    minute: '2-digit'
-                });
-                ctx.fillText(`Analysis Date: ${dateStr}`, compositeCanvas.width / 2, 160);
+                ctx.font = '36px sans-serif';
+                ctx.fillText('by Wessen Getachew', compositeCanvas.width / 2, 160);
             }
             
             // Stats summary bar
