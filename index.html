@@ -1657,7 +1657,7 @@
         </div>
 
         <!-- Analysis Statistics (Fixed toggle) -->
-        <div id="statsPanel" class="dropdown-section active" style="display: none; border: 2px solid #22c55e;">
+        <div id="statsPanel" class="dropdown-section" style="display: none; border: 2px solid #22c55e;">
             <div class="dropdown-header" onclick="toggleSection(this)" style="background: rgba(34, 197, 94, 0.1);">
                 <h3 style="color: #22c55e;">Analysis Statistics</h3>
                 <span class="dropdown-icon" style="color: #22c55e;">v</span>
@@ -1682,6 +1682,9 @@
     <div class="charts-container">
         <div class="chart-wrapper" id="convergenceWrapper">
             <div class="chart-title">Progressive Convergence to ζ(2) = π²/6</div>
+            <div class="chart-description">
+                Shows how the cumulative product P₁ × P₂ × P₄ × ... converges to the target value π²/6 ≈ 1.6449 as we add more gap families. Each gap family's product contributes multiplicatively toward the final value.
+            </div>
             <canvas id="convergenceChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
@@ -1717,6 +1720,9 @@
         
         <div class="chart-wrapper" id="gapContribWrapper">
             <div class="chart-title">Individual Gap Family Products P<sub>g</sub></div>
+            <div class="chart-description">
+                Displays the individual contribution of each gap family. Each bar shows P_g = ∏_{p: gap(p)=g} p²/(p²-1), the product over all primes with that specific gap size. Larger values indicate gap families that contribute more to ζ(2).
+            </div>
             <canvas id="gapContribChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
@@ -1752,6 +1758,9 @@
         
         <div class="chart-wrapper" id="gapDistWrapper">
             <div class="chart-title">Prime Distribution by Gap Class</div>
+            <div class="chart-description">
+                Shows how many primes belong to each gap family. Twin primes (gap 2) and cousin primes (gap 4) typically have the most members, while larger gaps become progressively rarer.
+            </div>
             <canvas id="gapDistChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
@@ -1784,6 +1793,9 @@
         
         <div class="chart-wrapper" id="percentageWrapper">
             <div class="chart-title">Percentage Contribution to ζ(2) by Gap Family</div>
+            <div class="chart-description">
+                Shows each gap family's contribution as a percentage of log(ζ(2)). This reveals which gap sizes are most important for building up the final value. Typically gap 1 and gap 2 (twin primes) dominate.
+            </div>
             <canvas id="percentageChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
@@ -1816,6 +1828,9 @@
         
         <div class="chart-wrapper" id="errorWrapper">
             <div class="chart-title">Convergence Error Analysis</div>
+            <div class="chart-description">
+                Tracks both absolute and relative error between the cumulative product and the target π²/6. As more gap families are included, the error decreases exponentially, showing convergence.
+            </div>
             <canvas id="errorChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
@@ -1848,6 +1863,9 @@
         
         <div class="chart-wrapper" id="logScaleWrapper">
             <div class="chart-title">Log-Scale Product Growth P<sub>g</sub></div>
+            <div class="chart-description">
+                Displays log(P_g) for each gap family, making it easier to compare contributions across many orders of magnitude. Since products become multiplicative in log space, this shows additive contributions to log(ζ(2)).
+            </div>
             <canvas id="logScaleChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
@@ -1977,6 +1995,9 @@
         
         <div class="chart-wrapper" id="stepByStepWrapper">
             <div class="chart-title">Step-by-Step Gap Accumulation: ζ(2) = P<sub>0</sub> × P<sub>2</sub> × P<sub>4</sub> × ...</div>
+            <div class="chart-description">
+                Shows the progressive buildup of the cumulative product as each gap family is added. This table view complements the convergence chart by providing exact numerical values at each step.
+            </div>
             <div class="stats-table-wrapper">
                 <div class="stats-table-header">
                     <div class="stats-table-title">Progressive Product Construction</div>
@@ -2058,6 +2079,15 @@
                             <option value="summary" selected>Summary (First 20 primes)</option>
                             <option value="detailed">Detailed (First 100 primes)</option>
                             <option value="full">Full (All primes in gap)</option>
+                        </select>
+                        <label style="margin-left: 20px;">Decimals:</label>
+                        <select id="decimalConvergencePrecision" onchange="updateDecimalAnalysis()">
+                            <option value="4">4</option>
+                            <option value="6">6</option>
+                            <option value="8">8</option>
+                            <option value="10">10</option>
+                            <option value="12" selected>12</option>
+                            <option value="15">15</option>
                         </select>
                     </div>
                 </div>
@@ -4509,17 +4539,6 @@
                 });
             });
             
-            // Title
-            ctx.fillStyle = '#ffd700';
-            ctx.font = 'bold 72px sans-serif';
-            ctx.textAlign = 'center';
-            ctx.fillText(`Gap ${focusGap} Decimal Convergence: Weight Decay Analysis`, w / 2, 90);
-            
-            // Subtitle
-            ctx.fillStyle = '#22c55e';
-            ctx.font = '40px sans-serif';
-            ctx.fillText(`How each prime's contribution affects decimal places (first ${primes.length} primes)`, w / 2, 145);
-            
             // Draw TWO subcharts: contribution magnitude and cumulative product
             
             // SUBCHART 1: Log10 contribution (shows which decimal places affected)
@@ -4639,6 +4658,7 @@
             
             const maxPrimes = detailLevel === 'summary' ? 20 : detailLevel === 'detailed' ? 100 : gapData.primes.length;
             const primes = gapData.primes.slice(0, maxPrimes);
+            const precision = parseInt(document.getElementById('decimalConvergencePrecision')?.value || 12);
             
             const table = document.getElementById('decimalAnalysisTableContent');
             
@@ -4662,10 +4682,10 @@
                 rows.push({
                     index: idx + 1,
                     prime: p,
-                    factor: factor.toFixed(15),
+                    factor: factor.toFixed(precision),
                     contribution: contribution.toExponential(6),
                     logContrib: logContribution.toExponential(6),
-                    cumProduct: cumProduct.toFixed(15),
+                    cumProduct: cumProduct.toFixed(precision),
                     percentChange: percentChange.toExponential(4),
                     decimalPlace: Math.min(decimalPlace, 15)
                 });
@@ -4726,6 +4746,7 @@
             
             const gap = parseInt(document.getElementById('decimalGapSelect').value);
             const detailLevel = document.getElementById('decimalDetailLevel').value;
+            const precision = parseInt(document.getElementById('decimalConvergencePrecision')?.value || 12);
             const gapData = analysisResults.gapProducts[gap];
             
             if (!gapData || !gapData.primes) return;
@@ -4735,7 +4756,8 @@
             
             let csv = 'DECIMAL CONVERGENCE ANALYSIS\\n';
             csv += `Gap ${gap} - Per-Prime Contribution Analysis\\n`;
-            csv += `Date: ${new Date().toISOString()}\\n\\n`;
+            csv += `Date: ${new Date().toISOString()}\\n`;
+            csv += `Precision: ${precision} decimal places\\n\\n`;
             
             csv += 'Index,Prime,Factor (p²/(p²-1)),Contribution (factor-1),Log₁₀(factor),Cumulative Product,Percent Change,Decimal Places Affected\\n';
             
@@ -4750,7 +4772,7 @@
                 const decimalChange = Math.abs(cumProduct - prevProduct);
                 const decimalPlace = decimalChange > 0 ? Math.ceil(-Math.log10(decimalChange)) : 15;
                 
-                csv += `${idx+1},${p},${factor.toFixed(15)},${contribution.toExponential(6)},${logContribution.toExponential(6)},${cumProduct.toFixed(15)},${percentChange.toExponential(4)}%,${Math.min(decimalPlace, 15)}+\\n`;
+                csv += `${idx+1},${p},${factor.toFixed(precision)},${contribution.toExponential(6)},${logContribution.toExponential(6)},${cumProduct.toFixed(precision)},${percentChange.toExponential(4)}%,${Math.min(decimalPlace, 15)}+\\n`;
             });
             
             const blob = new Blob([csv], { type: 'text/csv' });
@@ -6512,6 +6534,7 @@
         function renderDecimalConvergenceTableData(ctx, startY, canvasWidth, maxRows) {
             // Get selected gap from dropdown, default to 2
             const gap = parseInt(document.getElementById('decimalGapSelect')?.value || 2);
+            const precision = parseInt(document.getElementById('decimalConvergencePrecision')?.value || 12);
             const gapData = analysisResults.gapProducts[gap];
             
             if (!gapData || !gapData.primes) {
@@ -6581,17 +6604,54 @@
                 // Prime
                 ctx.fillText(p.toLocaleString(), 40 + 1 * colW + colW / 2, y + 32);
                 // Factor
-                ctx.fillText(factor.toFixed(6), 40 + 2 * colW + colW / 2, y + 32);
+                const displayPrecision = Math.min(precision, 9); // Canvas display limited to 9 for space
+                ctx.fillText(factor.toFixed(displayPrecision), 40 + 2 * colW + colW / 2, y + 32);
                 // Contribution
                 ctx.fillText(contribution.toExponential(2), 40 + 3 * colW + colW / 2, y + 32);
                 // Cumulative Product
-                ctx.fillText(cumProduct.toFixed(6), 40 + 4 * colW + colW / 2, y + 32);
+                ctx.fillText(cumProduct.toFixed(displayPrecision), 40 + 4 * colW + colW / 2, y + 32);
                 // Decimal Places
                 ctx.fillStyle = decimalPlace > 10 ? '#22c55e' : '#ffd700';
                 ctx.fillText(`${Math.min(decimalPlace, 15)}+`, 40 + 5 * colW + colW / 2, y + 32);
             });
             
-            startY += primes.length * 45 + 40;
+            startY += primes.length * 45 + 20;
+            
+            // Add summary row
+            const firstPrime = primes[0];
+            const lastPrime = primes[primes.length - 1];
+            const firstFactor = (firstPrime * firstPrime) / (firstPrime * firstPrime - 1);
+            const lastFactor = (lastPrime * lastPrime) / (lastPrime * lastPrime - 1);
+            const firstContrib = ((firstFactor - 1) * 100);
+            const lastContrib = ((lastFactor - 1) * 100);
+            const weightRatio = firstContrib / lastContrib;
+            
+            // Summary box background
+            ctx.fillStyle = 'rgba(255, 215, 0, 0.1)';
+            ctx.fillRect(40, startY, canvasWidth - 80, 120);
+            
+            // Border
+            ctx.strokeStyle = '#ffd700';
+            ctx.lineWidth = 3;
+            ctx.strokeRect(40, startY, canvasWidth - 80, 120);
+            
+            // Summary title
+            ctx.fillStyle = '#ffd700';
+            ctx.font = 'bold 32px sans-serif';
+            ctx.textAlign = 'left';
+            ctx.fillText('Summary:', 60, startY + 35);
+            
+            // Summary content
+            ctx.fillStyle = '#e0e0e0';
+            ctx.font = '26px sans-serif';
+            ctx.fillText(`First prime (p=${firstPrime}): Contributes ${firstContrib.toFixed(4)}% increase`, 60, startY + 70);
+            ctx.fillText(`Last prime (p=${lastPrime}): Contributes ${lastContrib.toExponential(4)}% increase`, 60, startY + 100);
+            
+            ctx.fillStyle = '#4ade80';
+            ctx.font = 'bold 26px sans-serif';
+            ctx.fillText(`Weight ratio: First/Last = ${weightRatio.toExponential(2)}×`, canvasWidth - 500, startY + 85);
+            
+            startY += 120 + 40;
             
             return startY - originalStartY;
         }
@@ -8442,6 +8502,10 @@
         // Auto-run analysis on page load with 10M default
         window.addEventListener('DOMContentLoaded', function() {
             console.log('Auto-running analysis with 10M primes...');
+            
+            // Load default preset for custom gap comparison
+            loadGapPreset('small_gaps');
+            
             setTimeout(() => {
                 runAnalysis();
             }, 500); // Small delay to ensure everything is loaded
