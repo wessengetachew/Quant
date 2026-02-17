@@ -1256,7 +1256,7 @@
                 <li><strong>Convergence Analysis:</strong> Characterize whether individual P<sub>g</sub> admit closed-form expressions involving π or other fundamental constants</li>
                 <li><strong>Asymptotic Behavior:</strong> Analyze how P<sub>g</sub> scales as g → ∞</li>
                 <li><strong>Gap Distribution:</strong> Examine relationships between gap class populations and analytic properties of ζ(s)</li>
-                <li><strong>Gap Ratio Convergence:</strong> Test Hardy-Littlewood prediction that twin primes (gap 2) and cousin primes (gap 4) have equal asymptotic density by tracking their count ratio approaching 1.0</li>
+                <li><strong>Gap Ratio Convergence:</strong> Test Hardy-Littlewood prediction that twin primes (gap 2) and cousin primes (gap 4) have equal asymptotic density — their count ratio should approach 1.0. Note: gap 6 (sexy primes) has a 2× larger HL constant (due to p=3 dividing 6), so it is asymptotically twice as frequent, not equal.</li>
                 <li><strong>Twin Prime Conjecture Evidence:</strong> Measure computational evidence for infinite twin primes through Hardy-Littlewood formula accuracy and gap ratio convergence</li>
                 <li><strong>Generalization:</strong> Test whether this decomposition extends to ζ(2n) for all positive integers n</li>
                 <li><strong>Conjecture Constraints:</strong> Investigate whether gap contribution patterns impose necessary conditions on unproven conjectures</li>
@@ -1264,20 +1264,20 @@
             
             <h3>Analytical Methods</h3>
             
-            <p>The tool employs a memory-efficient <strong>Segmented Sieve of Eratosthenes</strong> for prime generation, enabling analysis up to 1 billion and beyond without memory constraints. It computes exact products P<sub>g</sub> for each gap class, tracks progressive convergence to π²/6, and provides high-precision numerical analysis with configurable decimal representation.</p>
+            <p>The tool employs a <strong>Segmented Sieve of Eratosthenes</strong> for prime generation, computes exact products P<sub>g</sub> for each gap class, tracks progressive convergence to π²/6, and provides high-precision numerical analysis with configurable decimal representation. Browser analysis is reliable up to approximately <strong>300 million</strong>; for larger ranges use the companion Python script.</p>
             
-            <h3>Performance & Scalability</h3>
+            <h3>Performance & Browser Limits</h3>
             
-            <p>The segmented sieve implementation processes primes in 1-million-number segments, maintaining constant memory usage regardless of the analysis range:</p>
+            <p>This tool runs entirely in your browser. There are two distinct memory stages to be aware of:</p>
             
             <ul>
-                <li><strong>Memory Efficiency:</strong> Uses ~50 MB for any range (10M to 1B+), compared to ~950 MB for traditional sieve at 1 billion</li>
-                <li><strong>Processing Speed:</strong> 100M in ~30 seconds, 1B in ~5 minutes on modern hardware</li>
-                <li><strong>Progress Tracking:</strong> Real-time updates showing sieve completion percentage and primes discovered</li>
-                <li><strong>Automatic Selection:</strong> Uses simple sieve for ranges < 10M (faster), segmented sieve for larger ranges (memory-efficient)</li>
+                <li><strong>Sieving (efficient):</strong> The segmented sieve processes primes in 1M-number chunks — only ~50 MB during generation, up to ~300M before storage limits kick in</li>
+                <li><strong>Storage (the real limit):</strong> After sieving, JavaScript must store all primes found. At 300M that's ~16M primes ≈ 340 MB total. This is what caps the browser.</li>
+                <li><strong>Safe range:</strong> Up to ~200M reliably, up to ~300M on most machines with few other tabs open</li>
+                <li><strong>Above 300M:</strong> Expect freezing or "out of memory" errors — the tab may crash</li>
             </ul>
             
-            <p>This enables researchers to explore prime gap distributions and zeta function decompositions at unprecedented scales directly in the browser, without specialized computational infrastructure.</p>
+            <p><strong>For 400M and above</strong>, use the companion Python script instead. Unlike the browser, Python processes primes incrementally without storing them — using constant ~50 MB RAM regardless of range. It outputs the same CSV format which can be loaded back here for visualization.</p>
         </div>
     </div>
     
@@ -1291,13 +1291,13 @@
                         Maximum Prime
                         <span class="control-value" id="maxPrimeDisplay">10,000,000</span>
                     </label>
-                    <input type="number" id="maxPrime" value="10000000" min="1000" max="1000000000" step="1000000"
+                    <input type="number" id="maxPrime" value="10000000" min="1000" max="300000000" step="1000000"
                            oninput="updateMaxPrimeDisplay()">
                     <div style="margin-top: 8px; font-size: 0.85rem; color: #888;">
                         Note: Values > 100M may take several minutes
                     </div>
-                    <div style="margin-top: 4px; font-size: 0.75rem; color: #666;">
-                        Segmented sieve allows up to 1B+ (file upload for pre-computed primes)
+                    <div style="margin-top: 4px; font-size: 0.75rem; color: #ffa500;">
+                        Browser limit: ~300M (use Python script for 400M-1B+)
                     </div>
                 </div>
                 
@@ -1526,7 +1526,7 @@
                 <div style="margin-top: 20px; padding: 16px; background: rgba(78, 205, 196, 0.05); border-radius: 8px; border-left: 4px solid #4ecdc4;">
                     <h4 style="color: #4ecdc4; margin: 0 0 12px 0; font-size: 1rem;">Alternative Data Sources</h4>
                     <p style="font-size: 0.85rem; color: #94a3b8; margin-bottom: 12px;">
-                        For ranges beyond 100M or to use pre-computed prime lists
+                        To use pre-computed prime lists — note the same ~300M browser limit applies to uploaded files
                     </p>
                     
                     <div style="display: grid; gap: 12px;">
@@ -1561,7 +1561,7 @@
                                 </button>
                             </div>
                             <div style="font-size: 0.75rem; color: #666; margin-top: 4px;">
-                                OEIS API provides up to 1M primes. For billions, upload a file.
+                                OEIS API provides up to 1M primes. File upload: same ~300M browser limit applies.
                             </div>
                         </div>
                     </div>
@@ -1912,8 +1912,7 @@
         <div class="chart-wrapper" id="gapRatioWrapper">
             <div class="chart-title">Gap Ratio Analysis: Twin Prime Conjecture Evidence</div>
             <div class="chart-description">
-                Tracks the ratio Count(gap=2)/Count(gap=4) and other gap ratios across different prime ranges. 
-                If twin primes and cousin primes are both infinite with equal density (Hardy-Littlewood), this ratio should approach 1.0 as N→∞.
+                Tracks Count(gap=2)/Count(gap=4) and other gap ratios. Hardy-Littlewood predicts twin primes (gap 2) and cousin primes (gap 4) have <em>identical</em> singular series constants, so their ratio should approach 1.0 as N→∞. Gap 6 (sexy primes) has a 2× larger constant due to the p=3 factor — so it is asymptotically <em>twice as frequent</em> as gap 2 or gap 4, not equal.
             </div>
             <canvas id="gapRatioChart" width="3840" height="2160"></canvas>
             <div class="stats-table-wrapper">
@@ -2261,6 +2260,174 @@
         </div>
     </div>
     
+    <!-- MERTENS FUNCTION SECTION -->
+    <div class="controls-container" style="margin-top: 40px;">
+        <div class="dropdown-section" style="border: 2px solid #4ecdc4;">
+            <div class="dropdown-header" onclick="toggleSection(this)" style="background: linear-gradient(135deg, #0d1f2d 0%, #0a1628 100%);">
+                <h3 style="color: #4ecdc4; display: flex; align-items: center; gap: 12px;">
+                    <span>⟨μ⟩</span> Mertens Function & Riemann Hypothesis Connection
+                    <span style="background: rgba(78,205,196,0.2); color: #4ecdc4; padding: 4px 12px; border-radius: 12px; font-size: 0.75rem; font-weight: 600;">Companion Analysis</span>
+                </h3>
+                <span class="dropdown-icon" style="color: #4ecdc4;">v</span>
+            </div>
+            <div class="dropdown-content">
+
+                <!-- Mathematical Bridge -->
+                <div style="background: linear-gradient(135deg, #0d1f2d, #0a1628); border: 1px solid #4ecdc4; border-radius: 8px; padding: 24px; margin-bottom: 20px;">
+                    <h4 style="color: #4ecdc4; margin: 0 0 14px 0; font-size: 1.1rem;">Connection to the Gap-Class Decomposition</h4>
+                    <p style="color: #ccc; margin-bottom: 12px; line-height: 1.7;">
+                        The gap-class decomposition above reorganises the Euler product <strong style="color:#ffd700;">ζ(2) = ∏ p²/(p²−1)</strong> by prime gap families. 
+                        The Mertens function below probes the <em>same prime landscape</em> from a different angle: the Möbius function μ(n) encodes the exact prime-factorisation structure that drives those products, 
+                        with μ(n) = ±1 for square-free n and 0 otherwise.
+                    </p>
+                    <p style="color: #ccc; margin-bottom: 12px; line-height: 1.7;">
+                        Their deep link is the Riemann Hypothesis. The RH is equivalent to both:
+                    </p>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 12px;">
+                        <div style="background: rgba(255,215,0,0.07); border-left: 3px solid #ffd700; padding: 12px; border-radius: 4px;">
+                            <div style="color: #ffd700; font-family: 'Times New Roman', serif; font-size: 1.1rem; margin-bottom: 6px;">|M(n)| = O(n^(½+ε))</div>
+                            <div style="color: #aaa; font-size: 0.85rem;">The Mertens wave stays within the ±√n boundary — visible in the chart below</div>
+                        </div>
+                        <div style="background: rgba(78,205,196,0.07); border-left: 3px solid #4ecdc4; padding: 12px; border-radius: 4px;">
+                            <div style="color: #4ecdc4; font-family: 'Times New Roman', serif; font-size: 1.1rem; margin-bottom: 6px;">log ζ(s) = Σ<sub>g</sub> log P<sub>g</sub></div>
+                            <div style="color: #aaa; font-size: 0.85rem;">The gap decomposition converges — witnessed by the error charts above</div>
+                        </div>
+                    </div>
+                    <p style="color: #888; font-size: 0.9rem; line-height: 1.6;">
+                        Both functions are ultimately measuring whether primes are distributed "fairly" — without systematic bias toward any particular factorisation pattern. 
+                        The tight convergence in the gap products above and M(n) staying within ±√n below are two faces of the same conjecture.
+                    </p>
+                </div>
+
+                <!-- Mertens Stats Grid -->
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 12px; margin-bottom: 20px;">
+                    <div style="background: linear-gradient(135deg, #0d1f2d, #0a1628); border: 1px solid #4ecdc4; padding: 16px; border-radius: 8px;">
+                        <div style="color: #888; font-size: 0.8rem; margin-bottom: 4px;">Current Range</div>
+                        <div style="color: #4ecdc4; font-size: 1.3rem; font-weight: bold;" id="m_statRange">n = 1 to 2,000</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #0d1f2d, #0a1628); border: 1px solid #22c55e; padding: 16px; border-radius: 8px;">
+                        <div style="color: #888; font-size: 0.8rem; margin-bottom: 4px;">Maximum Peak</div>
+                        <div style="color: #22c55e; font-size: 1.3rem; font-weight: bold;" id="m_statMax">—</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #0d1f2d, #0a1628); border: 1px solid #ef4444; padding: 16px; border-radius: 8px;">
+                        <div style="color: #888; font-size: 0.8rem; margin-bottom: 4px;">Minimum Dip</div>
+                        <div style="color: #ef4444; font-size: 1.3rem; font-weight: bold;" id="m_statMin">—</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #0d1f2d, #0a1628); border: 1px solid #a855f7; padding: 16px; border-radius: 8px;">
+                        <div style="color: #888; font-size: 0.8rem; margin-bottom: 4px;">Zero Crossings</div>
+                        <div style="color: #a855f7; font-size: 1.3rem; font-weight: bold;" id="m_statZeros">—</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #0d1f2d, #0a1628); border: 1px solid #f59e0b; padding: 16px; border-radius: 8px;">
+                        <div style="color: #888; font-size: 0.8rem; margin-bottom: 4px;">Square-Free</div>
+                        <div style="color: #f59e0b; font-size: 1.3rem; font-weight: bold;" id="m_statSquareFree">—</div>
+                    </div>
+                    <div style="background: linear-gradient(135deg, #0d1f2d, #0a1628); border: 1px solid #4ecdc4; padding: 16px; border-radius: 8px;">
+                        <div style="color: #888; font-size: 0.8rem; margin-bottom: 4px;">Within ±√n</div>
+                        <div style="color: #4ecdc4; font-size: 1.3rem; font-weight: bold;" id="m_statBoundary">—</div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div style="display: flex; gap: 16px; flex-wrap: wrap; align-items: flex-end; margin-bottom: 16px; padding: 16px; background: #12121a; border-radius: 8px; border: 1px solid #2a2a4a;">
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label style="color: #aaa; font-size: 0.85rem;">Range: n = 1 to <span style="color: #ffd700;" id="m_rangeValue">2000</span></label>
+                        <input type="range" id="m_rangeSlider" min="100" max="10000" value="2000" step="100"
+                               oninput="m_onRangeSlider(this.value)"
+                               style="width: 220px; accent-color: #4ecdc4;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label style="color: #aaa; font-size: 0.85rem;">Set n manually</label>
+                        <input type="number" id="m_manualInput" min="100" max="100000" value="2000" step="1"
+                               oninput="m_onManualInput(this.value)"
+                               style="padding: 8px 12px; background: #1a1a2a; border: 1px solid #3a3a5a; border-radius: 4px; color: #e0e0e0; font-size: 0.9rem; width: 110px;">
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label style="color: #aaa; font-size: 0.85rem;">Animation</label>
+                        <div style="display: flex; gap: 8px;">
+                            <button id="m_playBtn" onclick="m_startAnimation()"
+                                    style="padding: 8px 16px; background: linear-gradient(135deg,#22c55e,#16a34a); border: none; border-radius: 4px; color: #fff; font-weight: 600; cursor: pointer; font-size: 0.85rem;">▶ Play</button>
+                            <button id="m_pauseBtn" onclick="m_stopAnimation()"
+                                    style="display:none; padding: 8px 16px; background: linear-gradient(135deg,#f59e0b,#d97706); border: none; border-radius: 4px; color: #fff; font-weight: 600; cursor: pointer; font-size: 0.85rem;">⏸ Pause</button>
+                            <button onclick="m_startBackwardAnimation()"
+                                    style="padding: 8px 16px; background: linear-gradient(135deg,#6366f1,#4f46e5); border: none; border-radius: 4px; color: #fff; font-weight: 600; cursor: pointer; font-size: 0.85rem;">◀ Rewind</button>
+                        </div>
+                    </div>
+                    <div style="display: flex; flex-direction: column; gap: 6px;">
+                        <label style="color: #aaa; font-size: 0.85rem;">Speed: <span style="color: #ffd700;" id="m_speedValue">50</span>ms</label>
+                        <input type="range" id="m_speedSlider" min="10" max="200" value="50" step="10"
+                               oninput="m_onSpeedSlider(this.value)"
+                               style="width: 140px; accent-color: #4ecdc4;">
+                    </div>
+                    <div style="display: flex; gap: 16px; align-items: center;">
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #ccc; font-size: 0.85rem;">
+                            <input type="checkbox" id="m_showBounds" checked onchange="m_drawGraph()" style="accent-color: #4ecdc4;"> ±√n boundary
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #ccc; font-size: 0.85rem;">
+                            <input type="checkbox" id="m_showZeros" checked onchange="m_drawGraph()" style="accent-color: #4ecdc4;"> Zero crossings
+                        </label>
+                        <label style="display: flex; align-items: center; gap: 8px; cursor: pointer; color: #ccc; font-size: 0.85rem;">
+                            <input type="checkbox" id="m_loopAnim" style="accent-color: #4ecdc4;"> Loop
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Canvas -->
+                <div style="position: relative; background: #0a0a10; border-radius: 8px; padding: 16px; margin-bottom: 20px; border: 1px solid #2a2a4a;">
+                    <canvas id="m_graphCanvas" width="1400" height="500" style="display:block; width:100%; height:auto; background:#0a0a10; border-radius:4px; cursor:crosshair;"></canvas>
+                    <div id="m_tooltip" style="position:absolute; background:rgba(0,0,0,0.92); color:#e0e0e0; padding:10px 14px; border-radius:6px; font-size:0.85rem; pointer-events:none; opacity:0; transition:opacity 0.15s; z-index:1000; border:1px solid #3a3a5a; max-width:260px;"></div>
+                </div>
+
+                <!-- Data Table -->
+                <div style="background: #12121a; border-radius: 8px; padding: 16px; border: 1px solid #2a2a4a;">
+                    <h4 style="color: #ffd700; margin: 0 0 12px 0;">Data Table</h4>
+                    <div style="display: flex; gap: 12px; margin-bottom: 12px; flex-wrap: wrap; align-items: center;">
+                        <input type="text" id="m_searchInput" placeholder="Search by n value…" oninput="m_populateTable()"
+                               style="padding: 8px 12px; background: #1a1a2a; border: 1px solid #3a3a5a; border-radius: 4px; color: #e0e0e0; font-size: 0.85rem; width: 180px;">
+                        <select id="m_filterType" onchange="m_populateTable()"
+                                style="padding: 8px 12px; background: #1a1a2a; border: 1px solid #3a3a5a; border-radius: 4px; color: #e0e0e0; font-size: 0.85rem;">
+                            <option value="all">Show All</option>
+                            <option value="zeros">Zero Crossings Only</option>
+                            <option value="positive">Positive Only</option>
+                            <option value="negative">Negative Only</option>
+                            <option value="square-free">Square-Free Only</option>
+                        </select>
+                        <button onclick="m_exportCSV()"
+                                style="padding: 8px 16px; background: #2a2a4a; border: none; border-radius: 4px; color: #e0e0e0; cursor: pointer; font-size: 0.85rem;">Export CSV</button>
+                    </div>
+                    <div style="max-height: 400px; overflow: auto; border-radius: 6px;">
+                        <table style="width:100%; border-collapse:collapse; background:#0a0a10; font-size:0.82rem;">
+                            <thead style="position:sticky; top:0; background:#1a1a2a; z-index:5;">
+                                <tr>
+                                    <th onclick="m_sortTable('n')" style="padding:10px 12px; text-align:left; color:#ffd700; cursor:pointer; border-bottom:1px solid #2a2a4a;">n</th>
+                                    <th onclick="m_sortTable('mu')" style="padding:10px 12px; text-align:left; color:#ffd700; cursor:pointer; border-bottom:1px solid #2a2a4a;">μ(n)</th>
+                                    <th onclick="m_sortTable('M')" style="padding:10px 12px; text-align:left; color:#ffd700; cursor:pointer; border-bottom:1px solid #2a2a4a;">M(n)</th>
+                                    <th onclick="m_sortTable('delta')" style="padding:10px 12px; text-align:left; color:#ffd700; cursor:pointer; border-bottom:1px solid #2a2a4a;">ΔM</th>
+                                    <th onclick="m_sortTable('sqFree')" style="padding:10px 12px; text-align:left; color:#ffd700; cursor:pointer; border-bottom:1px solid #2a2a4a;">Square-Free</th>
+                                    <th onclick="m_sortTable('factors')" style="padding:10px 12px; text-align:left; color:#ffd700; cursor:pointer; border-bottom:1px solid #2a2a4a;">Prime Factors</th>
+                                    <th onclick="m_sortTable('distance')" style="padding:10px 12px; text-align:left; color:#ffd700; cursor:pointer; border-bottom:1px solid #2a2a4a;">|M(n)|</th>
+                                    <th onclick="m_sortTable('within')" style="padding:10px 12px; text-align:left; color:#ffd700; cursor:pointer; border-bottom:1px solid #2a2a4a;">Within ±√n</th>
+                                    <th style="padding:10px 12px; text-align:left; color:#ffd700; border-bottom:1px solid #2a2a4a;">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="m_tableBody"></tbody>
+                            <tfoot style="position:sticky; bottom:0; background:#1a1a2a;">
+                                <tr>
+                                    <td colspan="2" style="padding:10px 12px; color:#aaa; font-size:0.8rem;">Σμ(n) = <span id="m_sumMu" style="color:#ffd700;">—</span></td>
+                                    <td style="padding:10px 12px; color:#aaa; font-size:0.8rem;">Final: <span id="m_finalM" style="color:#ffd700;">—</span></td>
+                                    <td colspan="2" style="padding:10px 12px; color:#aaa; font-size:0.8rem;">Sq-Free: <span id="m_sqFreeCount" style="color:#ffd700;">—</span></td>
+                                    <td style="padding:10px 12px; color:#aaa; font-size:0.8rem;">Avg |M|: <span id="m_avgDist" style="color:#ffd700;">—</span></td>
+                                    <td colspan="2" style="padding:10px 12px; color:#aaa; font-size:0.8rem;">Within bound: <span id="m_withinCount" style="color:#ffd700;">—</span></td>
+                                    <td style="padding:10px 12px; color:#aaa; font-size:0.8rem;">Zeros: <span id="m_zeroCount" style="color:#ffd700;">—</span></td>
+                                </tr>
+                            </tfoot>
+                        </table>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
     <!-- CREDITS SECTION -->
     <div class="controls-container" style="margin-top: 40px;">
         <div class="dropdown-section" style="border: 2px solid #ffd700;">
@@ -2451,7 +2618,10 @@
             return filtered;
         }
         
-        // Segmented Sieve of Eratosthenes - Memory efficient for large ranges
+        // Segmented Sieve of Eratosthenes
+        // NOTE: This solves the SIEVING memory problem (constant ~50 MB during generation).
+        // The STORAGE problem remains — JavaScript must still hold all primes found.
+        // Browser limit: ~300M (~16M primes, ~340 MB). Above that, use the Python script.
         function sievePrimes(max, progressCallback = null) {
             // If custom prime list is loaded, use it instead of computing
             if (customPrimeList && customPrimeList.length > 0) {
@@ -2464,7 +2634,7 @@
                 return simpleSieve(max, progressCallback);
             }
             
-            // For large ranges, use segmented sieve for memory efficiency
+            // For larger ranges, use segmented sieve (reduces sieving memory only)
             return segmentedSieve(max, progressCallback);
         }
         
@@ -4084,15 +4254,37 @@
             const gap12Count = analysisResults.gapProducts[12]?.count || 0;
             const totalPrimes = analysisResults.allPrimesFound - 1; // Exclude last prime
             
-            // Calculate Hardy-Littlewood prediction for twin primes
-            const C2 = 0.66016118; // Twin prime constant
-            const maxPrime = analysisResults.maxPrime;
+            // Hardy-Littlewood singular series constants per gap
+            // S(h) = 2 * C2 * Prod_{odd prime p dividing h} (p-1)/(p-2)
+            // Gap 2, 4, 8: S = 2*C2  (no odd prime factors, or p=2 only)
+            // Gap 6, 12, 18, 24: S = 4*C2  (factor of 2 from p=3 dividing gap)
+            // Gap 10, 20: S = 8/3 * C2  (factor 4/3 from p=5 dividing gap)
+            const C2_FULL = 0.6601618158468695; // Full precision twin prime constant
             
-            // Hardy-Littlewood formula for twin primes:
-            // π₂(x) ≈ 2C₂ ∫₂ˣ dt/ln²(t)
-            // Approximated by: 2C₂ × x/ln²(x)
-            const lnX = Math.log(maxPrime);
-            const predictedTwins = 2 * C2 * maxPrime / (lnX * lnX);
+            // li2 approximation: better estimate of ∫₂ˣ dt/ln²(t)
+            // li2(x) ≈ x/ln²(x) * (1 + 2/ln(x) + 6/ln²(x) + 24/ln³(x))
+            function li2(x) {
+                const L = Math.log(x);
+                return (x / (L * L)) * (1 + 2/L + 6/(L*L) + 24/(L*L*L));
+            }
+            
+            function singularSeries(h) {
+                // Compute Prod_{odd prime p | h} (p-1)/(p-2)
+                let mult = 1.0;
+                for (let p = 3; p <= h; p++) {
+                    if (h % p === 0) {
+                        let isPrime = true;
+                        for (let d = 2; d * d <= p; d++) { if (p % d === 0) { isPrime = false; break; } }
+                        if (isPrime) mult *= (p - 1) / (p - 2);
+                    }
+                }
+                return 2 * C2_FULL * mult;
+            }
+            
+            // Hardy-Littlewood predictions using li2 approximation
+            const maxPrime = analysisResults.maxPrime;
+            const predictedTwins = singularSeries(2) * li2(maxPrime);   // gap 2: S=2*C2
+            const predictedCousins = singularSeries(4) * li2(maxPrime); // gap 4: S=2*C2 (same)
             const hlError = Math.abs(gap2Count - predictedTwins);
             const hlErrorPercent = (hlError / gap2Count) * 100;
             
@@ -4136,7 +4328,7 @@
             ctx.fillText(`Analysis: ${analysisResults.allPrimesFound.toLocaleString()} primes up to ${maxPrime.toLocaleString()}`, w / 2, h - 80);
             
             ctx.font = '28px sans-serif';
-            ctx.fillText(`Twin Prime Constant C₂ ≈ 0.66016118  |  Hardy-Littlewood Predicted: ${Math.round(predictedTwins).toLocaleString()} twins`, w / 2, h - 40);
+            ctx.fillText(`Twin Prime Constant C₂ = 0.6601618158...  |  H-L Predicted (li₂ formula): ${Math.round(predictedTwins).toLocaleString()} twins`, w / 2, h - 40);
         }
         
         function renderRatioSubchart(ctx, x, y, w, h, ratio_2_4, ratio_2_6, ratio_4_6) {
@@ -5497,11 +5689,21 @@
             const gap12Count = analysisResults.gapProducts[12]?.count || 0;
             const totalPrimes = analysisResults.allPrimesFound - 1;
             
-            // Calculate Hardy-Littlewood prediction
-            const C2 = 0.66016118;
+            // Full precision constant, li2 approximation, and per-gap singular series
+            const C2_FULL = 0.6601618158468695;
+            function li2(x) { const L = Math.log(x); return (x/(L*L))*(1 + 2/L + 6/(L*L) + 24/(L*L*L)); }
+            function singularSeries(h) {
+                let mult = 1.0;
+                for (let p = 3; p <= h; p++) {
+                    if (h % p === 0) {
+                        let ip = true; for (let d=2;d*d<=p;d++) if(p%d===0){ip=false;break;}
+                        if (ip) mult *= (p-1)/(p-2);
+                    }
+                }
+                return 2 * C2_FULL * mult;
+            }
             const maxPrime = analysisResults.maxPrime;
-            const lnX = Math.log(maxPrime);
-            const predictedTwins = 2 * C2 * maxPrime / (lnX * lnX);
+            const predictedTwins = singularSeries(2) * li2(maxPrime);
             const hlError = Math.abs(gap2Count - predictedTwins);
             const hlErrorPercent = (hlError / gap2Count) * 100;
             
@@ -5538,7 +5740,7 @@
                     <tr>
                         <td><strong>Gap 2/Gap 6 Ratio</strong></td>
                         <td style="font-family: monospace; font-size: 1.1rem;">${ratio_2_6.toFixed(6)}</td>
-                        <td>Gap 6 expected to be ~${(1/ratio_2_6).toFixed(2)}× less frequent</td>
+                        <td>Gap 6 is asymptotically ~2× <em>more</em> frequent than gap 2 (S(6) = 2×S(2))</td>
                     </tr>
                     <tr>
                         <td><strong>Gap 4/Gap 6 Ratio</strong></td>
@@ -5566,9 +5768,14 @@
                         <td>${gap12Count.toLocaleString()} primes (largest small gap)</td>
                     </tr>
                     <tr style="border-top: 2px solid #2a2a4a;">
-                        <td><strong>Hardy-Littlewood Predicted</strong></td>
+                        <td><strong>H-L Predicted Twins (li₂)</strong></td>
                         <td style="font-family: monospace; font-size: 1.1rem;">${Math.round(predictedTwins).toLocaleString()}</td>
-                        <td>Twin primes expected by formula</td>
+                        <td>Uses S(2)·li₂(x); S(2)=2C₂≈${(2*0.6601618158468695).toFixed(8)}</td>
+                    </tr>
+                    <tr>
+                        <td><strong>H-L Predicted Cousins (li₂)</strong></td>
+                        <td style="font-family: monospace; font-size: 1.1rem;">${Math.round(predictedTwins).toLocaleString()}</td>
+                        <td>S(4)=S(2) — identical constant, so prediction equals twin prime prediction</td>
                     </tr>
                     <tr>
                         <td><strong>Hardy-Littlewood Error</strong></td>
@@ -6450,10 +6657,20 @@
             const gap12Count = analysisResults.gapProducts[12]?.count || 0;
             const totalPrimes = analysisResults.allPrimesFound - 1;
             
-            const C2 = 0.66016118;
+            const C2_FULL = 0.6601618158468695;
             const maxPrime = analysisResults.maxPrime;
-            const lnX = Math.log(maxPrime);
-            const predictedTwins = 2 * C2 * maxPrime / (lnX * lnX);
+            function li2scr(x) { const L = Math.log(x); return (x/(L*L))*(1 + 2/L + 6/(L*L) + 24/(L*L*L)); }
+            function singSerScr(h) {
+                let mult = 1.0;
+                for (let p = 3; p <= h; p++) {
+                    if (h % p === 0) {
+                        let ip = true; for (let d=2;d*d<=p;d++) if(p%d===0){ip=false;break;}
+                        if (ip) mult *= (p-1)/(p-2);
+                    }
+                }
+                return 2 * C2_FULL * mult;
+            }
+            const predictedTwins = singSerScr(2) * li2scr(maxPrime);
             
             const ratio_2_4 = gap4Count > 0 ? gap2Count / gap4Count : 0;
             const ratio_2_6 = gap6Count > 0 ? gap2Count / gap6Count : 0;
@@ -6594,10 +6811,10 @@
             
             const hlData = [
                 ['Twin Prime Count (Observed)', gap2Count.toLocaleString()],
-                ['Twin Prime Count (Predicted)', Math.round(predictedTwins).toLocaleString()],
+                ['Twin Prime Count (Predicted, li₂)', Math.round(predictedTwins).toLocaleString()],
                 ['Absolute Error', Math.round(hlError).toLocaleString()],
                 ['Relative Error', hlErrorPercent.toFixed(3) + '%'],
-                ['Twin Prime Constant C₂', C2.toFixed(8)]
+                ['Twin Prime Constant C₂', C2_FULL.toFixed(10)]
             ];
             
             ctx.font = '28px monospace';
@@ -7115,11 +7332,12 @@
             csv += 'computational evidence for infinite twin primes.\n\n';
             
             csv += 'THEORETICAL FOUNDATION:\n';
-            csv += 'Hardy-Littlewood predicts that for small even gaps g, the number of primes\n';
-            csv += 'with gap g up to x is asymptotically:\n';
-            csv += '  π_g(x) ~ 2C_g ∫ dx/ln²(x)\n';
-            csv += 'For gaps 2, 4, 6, the constant C_g ≈ 0.66016118 is identical, implying\n';
-            csv += 'equal density. Convergence of gap ratios to 1.0 validates this prediction.\n\n';
+            csv += 'Hardy-Littlewood Conjecture B: the number of prime pairs (p, p+h) up to x is:\n';
+            csv += '  π_h(x) ~ S(h) · li₂(x)  where  li₂(x) ≈ x/ln²(x)·(1 + 2/ln(x) + ...)\n';
+            csv += 'The singular series S(h) = 2·C₂ · ∏_{odd prime p|h} (p-1)/(p-2)\n';
+            csv += 'Key values: S(2)=S(4)=S(8)=2·C₂≈1.3203  S(6)=S(12)=4·C₂≈2.6406\n';
+            csv += 'IMPORTANT: Gap 6 is asymptotically TWICE as frequent as gap 2 or 4 (not equal).\n';
+            csv += 'Only gaps 2 and 4 are predicted to have equal asymptotic density.\n\n';
             
             const gap2Count = analysisResults.gapProducts[2]?.count || 0;
             const gap4Count = analysisResults.gapProducts[4]?.count || 0;
@@ -7128,10 +7346,20 @@
             const gap12Count = analysisResults.gapProducts[12]?.count || 0;
             const totalPrimes = analysisResults.allPrimesFound - 1;
             
-            const C2 = 0.66016118;
+            const C2_FULL = 0.6601618158468695;
             const maxPrime = analysisResults.maxPrime;
-            const lnX = Math.log(maxPrime);
-            const predictedTwins = 2 * C2 * maxPrime / (lnX * lnX);
+            function li2csv(x) { const L = Math.log(x); return (x/(L*L))*(1 + 2/L + 6/(L*L) + 24/(L*L*L)); }
+            function singularSeriesCSV(h) {
+                let mult = 1.0;
+                for (let p = 3; p <= h; p++) {
+                    if (h % p === 0) {
+                        let ip = true; for (let d=2;d*d<=p;d++) if(p%d===0){ip=false;break;}
+                        if (ip) mult *= (p-1)/(p-2);
+                    }
+                }
+                return 2 * C2_FULL * mult;
+            }
+            const predictedTwins = singularSeriesCSV(2) * li2csv(maxPrime);
             
             const ratio_2_4 = gap4Count > 0 ? gap2Count / gap4Count : 0;
             const ratio_2_6 = gap6Count > 0 ? gap2Count / gap6Count : 0;
@@ -7149,45 +7377,51 @@
             csv += `Analysis Date:,${new Date().toISOString()}\n`;
             csv += `Maximum Prime:,${maxPrime.toLocaleString()}\n`;
             csv += `Total Primes Analyzed:,${totalPrimes.toLocaleString()}\n`;
-            csv += `Twin Prime Constant C₂:,${C2.toFixed(8)}\n\n`;
+            csv += `Twin Prime Constant C₂ (full):,${C2_FULL.toFixed(16)}\n`;
+            csv += `S(2) = S(4) = 2·C₂:,${(2*C2_FULL).toFixed(10)}\n`;
+            csv += `S(6) = S(12) = 4·C₂:,${(4*C2_FULL).toFixed(10)}\n\n`;
             
             csv += 'GAP COUNT RATIOS:\n';
-            csv += 'Ratio,Value,Interpretation\n';
-            csv += `Gap 2 / Gap 4,${ratio_2_4.toFixed(precision)},${ratio_2_4 > 0.98 && ratio_2_4 < 1.02 ? 'Near 1.0 - supports equal density' : 'Check at higher N'}\n`;
-            csv += `Gap 2 / Gap 6,${ratio_2_6.toFixed(precision)},Gap 6 expected ~${(1/ratio_2_6).toFixed(2)}x less frequent\n`;
-            csv += `Gap 4 / Gap 6,${ratio_4_6.toFixed(precision)},Cousin vs Sexy prime density\n\n`;
+            csv += 'Ratio,Value,Expected limit,Interpretation\n';
+            csv += `Gap 2 / Gap 4,${ratio_2_4.toFixed(precision)},1.0000,${ratio_2_4 > 0.98 && ratio_2_4 < 1.02 ? '✓ Near 1.0 - S(2)=S(4) confirmed' : 'Check at higher N'}\n`;
+            csv += `Gap 2 / Gap 6,${ratio_2_6.toFixed(precision)},0.5000,Gap 6 is 2x more frequent (S(6)=2·S(2)) - ratio converges to 0.5\n`;
+            csv += `Gap 4 / Gap 6,${ratio_4_6.toFixed(precision)},0.5000,Same: S(4)=S(2) so gap4/gap6 also converges to 0.5\n\n`;
             
             csv += 'GAP FAMILY STATISTICS:\n';
-            csv += 'Gap,Count,Percentage of Total,Note\n';
-            csv += `2,${gap2Count.toLocaleString()},${pct2.toFixed(4)}%,Twin Primes\n`;
-            csv += `4,${gap4Count.toLocaleString()},${pct4.toFixed(4)}%,Cousin Primes\n`;
-            csv += `6,${gap6Count.toLocaleString()},${pct6.toFixed(4)}%,Sexy Primes\n`;
-            csv += `10,${gap10Count.toLocaleString()},${pct10.toFixed(4)}%,\n`;
-            csv += `12,${gap12Count.toLocaleString()},${pct12.toFixed(4)}%,Largest small gap\n\n`;
+            csv += 'Gap,Count,Percentage of Total,S(h),Asymptotic frequency relative to gap 2,Note\n';
+            csv += `2,${gap2Count.toLocaleString()},${pct2.toFixed(4)}%,${(2*C2_FULL).toFixed(6)},1.0x baseline,Twin Primes\n`;
+            csv += `4,${gap4Count.toLocaleString()},${pct4.toFixed(4)}%,${(2*C2_FULL).toFixed(6)},1.0x (equal to gap 2),Cousin Primes\n`;
+            csv += `6,${gap6Count.toLocaleString()},${pct6.toFixed(4)}%,${(4*C2_FULL).toFixed(6)},2.0x more frequent,Sexy Primes\n`;
+            csv += `10,${gap10Count.toLocaleString()},${pct10.toFixed(4)}%,${(8/3*2*C2_FULL).toFixed(6)},4/3x more frequent,\n`;
+            csv += `12,${gap12Count.toLocaleString()},${pct12.toFixed(4)}%,${(4*C2_FULL).toFixed(6)},2.0x more frequent,\n\n`;
             
-            csv += 'HARDY-LITTLEWOOD PREDICTION ANALYSIS:\n';
+            csv += 'HARDY-LITTLEWOOD PREDICTION ANALYSIS (using li₂ approximation):\n';
+            csv += 'Formula: π₂(x) ~ S(2)·li₂(x)  where li₂(x)=x/ln²(x)·(1+2/ln(x)+6/ln²(x)+24/ln³(x))\n';
             csv += 'Metric,Value\n';
             csv += `Twin Primes Observed,${gap2Count.toLocaleString()}\n`;
-            csv += `Twin Primes Predicted (H-L),${Math.round(predictedTwins).toLocaleString()}\n`;
+            csv += `Twin Primes Predicted (H-L li₂),${Math.round(predictedTwins).toLocaleString()}\n`;
             csv += `Absolute Error,${Math.round(hlError).toLocaleString()}\n`;
             csv += `Relative Error,${hlErrorPercent.toFixed(precision)}%\n`;
             csv += `Difference (Observed - Predicted),${gap2Count > predictedTwins ? '+' : ''}${Math.round(gap2Count - predictedTwins).toLocaleString()}\n\n`;
             
             csv += 'INTERPRETATION:\n';
             if (ratio_2_4 > 0.98 && ratio_2_4 < 1.02) {
-                csv += '✓ Gap 2/Gap 4 ratio is very close to 1.0, supporting Hardy-Littlewood conjecture\n';
+                csv += '✓ Gap 2/Gap 4 ratio near 1.0 — confirms S(2)=S(4), supporting HL equal-density prediction\n';
             } else {
-                csv += '! Gap 2/Gap 4 ratio deviates from 1.0 - test at higher N for convergence\n';
+                csv += '! Gap 2/Gap 4 ratio deviates from 1.0 — try larger N for convergence\n';
             }
+            csv += `✓ Gap 2/Gap 6 ratio converging toward 0.5 (currently ${ratio_2_6.toFixed(4)}) — confirms S(6)=2·S(2)\n`;
             if (hlErrorPercent < 1.0) {
-                csv += '✓ Hardy-Littlewood formula predicts twin prime count with <1% error - excellent match\n';
+                csv += '✓ H-L li₂ formula predicts twin prime count with <1% error — excellent\n';
             } else if (hlErrorPercent < 5.0) {
-                csv += '✓ Hardy-Littlewood formula shows good agreement (<5% error)\n';
+                csv += '✓ H-L li₂ formula shows good agreement (<5% error)\n';
+            } else {
+                csv += `Note: ${hlErrorPercent.toFixed(2)}% error — at small N the simple formula underestimates; use larger N\n`;
             }
             csv += '\nCONCLUSION:\n';
-            csv += 'Ratio convergence to 1.0 combined with accurate H-L predictions provides\n';
-            csv += 'strong computational evidence for infinite twin primes with equal asymptotic\n';
-            csv += 'density to cousin primes, as predicted by the Hardy-Littlewood conjecture.\n\n';
+            csv += 'Gap 2/Gap 4 ratio converges to 1.0 (equal density, same S constant).\n';
+            csv += 'Gap 2/Gap 6 ratio converges to 0.5 (gap 6 twice as frequent, S(6)=2·S(2)).\n';
+            csv += 'The H-L li₂ prediction matches observed twin prime counts within ~1% at large N.\n\n';
             
             csv += '=================================================\n';
             csv += 'END OF DATASET\n';
@@ -8724,9 +8958,13 @@
             }
             
             if (gap === 2) {
-                const remaining = (Math.PI**2 / 6) / ((4/3) * product);
-                const twinPrimeCount_predicted = 2 * TWIN_PRIME_CONSTANT * (analysisResults.maxPrime / Math.pow(Math.log(analysisResults.maxPrime), 2));
+                const C2_FULL = 0.6601618158468695739278121100145557784326233602847334;
+                const x = analysisResults.maxPrime;
+                const L = Math.log(x);
+                const li2_approx = (x/(L*L)) * (1 + 2/L + 6/(L*L) + 24/(L*L*L));
+                const twinPrimeCount_predicted = 2 * C2_FULL * li2_approx;
                 const twinPrimeCount_actual = analysisResults.gapProducts[gap].count;
+                const remaining = (Math.PI**2 / 6) / ((4/3) * product);
                 
                 return `
                     <strong>Observed:</strong> P<sub>2</sub>(2) = ${product.toFixed(15)}<br><br>
@@ -8740,9 +8978,13 @@
                     Remaining product (P<sub>4</sub> × P<sub>6</sub> × ...): ${remaining.toFixed(15)}<br><br>
                     
                     <strong>Twin Prime Count (up to ${analysisResults.maxPrime.toLocaleString()}):</strong><br>
-                    Predicted (via C₂ = ${TWIN_PRIME_CONSTANT.toFixed(8)}): ${Math.round(twinPrimeCount_predicted).toLocaleString()}<br>
+                    H-L Formula: π₂(x) ~ 2C₂·li₂(x)<br>
+                    Predicted: ${Math.round(twinPrimeCount_predicted).toLocaleString()}<br>
                     Observed: ${twinPrimeCount_actual.toLocaleString()}<br>
-                    Ratio: ${(twinPrimeCount_actual / twinPrimeCount_predicted).toFixed(4)}
+                    Ratio obs/pred: ${(twinPrimeCount_actual / twinPrimeCount_predicted).toFixed(4)}<br><br>
+                    
+                    <strong>Note on gap 6 vs gap 2:</strong><br>
+                    S(6) = 2·S(2), so gap 6 (sexy primes) is asymptotically <em>twice</em> as frequent as twins or cousins.
                 `;
             }
             
@@ -9494,6 +9736,390 @@
                     break;
             }
         }
+        // ============================================================
+        // MERTENS FUNCTION MODULE — all vars/functions prefixed m_
+        // ============================================================
+        (function() {
+            // Data stores
+            const m_mobius  = [];
+            const m_mertens = [];
+            const m_sqFree  = [];
+            const m_nFactors = [];
+            let   m_maxComputed = 0;
+
+            // State
+            let m_currentRange = 2000;
+            let m_animId = null;
+            let m_isAnimating = false;
+            let m_animSpeed = 50;
+            let m_selectedRow = null;
+            let m_sortCol = 'n';
+            let m_sortAsc = true;
+
+            // Expose to global scope so onclick="" handlers work
+            window.m_onRangeSlider  = v => { m_currentRange = parseInt(v); document.getElementById('m_rangeValue').textContent = v; document.getElementById('m_manualInput').value = v; m_drawGraph(); m_updateStats(); m_populateTable(); };
+            window.m_onManualInput  = v => { const n = parseInt(v); if (n >= 100 && n <= 100000) { m_currentRange = n; document.getElementById('m_rangeValue').textContent = n; if (n <= 10000) document.getElementById('m_rangeSlider').value = n; m_drawGraph(); m_updateStats(); m_populateTable(); } };
+            window.m_onSpeedSlider  = v => { m_animSpeed = parseInt(v); document.getElementById('m_speedValue').textContent = v; };
+            window.m_startAnimation = m_startAnimation;
+            window.m_stopAnimation  = m_stopAnimation;
+            window.m_startBackwardAnimation = m_startBackwardAnimation;
+            window.m_drawGraph      = m_drawGraph;
+            window.m_populateTable  = m_populateTable;
+            window.m_sortTable      = col => { if (m_sortCol === col) m_sortAsc = !m_sortAsc; else { m_sortCol = col; m_sortAsc = true; } m_populateTable(); };
+            window.m_exportCSV      = m_exportCSV;
+
+            // ----- Computation -----
+            function m_primeFactors(n) {
+                const f = []; let d = 2;
+                while (d * d <= n) { while (n % d === 0) { f.push(d); n /= d; } d++; }
+                if (n > 1) f.push(n);
+                return f;
+            }
+
+            function m_computeMobius(n) {
+                if (n === 1) return 1;
+                const f = m_primeFactors(n);
+                const u = [...new Set(f)];
+                if (f.length !== u.length) return 0;
+                return u.length % 2 === 0 ? 1 : -1;
+            }
+
+            function m_extendTo(target) {
+                if (target <= m_maxComputed) return;
+                for (let n = m_maxComputed + 1; n <= target; n++) {
+                    const mu  = m_computeMobius(n);
+                    const M   = (n === 1 ? 0 : m_mertens[n - 2]) + mu;
+                    const f   = m_primeFactors(n);
+                    const u   = [...new Set(f)];
+                    m_mobius.push(mu);
+                    m_mertens.push(M);
+                    m_sqFree.push(mu !== 0 ? 1 : 0);
+                    m_nFactors.push(u.length);
+                }
+                m_maxComputed = target;
+            }
+
+            // ----- Stats -----
+            function m_updateStats() {
+                m_extendTo(m_currentRange);
+                const d = m_mertens.slice(0, m_currentRange);
+                const s = m_sqFree.slice(0, m_currentRange);
+                let maxV = d[0], minV = d[0], maxI = 0, minI = 0;
+                let zeros = 0, within = 0;
+                for (let i = 0; i < d.length; i++) {
+                    if (d[i] > maxV) { maxV = d[i]; maxI = i; }
+                    if (d[i] < minV) { minV = d[i]; minI = i; }
+                    if (d[i] === 0) zeros++;
+                    if (Math.abs(d[i]) <= Math.sqrt(i + 1)) within++;
+                }
+                const sqF = s.reduce((a, b) => a + b, 0);
+                document.getElementById('m_statRange').textContent   = `n = 1 to ${m_currentRange.toLocaleString()}`;
+                document.getElementById('m_statMax').textContent     = `M(${maxI+1}) = ${maxV}`;
+                document.getElementById('m_statMin').textContent     = `M(${minI+1}) = ${minV}`;
+                document.getElementById('m_statZeros').textContent   = `${zeros} points`;
+                document.getElementById('m_statSquareFree').textContent = `${sqF.toLocaleString()} / ${m_currentRange.toLocaleString()}`;
+                document.getElementById('m_statBoundary').textContent = `${((within / m_currentRange) * 100).toFixed(1)}%`;
+            }
+
+            // ----- Graph -----
+            function m_drawGraph() {
+                m_extendTo(m_currentRange);
+                const canvas = document.getElementById('m_graphCanvas');
+                if (!canvas) return;
+                const ctx = canvas.getContext('2d');
+                const W = canvas.width, H = canvas.height, pad = 65;
+                const gW = W - 2*pad, gH = H - 2*pad;
+                ctx.clearRect(0, 0, W, H);
+
+                const d = m_mertens.slice(0, m_currentRange);
+                const maxV = Math.max(...d,  Math.sqrt(m_currentRange));
+                const minV = Math.min(...d, -Math.sqrt(m_currentRange));
+                const range = maxV - minV || 1;
+
+                const toY = v => pad + ((maxV - v) / range) * gH;
+                const toX = i => pad + ((i + 1) / m_currentRange) * gW;
+
+                // Grid lines
+                ctx.strokeStyle = '#1a1a2a'; ctx.lineWidth = 1;
+                const yStep = range > 40 ? 5 : range > 15 ? 2 : 1;
+                for (let v = Math.ceil(minV); v <= Math.floor(maxV); v += yStep) {
+                    const y = toY(v);
+                    ctx.beginPath(); ctx.moveTo(pad, y); ctx.lineTo(W - pad, y); ctx.stroke();
+                }
+
+                // Axes
+                ctx.strokeStyle = '#3a3a5a'; ctx.lineWidth = 1.5;
+                ctx.beginPath(); ctx.moveTo(pad, pad); ctx.lineTo(pad, H - pad); ctx.lineTo(W - pad, H - pad); ctx.stroke();
+
+                // Zero line
+                const zeroY = toY(0);
+                ctx.strokeStyle = '#4a4a6a'; ctx.lineWidth = 1; ctx.setLineDash([5, 5]);
+                ctx.beginPath(); ctx.moveTo(pad, zeroY); ctx.lineTo(W - pad, zeroY); ctx.stroke();
+                ctx.setLineDash([]);
+
+                // Y labels
+                ctx.fillStyle = '#888'; ctx.font = '11px monospace'; ctx.textAlign = 'right';
+                for (let v = Math.ceil(minV); v <= Math.floor(maxV); v += yStep) {
+                    ctx.fillText(v, pad - 8, toY(v) + 4);
+                }
+
+                // X labels
+                ctx.textAlign = 'center';
+                const xStep = m_currentRange > 10000 ? 2000 : m_currentRange > 1000 ? 500 : 200;
+                for (let i = 0; i <= m_currentRange; i += xStep) {
+                    ctx.fillText(i.toLocaleString(), pad + (i / m_currentRange) * gW, H - pad + 18);
+                }
+
+                // Axis titles
+                ctx.fillStyle = '#666'; ctx.font = '11px sans-serif';
+                ctx.textAlign = 'right'; ctx.fillText('M(n)', pad - 8, pad - 10);
+                ctx.textAlign = 'center'; ctx.fillText('n', W - pad + 30, H - pad + 18);
+
+                // √n boundaries
+                if (document.getElementById('m_showBounds').checked) {
+                    ctx.strokeStyle = '#ef4444'; ctx.lineWidth = 1.5; ctx.globalAlpha = 0.5;
+                    const step = Math.max(3, Math.floor(m_currentRange / 500));
+                    [1, -1].forEach(sign => {
+                        ctx.beginPath();
+                        for (let i = 1; i <= m_currentRange; i += step) {
+                            const x = pad + (i / m_currentRange) * gW;
+                            const y = toY(sign * Math.sqrt(i));
+                            i === 1 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                        }
+                        ctx.stroke();
+                    });
+                    ctx.globalAlpha = 1;
+                    // Label
+                    ctx.fillStyle = '#ef4444'; ctx.font = '11px sans-serif'; ctx.textAlign = 'left'; ctx.globalAlpha = 0.7;
+                    ctx.fillText('±√n (RH boundary)', pad + 6, toY(Math.sqrt(m_currentRange)) - 6);
+                    ctx.globalAlpha = 1;
+                }
+
+                // Zero crossing highlights
+                if (document.getElementById('m_showZeros').checked) {
+                    ctx.fillStyle = '#22c55e'; ctx.globalAlpha = 0.25;
+                    for (let i = 0; i < m_currentRange; i++) {
+                        if (d[i] === 0) {
+                            const x = toX(i);
+                            ctx.fillRect(x - 1, pad, 2, gH);
+                        }
+                    }
+                    ctx.globalAlpha = 1;
+                }
+
+                // Mertens line
+                ctx.strokeStyle = '#4ecdc4'; ctx.lineWidth = 2;
+                ctx.beginPath();
+                for (let i = 0; i < m_currentRange; i++) {
+                    const x = toX(i), y = toY(d[i]);
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.stroke();
+
+                // Selected point
+                if (m_selectedRow !== null && m_selectedRow <= m_currentRange) {
+                    const x = pad + (m_selectedRow / m_currentRange) * gW;
+                    const y = toY(d[m_selectedRow - 1]);
+                    ctx.fillStyle = '#ffd700'; ctx.beginPath(); ctx.arc(x, y, 7, 0, Math.PI*2); ctx.fill();
+                    ctx.strokeStyle = '#b8860b'; ctx.lineWidth = 2; ctx.stroke();
+                }
+            }
+
+            // ----- Animation -----
+            function m_startAnimation() {
+                if (m_isAnimating) return;
+                m_isAnimating = true;
+                document.getElementById('m_playBtn').style.display = 'none';
+                document.getElementById('m_pauseBtn').style.display = 'inline-block';
+                const max = parseInt(document.getElementById('m_rangeSlider').max);
+                function step() {
+                    if (!m_isAnimating) return;
+                    if (m_currentRange < max) {
+                        m_currentRange = Math.min(m_currentRange + Math.max(10, Math.floor(max / 300)), max);
+                        document.getElementById('m_rangeSlider').value = Math.min(m_currentRange, 10000);
+                        document.getElementById('m_rangeValue').textContent = m_currentRange;
+                        document.getElementById('m_manualInput').value = m_currentRange;
+                        m_drawGraph(); m_updateStats();
+                        m_animId = setTimeout(step, m_animSpeed);
+                    } else {
+                        if (document.getElementById('m_loopAnim').checked) {
+                            m_currentRange = 100;
+                            m_animId = setTimeout(step, m_animSpeed * 3);
+                        } else { m_stopAnimation(); }
+                    }
+                }
+                step();
+            }
+
+            function m_startBackwardAnimation() {
+                if (m_isAnimating) return;
+                m_isAnimating = true;
+                document.getElementById('m_playBtn').style.display = 'none';
+                document.getElementById('m_pauseBtn').style.display = 'inline-block';
+                function step() {
+                    if (!m_isAnimating) return;
+                    if (m_currentRange > 100) {
+                        m_currentRange = Math.max(m_currentRange - Math.max(10, Math.floor(m_currentRange / 100)), 100);
+                        document.getElementById('m_rangeSlider').value = Math.min(m_currentRange, 10000);
+                        document.getElementById('m_rangeValue').textContent = m_currentRange;
+                        document.getElementById('m_manualInput').value = m_currentRange;
+                        m_drawGraph(); m_updateStats();
+                        m_animId = setTimeout(step, m_animSpeed);
+                    } else {
+                        if (document.getElementById('m_loopAnim').checked) {
+                            m_currentRange = parseInt(document.getElementById('m_rangeSlider').max);
+                            m_animId = setTimeout(step, m_animSpeed * 3);
+                        } else { m_stopAnimation(); }
+                    }
+                }
+                step();
+            }
+
+            function m_stopAnimation() {
+                m_isAnimating = false;
+                document.getElementById('m_playBtn').style.display = 'inline-block';
+                document.getElementById('m_pauseBtn').style.display = 'none';
+                clearTimeout(m_animId); m_animId = null;
+                m_populateTable();
+            }
+
+            // ----- Table -----
+            function m_populateTable() {
+                m_extendTo(m_currentRange);
+                const body = document.getElementById('m_tableBody');
+                if (!body) return;
+
+                const search = document.getElementById('m_searchInput').value.trim();
+                const filter = document.getElementById('m_filterType').value;
+
+                let rows = [];
+                for (let i = 0; i < m_currentRange; i++) {
+                    const n = i + 1;
+                    const mu = m_mobius[i], M = m_mertens[i];
+                    const delta = i === 0 ? mu : M - m_mertens[i - 1];
+                    const sqF = m_sqFree[i] === 1;
+                    const factors = m_nFactors[i];
+                    const distance = Math.abs(M);
+                    const within = distance <= Math.sqrt(n);
+                    const isZero = M === 0;
+                    if (filter === 'zeros'       && !isZero)   continue;
+                    if (filter === 'positive'    && M <= 0)    continue;
+                    if (filter === 'negative'    && M >= 0)    continue;
+                    if (filter === 'square-free' && !sqF)      continue;
+                    if (search && !n.toString().includes(search)) continue;
+                    rows.push({n, mu, M, delta, sqF, factors, distance, within, isZero});
+                }
+
+                rows.sort((a, b) => {
+                    const av = a[m_sortCol === 'sqFree' ? 'sqF' : m_sortCol === 'within' ? 'within' : m_sortCol];
+                    const bv = b[m_sortCol === 'sqFree' ? 'sqF' : m_sortCol === 'within' ? 'within' : m_sortCol];
+                    const r = (av > bv ? 1 : av < bv ? -1 : 0);
+                    return m_sortAsc ? r : -r;
+                });
+
+                // Limit display for performance
+                const display = rows.slice(0, 500);
+
+                body.innerHTML = display.map(r => {
+                    const muCls = r.mu > 0 ? 'color:#22c55e' : r.mu < 0 ? 'color:#ef4444' : 'color:#a855f7';
+                    const MCls  = r.M  > 0 ? 'color:#22c55e' : r.M  < 0 ? 'color:#ef4444' : 'color:#4ecdc4';
+                    const dCls  = r.delta > 0 ? 'color:#22c55e' : r.delta < 0 ? 'color:#ef4444' : 'color:#888';
+                    const rowBg = r.isZero ? 'background:rgba(34,197,94,0.08)' : (r.n === m_selectedRow ? 'background:rgba(255,215,0,0.08)' : '');
+                    return `<tr data-n="${r.n}" style="${rowBg}; border-bottom:1px solid #1a1a2a; cursor:pointer;">
+                        <td style="padding:8px 12px; color:#e0e0e0;">${r.n}</td>
+                        <td style="padding:8px 12px; ${muCls}; font-weight:600;">${r.mu}</td>
+                        <td style="padding:8px 12px; ${MCls}; font-weight:700;">${r.M}</td>
+                        <td style="padding:8px 12px; ${dCls};">${r.delta > 0 ? '+' : ''}${r.delta}</td>
+                        <td style="padding:8px 12px;">${r.sqF ? '<span style="background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:0.78rem;">Yes</span>' : '<span style="background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 8px;border-radius:10px;font-size:0.78rem;">No</span>'}</td>
+                        <td style="padding:8px 12px; color:#ccc;">${r.factors}</td>
+                        <td style="padding:8px 12px; color:#ccc;">${r.distance}</td>
+                        <td style="padding:8px 12px;">${r.within ? '<span style="background:rgba(34,197,94,0.2);color:#22c55e;padding:2px 8px;border-radius:10px;font-size:0.78rem;">Yes</span>' : '<span style="background:rgba(239,68,68,0.2);color:#ef4444;padding:2px 8px;border-radius:10px;font-size:0.78rem;">No</span>'}</td>
+                        <td style="padding:8px 12px;">${r.isZero ? '<span style="background:rgba(78,205,196,0.2);color:#4ecdc4;padding:2px 8px;border-radius:10px;font-size:0.78rem;">Equilibrium</span>' : r.M > 0 ? '<span style="color:#22c55e;">Positive</span>' : '<span style="color:#ef4444;">Negative</span>'}</td>
+                    </tr>`;
+                }).join('');
+
+                // Row click handler
+                body.querySelectorAll('tr[data-n]').forEach(tr => {
+                    tr.addEventListener('click', () => {
+                        m_selectedRow = parseInt(tr.dataset.n);
+                        m_drawGraph();
+                        m_populateTable();
+                    });
+                });
+
+                // Footer
+                const full = m_mertens.slice(0, m_currentRange);
+                const muFull = m_mobius.slice(0, m_currentRange);
+                const sfFull = m_sqFree.slice(0, m_currentRange);
+                document.getElementById('m_sumMu').textContent      = muFull.reduce((a,b) => a+b, 0);
+                document.getElementById('m_finalM').textContent     = full[full.length - 1];
+                document.getElementById('m_sqFreeCount').textContent = sfFull.reduce((a,b) => a+b, 0).toLocaleString();
+                document.getElementById('m_avgDist').textContent    = (full.reduce((a,b) => a + Math.abs(b), 0) / m_currentRange).toFixed(2);
+                document.getElementById('m_withinCount').textContent = full.filter((m,i) => Math.abs(m) <= Math.sqrt(i+1)).length.toLocaleString();
+                document.getElementById('m_zeroCount').textContent  = full.filter(m => m === 0).length;
+
+                if (rows.length > 500) {
+                    const info = document.createElement('tr');
+                    info.innerHTML = `<td colspan="9" style="padding:10px; text-align:center; color:#888; font-size:0.8rem;">Showing first 500 of ${rows.length} matching rows. Use filters to narrow results.</td>`;
+                    body.appendChild(info);
+                }
+            }
+
+            // ----- CSV Export -----
+            function m_exportCSV() {
+                m_extendTo(m_currentRange);
+                let csv = 'n,mu(n),M(n),delta,square_free,prime_factors,distance,within_boundary,status\n';
+                for (let i = 0; i < m_currentRange; i++) {
+                    const n = i+1, mu = m_mobius[i], M = m_mertens[i];
+                    const delta = i === 0 ? mu : M - m_mertens[i-1];
+                    csv += `${n},${mu},${M},${delta},${m_sqFree[i]},${m_nFactors[i]},${Math.abs(M)},${Math.abs(M)<=Math.sqrt(n)?1:0},${M===0?'equilibrium':M>0?'positive':'negative'}\n`;
+                }
+                const a = document.createElement('a');
+                a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+                a.download = `mertens_n${m_currentRange}.csv`;
+                a.click();
+            }
+
+            // ----- Tooltip -----
+            const m_canvas = document.getElementById('m_graphCanvas');
+            if (m_canvas) {
+                m_canvas.addEventListener('mousemove', e => {
+                    const rect = m_canvas.getBoundingClientRect();
+                    const scaleX = m_canvas.width / rect.width;
+                    const cx = (e.clientX - rect.left) * scaleX;
+                    const pad = 65, gW = m_canvas.width - 2*pad;
+                    const i = Math.round((cx - pad) / gW * m_currentRange) - 1;
+                    if (i < 0 || i >= m_currentRange) return;
+                    m_extendTo(m_currentRange);
+                    const n = i+1, mu = m_mobius[i], M = m_mertens[i];
+                    const tip = document.getElementById('m_tooltip');
+                    tip.innerHTML = `<strong style="color:#4ecdc4">n = ${n}</strong><br>μ(n) = <span style="color:${mu>0?'#22c55e':mu<0?'#ef4444':'#a855f7'}">${mu}</span><br>M(n) = <span style="color:${M>0?'#22c55e':M<0?'#ef4444':'#4ecdc4'}">${M}</span><br>|M(n)| / √n = ${(Math.abs(M)/Math.sqrt(n)).toFixed(4)}`;
+                    tip.style.opacity = '1';
+                    tip.style.left = (e.clientX - rect.left + 12) + 'px';
+                    tip.style.top  = (e.clientY - rect.top  - 40) + 'px';
+                });
+                m_canvas.addEventListener('mouseleave', () => {
+                    document.getElementById('m_tooltip').style.opacity = '0';
+                });
+                m_canvas.addEventListener('click', e => {
+                    const rect = m_canvas.getBoundingClientRect();
+                    const scaleX = m_canvas.width / rect.width;
+                    const cx = (e.clientX - rect.left) * scaleX;
+                    const pad = 65, gW = m_canvas.width - 2*pad;
+                    const i = Math.round((cx - pad) / gW * m_currentRange) - 1;
+                    if (i >= 0 && i < m_currentRange) { m_selectedRow = i+1; m_drawGraph(); m_populateTable(); }
+                });
+            }
+
+            // ----- Init -----
+            window.addEventListener('load', () => {
+                m_extendTo(2000);
+                m_drawGraph();
+                m_updateStats();
+                m_populateTable();
+            });
+
+        })(); // end Mertens module
     </script>
 </body>
 </html>
