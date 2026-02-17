@@ -1198,6 +1198,14 @@
                 padding: 12px;
             }
         }
+        /* Hardy-Littlewood Deep Dive styles */
+        .hl-preset-btn { padding:6px 12px; background:#1a1a2a; border:1px solid #3a3a5a; border-radius:4px; color:#e0e0e0; cursor:pointer; font-size:.8rem; transition:background .2s, border-color .2s; }
+        .hl-preset-btn:hover { background:#2a1a3a; border-color:#e879f9; color:#e879f9; }
+        .hl-step-block { background:#12121a; border-radius:6px; padding:14px 18px; margin-bottom:10px; border-left:3px solid #a855f7; }
+        .hl-step-num { color:#a855f7; font-size:.73rem; font-weight:700; text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+        .hl-step-math { font-family:'Times New Roman',serif; font-size:1.05rem; color:#ffd700; margin-bottom:4px; line-height:1.6; }
+        .hl-step-explain { color:#888; font-size:.82rem; line-height:1.6; }
+        .hl-result-box { background:linear-gradient(135deg,#1a1a2a,#2a1a2a); border:2px solid #e879f9; border-radius:8px; padding:18px; margin-top:16px; text-align:center; }
     </style>
 </head>
 <body>
@@ -1940,6 +1948,220 @@
             </div>
         </div>
         
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <!-- HARDY-LITTLEWOOD DEEP DIVE SECTION                                  -->
+        <!-- ═══════════════════════════════════════════════════════════════════ -->
+        <div class="chart-wrapper" id="hlDeepDiveWrapper" style="border: 2px solid #a855f7;">
+            <div class="chart-title" style="color: #a855f7; font-size: 1.5rem; border-bottom-color: #a855f7;">
+                Hardy-Littlewood Conjecture B: Step-by-Step Calculations for Every Gap Family
+            </div>
+            <div class="chart-description" style="border-left-color: #a855f7;">
+                Full derivation of the singular series S(h), the logarithmic integral li₂(x), and the predicted prime-pair count
+                for each gap family — with every arithmetic step shown and compared against your observed data.
+            </div>
+
+            <!-- PART 1: THE FORMULA -->
+            <div style="background:#0d0d1a;border:1px solid #a855f7;border-radius:10px;padding:28px;margin-bottom:24px;">
+                <h3 style="color:#a855f7;margin:0 0 20px 0;font-size:1.1rem;text-transform:uppercase;letter-spacing:.05em;">Part 1 — The Hardy-Littlewood Formula</h3>
+                <p style="color:#ccc;margin-bottom:16px;line-height:1.8;">Hardy &amp; Littlewood's Conjecture B (1923): for any even integer h ≥ 2, the count of primes p ≤ x where p+h is also prime satisfies:</p>
+                <div class="formula-box" style="font-size:1.4rem;margin:20px 0;">π<sub>h</sub>(x) &nbsp;~&nbsp; S(h) · li<sub>2</sub>(x)</div>
+                <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:20px;">
+                    <div style="background:rgba(168,85,247,.08);border-left:3px solid #a855f7;padding:16px;border-radius:6px;">
+                        <div style="color:#a855f7;font-weight:700;margin-bottom:10px;">S(h) — The Singular Series</div>
+                        <div style="color:#e0e0e0;font-family:'Times New Roman',serif;font-size:1.1rem;line-height:2.2;">S(h) = 2C<sub>2</sub> · ∏<sub>p | h, p odd prime</sub> (p−1)/(p−2)</div>
+                        <div style="color:#888;font-size:.85rem;margin-top:8px;">Encodes how divisibility of h by small primes opens extra residue classes, making some gaps more probable than others.</div>
+                    </div>
+                    <div style="background:rgba(78,205,196,.08);border-left:3px solid #4ecdc4;padding:16px;border-radius:6px;">
+                        <div style="color:#4ecdc4;font-weight:700;margin-bottom:10px;">li<sub>2</sub>(x) — The Logarithmic Integral</div>
+                        <div style="color:#e0e0e0;font-family:'Times New Roman',serif;font-size:1.1rem;line-height:2.2;">li<sub>2</sub>(x) = ∫<sub>2</sub><sup>x</sup> dt / ln²(t)</div>
+                        <div style="color:#888;font-size:.85rem;margin-top:8px;">The density baseline — how many prime pairs would exist if distributed purely by logarithm. S(h) scales this per gap.</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PART 2: C2 CONSTANT -->
+            <div style="background:#0d0d1a;border:1px solid #ffd700;border-radius:10px;padding:28px;margin-bottom:24px;">
+                <h3 style="color:#ffd700;margin:0 0 20px 0;font-size:1.1rem;text-transform:uppercase;letter-spacing:.05em;">Part 2 — Where Does C₂ = 0.6601618… Come From?</h3>
+                <p style="color:#ccc;margin-bottom:16px;line-height:1.8;">C₂ is the <strong style="color:#ffd700">twin prime constant</strong> — an infinite Euler product over all primes p ≥ 3, measuring how residue-class constraints reduce the density of twin primes relative to a random model:</p>
+                <div class="formula-box">C<sub>2</sub> = ∏<sub>p ≥ 3</sub> p(p−2) / (p−1)²</div>
+                <p style="color:#ccc;margin:0 0 16px 0;line-height:1.7;font-size:.9rem;">Each factor p(p−2)/(p−1)² &lt; 1 accounts for the fact that for a prime p, there is one forbidden residue class mod p for each element of a twin-prime pair. The infinite product converges slowly to ≈ 0.66016. Below: partial products through the first 20 primes.</p>
+                <div style="background:#12121a;border-radius:8px;padding:20px;overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-family:monospace;font-size:.83rem;min-width:600px;">
+                        <thead><tr style="background:#1a1a2a;">
+                            <th style="padding:8px 12px;text-align:left;color:#ffd700;border-bottom:1px solid #2a2a4a;">Prime p</th>
+                            <th style="padding:8px 12px;text-align:left;color:#ffd700;border-bottom:1px solid #2a2a4a;">p(p−2)/(p−1)²</th>
+                            <th style="padding:8px 12px;text-align:left;color:#ffd700;border-bottom:1px solid #2a2a4a;">Factor value</th>
+                            <th style="padding:8px 12px;text-align:left;color:#ffd700;border-bottom:1px solid #2a2a4a;">Running C₂ product</th>
+                            <th style="padding:8px 12px;text-align:left;color:#ffd700;border-bottom:1px solid #2a2a4a;">% of final C₂</th>
+                        </tr></thead>
+                        <tbody id="hl_c2_table_body"></tbody>
+                    </table>
+                </div>
+                <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:16px;">
+                    <div style="background:rgba(255,215,0,.07);border:1px solid #ffd700;border-radius:6px;padding:14px;text-align:center;">
+                        <div style="color:#888;font-size:.78rem;margin-bottom:4px;">C₂ (full precision)</div>
+                        <div style="color:#ffd700;font-family:monospace;font-size:.9rem;">0.6601618158468695…</div>
+                    </div>
+                    <div style="background:rgba(255,215,0,.07);border:1px solid #ffd700;border-radius:6px;padding:14px;text-align:center;">
+                        <div style="color:#888;font-size:.78rem;margin-bottom:4px;">2·C₂ = S(2) = S(4) = S(8)</div>
+                        <div style="color:#ffd700;font-family:monospace;font-size:.9rem;">1.3203236316937390…</div>
+                    </div>
+                    <div style="background:rgba(255,215,0,.07);border:1px solid #ffd700;border-radius:6px;padding:14px;text-align:center;">
+                        <div style="color:#888;font-size:.78rem;margin-bottom:4px;">4·C₂ = S(6) = S(12) = S(18)</div>
+                        <div style="color:#ffd700;font-family:monospace;font-size:.9rem;">2.6406472633874780…</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- PART 3: SINGULAR SERIES TABLE -->
+            <div style="background:#0d0d1a;border:1px solid #22c55e;border-radius:10px;padding:28px;margin-bottom:24px;">
+                <h3 style="color:#22c55e;margin:0 0 20px 0;font-size:1.1rem;text-transform:uppercase;letter-spacing:.05em;">Part 3 — Singular Series S(h) for the First 30 Even Gaps: Full Derivation</h3>
+                <p style="color:#ccc;margin-bottom:16px;line-height:1.8;">For each gap h, we compute S(h) = 2C₂ · ∏<sub>(odd prime p | h)</sub> (p−1)/(p−2). The table below shows the factorisation of h, which odd primes divide it, each correction factor, and the final S(h). <strong style="color:#22c55e;">Only odd prime factors count</strong> — p=2 always divides even h but contributes no correction because 2 is already handled in the baseline C₂ Euler product.</p>
+                <div style="background:#12121a;border-radius:8px;padding:20px;overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:.82rem;min-width:900px;">
+                        <thead><tr style="background:#1a1a2a;">
+                            <th style="padding:8px 10px;text-align:left;color:#22c55e;border-bottom:1px solid #2a2a4a;">Gap h</th>
+                            <th style="padding:8px 10px;text-align:left;color:#22c55e;border-bottom:1px solid #2a2a4a;">h = 2^a × odd</th>
+                            <th style="padding:8px 10px;text-align:left;color:#22c55e;border-bottom:1px solid #2a2a4a;">Odd prime factors</th>
+                            <th style="padding:8px 10px;text-align:left;color:#22c55e;border-bottom:1px solid #2a2a4a;">Correction factors (p−1)/(p−2)</th>
+                            <th style="padding:8px 10px;text-align:left;color:#22c55e;border-bottom:1px solid #2a2a4a;">Product</th>
+                            <th style="padding:8px 10px;text-align:left;color:#22c55e;border-bottom:1px solid #2a2a4a;">S(h) = 2C₂ × product</th>
+                            <th style="padding:8px 10px;text-align:left;color:#22c55e;border-bottom:1px solid #2a2a4a;">S(h)/S(2)</th>
+                            <th style="padding:8px 10px;text-align:left;color:#22c55e;border-bottom:1px solid #2a2a4a;">Name</th>
+                        </tr></thead>
+                        <tbody id="hl_singular_table_body"></tbody>
+                    </table>
+                </div>
+                <div style="background:rgba(34,197,94,.07);border-left:4px solid #22c55e;padding:16px;border-radius:6px;margin-top:16px;">
+                    <div style="color:#22c55e;font-weight:700;margin-bottom:8px;">The key insight: why gap 6 is twice as common as gap 2</div>
+                    <div style="color:#ccc;font-size:.88rem;line-height:1.8;">
+                        Gap 2: h=2, no odd prime factors → correction product = 1 → S(2) = 2C₂ ≈ 1.3203<br>
+                        Gap 4: h=4=2², no odd prime factors → S(4) = 2C₂ <em>identical to gap 2</em><br>
+                        Gap 6: h=6=2×3, odd factor p=3 → correction = (3−1)/(3−2) = 2/1 = <strong style="color:#ffd700">2</strong> → S(6) = 2 × 2C₂ = 4C₂ ≈ 2.6406<br><br>
+                        Because 3 | 6, the pair {p, p+6} satisfies p ≡ p+6 (mod 3), so <em>neither element is forced to be divisible by 3</em>.
+                        This doubles admissible residue pairs. At 400M your data shows gap6/gap2 = 1.767 — converging toward the limit of 2.0.
+                    </div>
+                </div>
+            </div>
+
+            <!-- PART 4: li2 EXPANSION -->
+            <div style="background:#0d0d1a;border:1px solid #4ecdc4;border-radius:10px;padding:28px;margin-bottom:24px;">
+                <h3 style="color:#4ecdc4;margin:0 0 20px 0;font-size:1.1rem;text-transform:uppercase;letter-spacing:.05em;">Part 4 — The li₂(x) Expansion: Every Correction Term Analysed</h3>
+                <p style="color:#ccc;margin-bottom:16px;line-height:1.8;">The integral li₂(x)=∫dt/ln²(t) has an asymptotic expansion. Each correction term below reduces prediction error. Change x to see how the terms' magnitudes shift with your analysis range.</p>
+                <div class="formula-box" style="font-size:1.05rem;">li₂(x) = (x/ln²x) · [ 1 + 2/ln x + 6/ln²x + 24/ln³x + 120/ln⁴x + … ]&nbsp;&nbsp;&nbsp;(coefficients = k!)</div>
+                <div style="background:#12121a;border-radius:8px;padding:14px;margin:16px 0;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                    <label style="color:#4ecdc4;font-size:.9rem;">Compute at x =</label>
+                    <input type="number" id="hl_li2_x_input" value="400000000" min="1000" max="10000000000" step="1000000"
+                           oninput="hl_updateLi2Table()"
+                           style="padding:8px 12px;background:#1a1a2a;border:1px solid #3a3a5a;border-radius:4px;color:#e0e0e0;font-size:.9rem;width:180px;">
+                    <div id="hl_li2_lnx_display" style="color:#888;font-size:.82rem;"></div>
+                </div>
+                <div style="background:#12121a;border-radius:8px;padding:20px;overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-family:monospace;font-size:.82rem;min-width:750px;">
+                        <thead><tr style="background:#1a1a2a;">
+                            <th style="padding:8px 12px;text-align:left;color:#4ecdc4;border-bottom:1px solid #2a2a4a;">Terms used</th>
+                            <th style="padding:8px 12px;text-align:left;color:#4ecdc4;border-bottom:1px solid #2a2a4a;">Formula</th>
+                            <th style="padding:8px 12px;text-align:left;color:#4ecdc4;border-bottom:1px solid #2a2a4a;">li₂(x) value</th>
+                            <th style="padding:8px 12px;text-align:left;color:#4ecdc4;border-bottom:1px solid #2a2a4a;">2C₂·li₂ prediction</th>
+                            <th style="padding:8px 12px;text-align:left;color:#4ecdc4;border-bottom:1px solid #2a2a4a;">Gain from prev term</th>
+                            <th style="padding:8px 12px;text-align:left;color:#4ecdc4;border-bottom:1px solid #2a2a4a;">Error vs obs twins*</th>
+                        </tr></thead>
+                        <tbody id="hl_li2_table_body"></tbody>
+                    </table>
+                    <div style="color:#555;font-size:.75rem;margin-top:8px;">*Observed twin count auto-populated from your last analysis run; otherwise uses 1,507,733 (400M baseline)</div>
+                </div>
+                <div style="background:rgba(78,205,196,.07);border-left:4px solid #4ecdc4;padding:14px;border-radius:6px;margin-top:16px;">
+                    <div style="color:#4ecdc4;font-weight:700;margin-bottom:6px;">Why the corrections are large at practical ranges</div>
+                    <div style="color:#ccc;font-size:.85rem;line-height:1.7;">At x=400M, ln(x) ≈ 19.8, so the first correction 2/ln(x) ≈ 10.1% — far from negligible. The corrections form a divergent asymptotic series (coefficients grow as k!), so accuracy peaks around the 4th–5th term for x in the billions, then worsens. The 4-term formula gives &lt;0.1% error at 400M.</div>
+                </div>
+            </div>
+
+            <!-- PART 5: PER-GAP FULL TABLE (live from analysis) -->
+            <div style="background:#0d0d1a;border:1px solid #f59e0b;border-radius:10px;padding:28px;margin-bottom:24px;">
+                <h3 style="color:#f59e0b;margin:0 0 20px 0;font-size:1.1rem;text-transform:uppercase;letter-spacing:.05em;">Part 5 — Full Gap-by-Gap H-L Prediction vs Your Observed Data</h3>
+                <p style="color:#ccc;margin-bottom:16px;line-height:1.8;">Every gap family in your analysis: S(h) derived step-by-step, li₂ prediction computed, compared against your observed count. The obs/pred ratio converges to 1.0 as x→∞.</p>
+                <div style="background:#12121a;border-radius:8px;padding:14px;margin-bottom:16px;display:flex;align-items:center;gap:14px;flex-wrap:wrap;">
+                    <div style="color:#f59e0b;font-size:.9rem;">Analysis range:</div>
+                    <div id="hl_range_display" style="color:#ffd700;font-family:monospace;font-size:.95rem;font-weight:700;">Run analysis above first</div>
+                </div>
+                <div style="background:#12121a;border-radius:8px;padding:20px;overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:.8rem;min-width:1050px;">
+                        <thead><tr style="background:#1a1a2a;">
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">Gap h</th>
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">Name</th>
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">Odd prime factors of h</th>
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">S(h)</th>
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">S(h)/S(2)</th>
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">Predicted</th>
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">Observed</th>
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">Obs/Pred</th>
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">Error %</th>
+                            <th style="padding:8px 10px;text-align:left;color:#f59e0b;border-bottom:1px solid #2a2a4a;">Convergence</th>
+                        </tr></thead>
+                        <tbody id="hl_full_table_body">
+                            <tr><td colspan="10" style="padding:20px;text-align:center;color:#888;font-style:italic;">Run the prime analysis above to populate this table</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- PART 6: INTERACTIVE WALKTHROUGH -->
+            <div style="background:#0d0d1a;border:1px solid #e879f9;border-radius:10px;padding:28px;margin-bottom:24px;">
+                <h3 style="color:#e879f9;margin:0 0 20px 0;font-size:1.1rem;text-transform:uppercase;letter-spacing:.05em;">Part 6 — Interactive: Full Arithmetic Walkthrough for Any Gap</h3>
+                <p style="color:#ccc;margin-bottom:20px;line-height:1.8;">Select any gap to see every single arithmetic step: prime factorisation of h, identifying correction primes, computing each (p−1)/(p−2) factor, building S(h), expanding li₂(x) term by term, and arriving at the final prediction.</p>
+                <div style="display:flex;gap:12px;flex-wrap:wrap;margin-bottom:20px;align-items:flex-end;">
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <label style="color:#e879f9;font-size:.85rem;">Gap h</label>
+                        <input type="number" id="hl_gap_input" value="6" min="2" max="500" step="2"
+                               style="padding:8px 12px;background:#1a1a2a;border:1px solid #3a3a5a;border-radius:4px;color:#e0e0e0;font-size:.9rem;width:100px;">
+                    </div>
+                    <div style="display:flex;flex-direction:column;gap:6px;">
+                        <label style="color:#e879f9;font-size:.85rem;">At x =</label>
+                        <input type="number" id="hl_x_input" value="400000000" min="1000" max="10000000000" step="1000000"
+                               style="padding:8px 12px;background:#1a1a2a;border:1px solid #3a3a5a;border-radius:4px;color:#e0e0e0;font-size:.9rem;width:180px;">
+                    </div>
+                    <button onclick="hl_computeWalkthrough()"
+                            style="padding:10px 24px;background:linear-gradient(135deg,#e879f9,#a855f7);border:none;border-radius:6px;color:#fff;font-weight:700;cursor:pointer;font-size:.95rem;">
+                        Compute Step by Step
+                    </button>
+                    <div style="display:flex;gap:8px;flex-wrap:wrap;">
+                        <button onclick="hl_setGap(2)"  class="hl-preset-btn">Gap 2 (twins)</button>
+                        <button onclick="hl_setGap(4)"  class="hl-preset-btn">Gap 4 (cousins)</button>
+                        <button onclick="hl_setGap(6)"  class="hl-preset-btn">Gap 6 (sexy)</button>
+                        <button onclick="hl_setGap(10)" class="hl-preset-btn">Gap 10</button>
+                        <button onclick="hl_setGap(12)" class="hl-preset-btn">Gap 12</button>
+                        <button onclick="hl_setGap(30)" class="hl-preset-btn">Gap 30</button>
+                        <button onclick="hl_setGap(210)" class="hl-preset-btn">Gap 210 (2×3×5×7)</button>
+                    </div>
+                </div>
+                <div id="hl_walkthrough_output" style="background:#0a0a10;border-radius:8px;padding:24px;border:1px solid #2a2a4a;min-height:80px;">
+                    <div style="color:#666;font-style:italic;">Click "Compute Step by Step" to see the full arithmetic</div>
+                </div>
+            </div>
+
+            <!-- PART 7: RATIO CONVERGENCE TABLE -->
+            <div style="background:#0d0d1a;border:1px solid #64748b;border-radius:10px;padding:28px;">
+                <h3 style="color:#94a3b8;margin:0 0 20px 0;font-size:1.1rem;text-transform:uppercase;letter-spacing:.05em;">Part 7 — Convergence of Count Ratios to Theoretical Limits</h3>
+                <p style="color:#ccc;margin-bottom:16px;line-height:1.8;">As x→∞, Count(gap=a)/Count(gap=b) → S(a)/S(b). This table shows current ratios from your data vs the theoretical limits, with a convergence bar showing how close you are.</p>
+                <div style="background:#12121a;border-radius:8px;padding:20px;overflow-x:auto;">
+                    <table style="width:100%;border-collapse:collapse;font-size:.83rem;min-width:750px;">
+                        <thead><tr style="background:#1a1a2a;">
+                            <th style="padding:8px 12px;text-align:left;color:#94a3b8;border-bottom:1px solid #2a2a4a;">Ratio</th>
+                            <th style="padding:8px 12px;text-align:left;color:#94a3b8;border-bottom:1px solid #2a2a4a;">Why this limit</th>
+                            <th style="padding:8px 12px;text-align:left;color:#94a3b8;border-bottom:1px solid #2a2a4a;">Theoretical limit</th>
+                            <th style="padding:8px 12px;text-align:left;color:#94a3b8;border-bottom:1px solid #2a2a4a;">Current value</th>
+                            <th style="padding:8px 12px;text-align:left;color:#94a3b8;border-bottom:1px solid #2a2a4a;">% of limit reached</th>
+                            <th style="padding:8px 12px;text-align:left;color:#94a3b8;border-bottom:1px solid #2a2a4a;">Visual</th>
+                        </tr></thead>
+                        <tbody id="hl_ratio_table_body">
+                            <tr><td colspan="6" style="padding:20px;text-align:center;color:#888;font-style:italic;">Run analysis above to populate</td></tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <!-- ── end hl deep dive section ── -->
+
         <div class="chart-wrapper" id="customGapCompareWrapper">
             <div class="chart-title">Custom Gap Family Comparison</div>
             <div class="chart-description">
@@ -10120,6 +10342,446 @@
             });
 
         })(); // end Mertens module
+        // ============================================================
+        // HARDY-LITTLEWOOD DEEP DIVE MODULE
+        // ============================================================
+        (function() {
+            const C2 = 0.6601618158468695;
+
+            // ── helpers ──────────────────────────────────────────────
+            function isPrime(n) {
+                if (n < 2) return false;
+                if (n === 2) return true;
+                if (n % 2 === 0) return false;
+                for (let d = 3; d * d <= n; d += 2) if (n % d === 0) return false;
+                return true;
+            }
+
+            function oddPrimeFactors(h) {
+                // unique odd prime factors of h
+                const factors = [];
+                let n = h;
+                while (n % 2 === 0) n /= 2;
+                for (let p = 3; p * p <= n; p += 2) {
+                    if (n % p === 0) { factors.push(p); while (n % p === 0) n /= p; }
+                }
+                if (n > 1) factors.push(n);
+                return factors;
+            }
+
+            function singularSeries(h) {
+                const opf = oddPrimeFactors(h);
+                let mult = 1;
+                opf.forEach(p => mult *= (p - 1) / (p - 2));
+                return 2 * C2 * mult;
+            }
+
+            function li2(x, terms = 4) {
+                const L = Math.log(x);
+                let sum = 1;
+                let coeff = 1;
+                for (let k = 1; k < terms; k++) {
+                    coeff *= k;
+                    sum += coeff / Math.pow(L, k);
+                }
+                return (x / (L * L)) * sum;
+            }
+
+            function gapName(h) {
+                const names = { 2:'Twin', 4:'Cousin', 6:'Sexy', 8:'', 10:'', 12:'', 14:'',
+                    18:'', 20:'', 24:'', 30:'', 42:'', 60:'', 70:'', 78:'', 102:'', 210:'' };
+                return names[h] || '';
+            }
+
+            function factorString(h) {
+                // return "2^a × p × q…" nicely
+                let n = h, pow2 = 0;
+                while (n % 2 === 0) { pow2++; n /= 2; }
+                let s = pow2 > 1 ? `2^${pow2}` : pow2 === 1 ? '2' : '';
+                const opf = oddPrimeFactors(h);
+                if (opf.length) s += (s ? '×' : '') + opf.join('×');
+                return s || String(h);
+            }
+
+            // ── Part 2: C2 partial products table ────────────────────
+            function buildC2Table() {
+                const tbody = document.getElementById('hl_c2_table_body');
+                if (!tbody) return;
+                const primes = [3,5,7,11,13,17,19,23,29,31,37,41,43,47,53,59,61,67,71,73];
+                let running = 1;
+                const C2_TARGET = 0.6601618158468695;
+                let rows = '';
+                primes.forEach(p => {
+                    const factor = p * (p - 2) / ((p - 1) * (p - 1));
+                    running *= factor;
+                    const pctOfFinal = (running / C2_TARGET * 100).toFixed(3);
+                    const factorColor = factor < 0.97 ? '#ef4444' : '#f59e0b';
+                    rows += `<tr style="border-bottom:1px solid #1a1a2a;">
+                        <td style="padding:6px 12px;color:#e0e0e0;">${p}</td>
+                        <td style="padding:6px 12px;color:#ccc;">${p}×${p-2}/${(p-1)}² = ${p*(p-2)}/${(p-1)*(p-1)}</td>
+                        <td style="padding:6px 12px;color:${factorColor};">${factor.toFixed(8)}</td>
+                        <td style="padding:6px 12px;color:#ffd700;">${running.toFixed(10)}</td>
+                        <td style="padding:6px 12px;">
+                            <div style="display:flex;align-items:center;gap:8px;">
+                                <div style="background:#1a1a2a;border-radius:3px;width:80px;height:8px;overflow:hidden;">
+                                    <div style="background:#ffd700;height:100%;width:${Math.min(parseFloat(pctOfFinal),100)}%;"></div>
+                                </div>
+                                <span style="color:#888;">${pctOfFinal}%</span>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+                rows += `<tr style="background:#1a1a2a;font-weight:700;">
+                    <td colspan="3" style="padding:8px 12px;color:#4ecdc4;">Limit (infinite product)</td>
+                    <td style="padding:8px 12px;color:#ffd700;">0.6601618158468695…</td>
+                    <td style="padding:8px 12px;color:#22c55e;">100.000%</td>
+                </tr>`;
+                tbody.innerHTML = rows;
+            }
+
+            // ── Part 3: Singular series table ─────────────────────────
+            function buildSingularTable() {
+                const tbody = document.getElementById('hl_singular_table_body');
+                if (!tbody) return;
+                const gaps = [2,4,6,8,10,12,14,16,18,20,22,24,26,28,30,36,42,48,60,66,70,78,90,102,110,120,150,180,210,330];
+                const S2 = 2 * C2;
+                let rows = '';
+                gaps.forEach((h, idx) => {
+                    const opf = oddPrimeFactors(h);
+                    const factors = opf.map(p => `(${p-1})/(${p-2})=${((p-1)/(p-2)).toFixed(4)}`);
+                    const product = opf.reduce((a, p) => a * (p-1)/(p-2), 1);
+                    const Sh = 2 * C2 * product;
+                    const ratio = Sh / S2;
+                    const rowBg = idx % 2 === 0 ? '' : 'background:rgba(255,255,255,.02)';
+                    const ratioColor = ratio > 1.5 ? '#22c55e' : ratio > 1.1 ? '#f59e0b' : '#4ecdc4';
+                    rows += `<tr style="border-bottom:1px solid #1a1a2a;${rowBg}">
+                        <td style="padding:6px 10px;color:#ffd700;font-weight:700;">${h}</td>
+                        <td style="padding:6px 10px;color:#ccc;font-family:monospace;font-size:.8rem;">${factorString(h)}</td>
+                        <td style="padding:6px 10px;color:#a855f7;">${opf.length ? opf.join(', ') : '(none)'}</td>
+                        <td style="padding:6px 10px;color:#ccc;font-size:.8rem;">${factors.length ? factors.join(' × ') : '—'}</td>
+                        <td style="padding:6px 10px;color:#f59e0b;font-family:monospace;">${product.toFixed(6)}</td>
+                        <td style="padding:6px 10px;color:#22c55e;font-family:monospace;font-weight:700;">${Sh.toFixed(8)}</td>
+                        <td style="padding:6px 10px;color:${ratioColor};font-weight:700;">${ratio.toFixed(4)}×</td>
+                        <td style="padding:6px 10px;color:#888;font-size:.8rem;">${gapName(h)}</td>
+                    </tr>`;
+                });
+                tbody.innerHTML = rows;
+            }
+
+            // ── Part 4: li2 expansion table ────────────────────────────
+            window.hl_updateLi2Table = function() {
+                const tbody = document.getElementById('hl_li2_table_body');
+                if (!tbody) return;
+                const xEl = document.getElementById('hl_li2_x_input');
+                const x = xEl ? parseFloat(xEl.value) || 400000000 : 400000000;
+                const L = Math.log(x);
+                const lnDisp = document.getElementById('hl_li2_lnx_display');
+                if (lnDisp) lnDisp.textContent = `ln(x) = ${L.toFixed(6)}   x/ln²(x) = ${(x/(L*L)).toLocaleString('en', {maximumFractionDigits:0})}`;
+
+                // observed twins: use analysis results if available
+                const obsTwins = (typeof analysisResults !== 'undefined' && analysisResults && analysisResults.gapProducts && analysisResults.gapProducts[2])
+                    ? analysisResults.gapProducts[2].count : 1507733;
+
+                const termLabels = [
+                    '1 term (crude)',
+                    '2 terms (+ 2/lnx)',
+                    '3 terms (+ 6/ln²x)',
+                    '4 terms (+ 24/ln³x)',
+                    '5 terms (+ 120/ln⁴x)',
+                    '6 terms (+ 720/ln⁵x)'
+                ];
+                const termFormulas = [
+                    'x/ln²(x)',
+                    'x/ln²(x)·(1+2/L)',
+                    'x/ln²(x)·(1+2/L+6/L²)',
+                    'x/ln²(x)·(1+2/L+6/L²+24/L³)',
+                    'x/ln²(x)·(1+…+120/L⁴)',
+                    'x/ln²(x)·(1+…+720/L⁵)'
+                ];
+                const coeffs = [1, 2, 6, 24, 120, 720];
+                let prevErr = null;
+                let rows = '';
+
+                for (let t = 1; t <= 6; t++) {
+                    let sum = 1;
+                    for (let k = 1; k < t; k++) sum += coeffs[k] / Math.pow(L, k);
+                    const li2val = (x / (L * L)) * sum;
+                    const pred = 2 * C2 * li2val;
+                    const err = Math.abs(obsTwins - pred) / obsTwins * 100;
+                    const improvement = prevErr !== null ? (prevErr - err).toFixed(3) + '%' : '—';
+                    const errColor = err < 1 ? '#22c55e' : err < 5 ? '#f59e0b' : '#ef4444';
+                    const isActive = t === 4 ? 'background:#1e1e30;' : '';
+                    rows += `<tr style="border-bottom:1px solid #1a1a2a;${isActive}">
+                        <td style="padding:7px 12px;color:${t===4?'#4ecdc4':'#ccc'};">${termLabels[t-1]}${t===4?' ✓':''}</td>
+                        <td style="padding:7px 12px;color:#888;font-size:.78rem;">${termFormulas[t-1]}</td>
+                        <td style="padding:7px 12px;color:#e0e0e0;font-family:monospace;">${Math.round(li2val).toLocaleString()}</td>
+                        <td style="padding:7px 12px;color:#ffd700;font-family:monospace;">${Math.round(pred).toLocaleString()}</td>
+                        <td style="padding:7px 12px;color:#22c55e;font-size:.82rem;">${improvement}</td>
+                        <td style="padding:7px 12px;color:${errColor};font-weight:600;">${err.toFixed(4)}%</td>
+                    </tr>`;
+                    prevErr = err;
+                }
+                tbody.innerHTML = rows;
+            };
+
+            // ── Part 5: Full gap-by-gap table (live from analysis) ─────
+            window.hl_populateFullTable = function() {
+                const tbody = document.getElementById('hl_full_table_body');
+                const rangeDisp = document.getElementById('hl_range_display');
+                if (!tbody) return;
+                if (typeof analysisResults === 'undefined' || !analysisResults || !analysisResults.gapProducts) {
+                    return; // leave placeholder
+                }
+                const x = analysisResults.maxPrime;
+                if (rangeDisp) rangeDisp.textContent = `N = ${x.toLocaleString()}  |  ${analysisResults.allPrimesFound.toLocaleString()} primes`;
+
+                const li2x = li2(x, 4);
+                const S2 = singularSeries(2);
+                const gaps = analysisResults.evenGaps || [];
+                let rows = '';
+                gaps.forEach((h, idx) => {
+                    const obs = analysisResults.gapProducts[h]?.count || 0;
+                    const opf = oddPrimeFactors(h);
+                    const Sh = singularSeries(h);
+                    const pred = Sh * li2x;
+                    const ratio = obs / pred;
+                    const err = Math.abs(obs - pred) / Math.max(obs, 1) * 100;
+                    const ratioColor = ratio > 0.99 && ratio < 1.01 ? '#22c55e' : ratio > 0.95 && ratio < 1.05 ? '#f59e0b' : '#ef4444';
+                    const errColor = err < 2 ? '#22c55e' : err < 10 ? '#f59e0b' : '#ef4444';
+                    const pctConv = Math.min(100, 100 - Math.abs(100 * (ratio - 1)));
+                    const rowBg = idx % 2 === 0 ? '' : 'background:rgba(255,255,255,.015)';
+                    rows += `<tr style="border-bottom:1px solid #1a1a2a;${rowBg}">
+                        <td style="padding:6px 10px;color:#ffd700;font-weight:700;">${h}</td>
+                        <td style="padding:6px 10px;color:#888;font-size:.78rem;">${gapName(h)}</td>
+                        <td style="padding:6px 10px;color:#a855f7;font-size:.78rem;">${opf.length ? opf.join(', ') : 'none'}</td>
+                        <td style="padding:6px 10px;color:#22c55e;font-family:monospace;">${Sh.toFixed(6)}</td>
+                        <td style="padding:6px 10px;color:#4ecdc4;font-family:monospace;">${(Sh/S2).toFixed(4)}×</td>
+                        <td style="padding:6px 10px;color:#ffd700;font-family:monospace;">${Math.round(pred).toLocaleString()}</td>
+                        <td style="padding:6px 10px;color:#e0e0e0;font-family:monospace;">${obs.toLocaleString()}</td>
+                        <td style="padding:6px 10px;color:${ratioColor};font-weight:700;">${ratio.toFixed(4)}</td>
+                        <td style="padding:6px 10px;color:${errColor};">${err.toFixed(2)}%</td>
+                        <td style="padding:6px 10px;">
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <div style="background:#1a1a2a;border-radius:3px;width:70px;height:6px;overflow:hidden;">
+                                    <div style="background:${ratioColor};height:100%;width:${Math.max(0,Math.min(100,pctConv))}%;transition:width .3s;"></div>
+                                </div>
+                                <span style="color:#888;font-size:.75rem;">${pctConv.toFixed(0)}%</span>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+                tbody.innerHTML = rows || '<tr><td colspan="10" style="padding:14px;color:#888;text-align:center;">No gap data found</td></tr>';
+
+                // Also update Part 7 ratios table
+                hl_populateRatioTable(x);
+                // Also refresh li2 table with current observed twins
+                hl_updateLi2Table();
+                // Sync x input
+                const xEl = document.getElementById('hl_x_input');
+                const li2El = document.getElementById('hl_li2_x_input');
+                if (xEl) xEl.value = x;
+                if (li2El) li2El.value = x;
+            };
+
+            // ── Part 7: ratio convergence table ────────────────────────
+            function hl_populateRatioTable(x) {
+                const tbody = document.getElementById('hl_ratio_table_body');
+                if (!tbody || typeof analysisResults === 'undefined' || !analysisResults) return;
+                const gp = analysisResults.gapProducts;
+
+                const ratioSpecs = [
+                    { label:'Count(2)/Count(4)', a:2, b:4,
+                      why:'S(2)=S(4)=2C₂ (neither 2 nor 4 has odd prime factors) — both gaps equally likely' },
+                    { label:'Count(6)/Count(2)', a:6, b:2,
+                      why:'S(6)=4C₂, S(2)=2C₂ → ratio=2. Factor of 2 from p=3 dividing 6.' },
+                    { label:'Count(6)/Count(4)', a:6, b:4,
+                      why:'Same as above: S(6)/S(4) = 4C₂/2C₂ = 2' },
+                    { label:'Count(12)/Count(6)', a:12, b:6,
+                      why:'S(12)=S(6)=4C₂ (12=4×3, same odd factor 3). Ratio → 1.' },
+                    { label:'Count(10)/Count(2)', a:10, b:2,
+                      why:'S(10)=8C₂/3 (factor 4/3 from p=5). Ratio → 4/3 ≈ 1.333.' },
+                    { label:'Count(30)/Count(6)', a:30, b:6,
+                      why:'S(30)=8C₂ (factors from p=3 and p=5). Ratio → S(30)/S(6) = 2.' },
+                ];
+
+                let rows = '';
+                ratioSpecs.forEach(spec => {
+                    const ca = gp[spec.a]?.count || 0;
+                    const cb = gp[spec.b]?.count || 0;
+                    if (!cb) return;
+                    const theoryLimit = singularSeries(spec.a) / singularSeries(spec.b);
+                    const current = ca / cb;
+                    const pctReached = Math.min(100, Math.max(0, 100 - Math.abs((current/theoryLimit - 1)*100)));
+                    const barColor = pctReached > 95 ? '#22c55e' : pctReached > 80 ? '#f59e0b' : '#ef4444';
+                    rows += `<tr style="border-bottom:1px solid #1a1a2a;">
+                        <td style="padding:8px 12px;color:#ffd700;font-family:monospace;">${spec.label}</td>
+                        <td style="padding:8px 12px;color:#888;font-size:.8rem;">${spec.why}</td>
+                        <td style="padding:8px 12px;color:#4ecdc4;font-family:monospace;font-weight:700;">${theoryLimit.toFixed(6)}</td>
+                        <td style="padding:8px 12px;color:#e0e0e0;font-family:monospace;">${current.toFixed(6)}</td>
+                        <td style="padding:8px 12px;color:${barColor};">${pctReached.toFixed(1)}%</td>
+                        <td style="padding:8px 12px;">
+                            <div style="display:flex;align-items:center;gap:6px;">
+                                <div style="background:#1a1a2a;border-radius:3px;width:90px;height:8px;overflow:hidden;">
+                                    <div style="background:${barColor};height:100%;width:${pctReached}%;"></div>
+                                </div>
+                            </div>
+                        </td>
+                    </tr>`;
+                });
+                tbody.innerHTML = rows || '<tr><td colspan="6" style="padding:14px;text-align:center;color:#888;">No data</td></tr>';
+            }
+
+            // ── Part 6: interactive walkthrough ───────────────────────
+            window.hl_setGap = function(h) {
+                const el = document.getElementById('hl_gap_input');
+                if (el) { el.value = h; hl_computeWalkthrough(); }
+            };
+
+            window.hl_computeWalkthrough = function() {
+                const h = parseInt(document.getElementById('hl_gap_input')?.value || 6);
+                const x = parseFloat(document.getElementById('hl_x_input')?.value || 400000000);
+                const out = document.getElementById('hl_walkthrough_output');
+                if (!out) return;
+
+                const L = Math.log(x);
+                const opf = oddPrimeFactors(h);
+                const S2 = 2 * C2;
+                const Sh = singularSeries(h);
+                const li2val = li2(x, 4);
+                const prediction = Sh * li2val;
+                const obs = (typeof analysisResults !== 'undefined' && analysisResults?.gapProducts?.[h])
+                    ? analysisResults.gapProducts[h].count : null;
+
+                let html = '';
+
+                // Step 1: factorise h
+                html += `<div class="hl-step-block">
+                    <div class="hl-step-num">Step 1 — Factorise h</div>
+                    <div class="hl-step-math">h = ${h} = ${factorString(h)}</div>
+                    <div class="hl-step-explain">We need the <strong>odd prime factors</strong> of h. Even prime factor p=2 is already absorbed into the baseline C₂ and contributes no extra correction. Odd prime factors: <strong>${opf.length ? opf.join(', ') : '(none — h is a power of 2)'}</strong></div>
+                </div>`;
+
+                // Step 2: correction factors
+                if (opf.length === 0) {
+                    html += `<div class="hl-step-block" style="border-left-color:#4ecdc4">
+                        <div class="hl-step-num">Step 2 — Correction Factors</div>
+                        <div class="hl-step-math">No odd prime factors → correction product = 1</div>
+                        <div class="hl-step-explain">Since h = ${factorString(h)} has no odd prime factors, there is no "extra opening" of residue classes. S(h) = S(2) — gap ${h} has identical asymptotic density to gap 2.</div>
+                    </div>`;
+                } else {
+                    let corrHtml = '';
+                    let product = 1;
+                    opf.forEach(p => {
+                        const factor = (p-1)/(p-2);
+                        product *= factor;
+                        corrHtml += `<div style="background:#0a0a10;border-radius:4px;padding:8px 12px;margin-bottom:6px;">
+                            <span style="color:#a855f7;font-weight:600;">p = ${p}:</span>
+                            <span style="color:#ffd700;font-family:'Times New Roman',serif;font-size:1rem;margin-left:8px;">(${p}−1)/(${p}−2) = ${p-1}/${p-2} = ${factor.toFixed(6)}</span>
+                            <span style="color:#888;font-size:.82rem;margin-left:12px;">
+                                Because ${p} | ${h}, the pair {p, p+${h}} has p ≡ p+${h} (mod ${p}), so neither is forced to be divisible by ${p}. This ${factor > 1.5 ? 'more than doubles' : factor > 1.1 ? 'significantly boosts' : 'boosts'} the density by factor ${factor.toFixed(4)}.
+                            </span>
+                        </div>`;
+                    });
+                    html += `<div class="hl-step-block">
+                        <div class="hl-step-num">Step 2 — Correction Factors for Each Odd Prime p | h</div>
+                        ${corrHtml}
+                        <div class="hl-step-math" style="margin-top:10px;">Product of all corrections = ${product.toFixed(8)}</div>
+                    </div>`;
+                }
+
+                // Step 3: compute S(h)
+                const product_opf = opf.reduce((a,p) => a*(p-1)/(p-2), 1);
+                html += `<div class="hl-step-block" style="border-left-color:#22c55e">
+                    <div class="hl-step-num">Step 3 — Compute S(h)</div>
+                    <div class="hl-step-math">S(${h}) = 2 × C₂ × ${product_opf.toFixed(6)}</div>
+                    <div class="hl-step-math">= 2 × 0.6601618… × ${product_opf.toFixed(6)}</div>
+                    <div class="hl-step-math">= <strong style="color:#22c55e">${Sh.toFixed(10)}</strong></div>
+                    <div class="hl-step-explain">Compared to S(2) = ${S2.toFixed(8)}: S(${h})/S(2) = <strong style="color:#ffd700">${(Sh/S2).toFixed(6)}×</strong>
+                    — gap ${h} is ${(Sh/S2).toFixed(4)} times as frequent as twin primes asymptotically.</div>
+                </div>`;
+
+                // Step 4: compute li2
+                const base = x / (L*L);
+                const coeffs = [1, 2, 6, 24, 120];
+                let termBreakdown = '';
+                let cumsum = 0;
+                coeffs.slice(0,4).forEach((c, k) => {
+                    const term = c / Math.pow(L, k);
+                    cumsum += term;
+                    termBreakdown += `<div style="color:#ccc;font-family:monospace;font-size:.82rem;margin-bottom:3px;">
+                        ${k===0?'':'  + '}${c}/ln${k===0?'':'^'+k}(x) = ${c}/${Math.pow(L,k).toFixed(4)} = <span style="color:#4ecdc4">${term.toFixed(6)}</span>  ${k>0?`(${(term*100).toFixed(2)}% correction)`:'(base term)'}
+                    </div>`;
+                });
+                html += `<div class="hl-step-block" style="border-left-color:#4ecdc4">
+                    <div class="hl-step-num">Step 4 — Compute li₂(x) with 4 Terms</div>
+                    <div class="hl-step-math">x = ${x.toLocaleString()},  ln(x) = ${L.toFixed(6)},  x/ln²(x) = ${Math.round(base).toLocaleString()}</div>
+                    <div style="margin:10px 0;">${termBreakdown}</div>
+                    <div class="hl-step-math">Sum of terms = ${cumsum.toFixed(8)}</div>
+                    <div class="hl-step-math">li₂(x) = ${Math.round(base).toLocaleString()} × ${cumsum.toFixed(8)} = <strong style="color:#4ecdc4">${Math.round(li2val).toLocaleString()}</strong></div>
+                </div>`;
+
+                // Step 5: final prediction
+                html += `<div class="hl-step-block" style="border-left-color:#f59e0b">
+                    <div class="hl-step-num">Step 5 — Final Prediction</div>
+                    <div class="hl-step-math">π<sub>${h}</sub>(${x.toLocaleString()}) ~ S(${h}) × li₂(x)</div>
+                    <div class="hl-step-math">= ${Sh.toFixed(8)} × ${Math.round(li2val).toLocaleString()}</div>
+                    <div class="hl-step-math">= <strong style="color:#f59e0b">${Math.round(prediction).toLocaleString()}</strong></div>
+                    <div class="hl-step-explain">Predicted prime pairs (p, p+${h}) up to ${x.toLocaleString()}: approximately <strong style="color:#ffd700">${Math.round(prediction).toLocaleString()}</strong></div>
+                </div>`;
+
+                // Step 6: vs observed (if available)
+                if (obs !== null) {
+                    const err = Math.abs(obs - prediction) / obs * 100;
+                    const errColor = err < 1 ? '#22c55e' : err < 5 ? '#f59e0b' : '#ef4444';
+                    html += `<div class="hl-result-box">
+                        <div style="color:#e879f9;font-weight:700;font-size:1rem;margin-bottom:12px;">Step 6 — Comparison with Your Data</div>
+                        <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;">
+                            <div><div style="color:#888;font-size:.78rem;">H-L Predicted</div><div style="color:#ffd700;font-size:1.3rem;font-weight:700;font-family:monospace;">${Math.round(prediction).toLocaleString()}</div></div>
+                            <div><div style="color:#888;font-size:.78rem;">Observed (your data)</div><div style="color:#e0e0e0;font-size:1.3rem;font-weight:700;font-family:monospace;">${obs.toLocaleString()}</div></div>
+                            <div><div style="color:#888;font-size:.78rem;">Relative Error</div><div style="color:${errColor};font-size:1.3rem;font-weight:700;font-family:monospace;">${err.toFixed(3)}%</div></div>
+                        </div>
+                        <div style="margin-top:12px;color:#888;font-size:.82rem;">
+                            Obs/Pred ratio = ${(obs/prediction).toFixed(6)} (converges to 1.0 as x→∞)
+                        </div>
+                    </div>`;
+                } else {
+                    html += `<div class="hl-result-box">
+                        <div style="color:#e879f9;font-weight:700;margin-bottom:8px;">Final Result for Gap ${h}</div>
+                        <div style="color:#ffd700;font-size:1.2rem;font-family:monospace;">${Math.round(prediction).toLocaleString()} predicted prime pairs (p, p+${h}) up to ${x.toLocaleString()}</div>
+                        <div style="color:#888;font-size:.82rem;margin-top:8px;">Run analysis above to compare against observed count</div>
+                    </div>`;
+                }
+
+                out.innerHTML = html;
+            };
+
+            // ── Init on load ───────────────────────────────────────────
+            window.addEventListener('load', () => {
+                buildC2Table();
+                buildSingularTable();
+                hl_updateLi2Table();
+                // Try to auto-populate if analysis already ran
+                if (typeof analysisResults !== 'undefined' && analysisResults) {
+                    hl_populateFullTable();
+                }
+            });
+
+            // Hook into the existing runAnalysis so tables auto-update after analysis
+            const _origRun = window.runAnalysis;
+            if (typeof _origRun === 'function') {
+                window.runAnalysis = function() {
+                    const result = _origRun.apply(this, arguments);
+                    // Delay to let analysis complete
+                    setTimeout(() => {
+                        if (typeof analysisResults !== 'undefined' && analysisResults) {
+                            hl_populateFullTable();
+                        }
+                    }, 2000);
+                    return result;
+                };
+            }
+
+        })(); // end HL module
     </script>
 </body>
 </html>
